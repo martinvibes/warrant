@@ -10,6 +10,8 @@ import { AgentProfile } from './components/AgentProfile';
 import { Docs } from './components/Docs';
 import { Ledger } from './components/Ledger';
 import { Resources } from './components/Resources';
+import { NumberSearch } from './components/NumberSearch';
+import { Upcoming } from './components/Upcoming';
 import { NotFound } from './components/NotFound';
 
 function App() {
@@ -39,10 +41,12 @@ function App() {
         <Nav />
         <Hero />
         <div className="reveal"><Resources /></div>
+        <div className="reveal"><NumberSearch /></div>
         <div className="reveal"><Terminal /></div>
         <div className="reveal"><Limits /></div>
         <div className="reveal"><HowItWorks /></div>
         <div className="reveal"><Settlement /></div>
+        <div className="reveal"><Upcoming /></div>
         <Footer />
       </>
     );

@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Nav } from './Nav';
 import { Footer } from './Footer';
 import {
   formatUsdc,
   getContracts,
   getPurchases,
+  getReceipt,
   getStats,
   shortHash,
   timeAgo,
   type Contracts,
   type Purchase,
+  type Receipt,
   type Stats,
 } from '../lib/api';
 
@@ -62,6 +64,94 @@ function Tile({ value, label }: { value: string | number; label: string }) {
   );
 }
 
+/**
+ * One receipt, opened in place.
+ *
+ * The digest and the signature are shown in full rather than shortened,
+ * because they are the parts somebody would actually copy out to check the
+ * thing. Everything needed to verify it is on screen: no key, no account.
+ */
+function ReceiptDetail({ id, issuer }: { id: string; issuer: string | null }) {
+  const [receipt, setReceipt] = useState<Receipt | null>(null);
+  const [error, setError] = useState<string>();
+
+  useEffect(() => {
+    getReceipt(id)
+      .then(r => setReceipt(r.receipt))
+      .catch(e => setError((e as Error).message));
+  }, [id]);
+
+  if (error) {
+    return (
+      <p style={{ padding: '16px 22px', fontSize: 13, color: 'var(--color-refused)' }}>
+        That receipt could not be read: {error}
+      </p>
+    );
+  }
+  if (!receipt) {
+    return (
+      <p style={{ padding: '16px 22px', fontSize: 13, color: 'var(--color-muted)' }}>Reading…</p>
+    );
+  }
+
+  const signedByIssuer = Boolean(
+    receipt.signature && issuer && receipt.issuer.toLowerCase() === issuer.toLowerCase(),
+  );
+
+  const Field = ({ label, value }: { label: string; value: string }) => (
+    <div style={{ display: 'grid', gap: 4 }}>
+      <span className="label" style={{ fontSize: 10, color: 'var(--color-muted)' }}>
+        {label}
+      </span>
+      <span
+        className="mono"
+        style={{ fontSize: 11.5, color: 'var(--color-dim)', wordBreak: 'break-all', lineHeight: 1.6 }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gap: 16,
+        padding: '18px 22px',
+        background: 'var(--color-bg)',
+        borderTop: '1px solid var(--color-faint)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <span
+          className="label"
+          style={{
+            padding: '3px 9px',
+            fontSize: 10,
+            color: signedByIssuer ? 'var(--color-settled)' : 'var(--color-muted)',
+            border: `1px solid ${signedByIssuer ? 'rgba(111,227,165,0.3)' : 'var(--color-faint)'}`,
+          }}
+        >
+          {signedByIssuer ? 'SIGNED BY THE ISSUER' : 'UNSIGNED'}
+        </span>
+        <span style={{ fontSize: 12.5, color: 'var(--color-muted)' }}>
+          {receipt.resource} · issued {receipt.issuedAt}
+        </span>
+      </div>
+
+      <Field label="Digest" value={receipt.digest} />
+      <Field label="Signature" value={receipt.signature || 'none'} />
+      <Field label="Issuer" value={receipt.issuer} />
+
+      <p style={{ fontSize: 12.5, lineHeight: 1.65, color: 'var(--color-muted)' }}>
+        The digest is a SHA-256 over version, id, agent, kind, resource, amount, asset, network,
+        settlement and issue time, joined by pipes. Recover the signer from it and you should get
+        the issuer above. Nothing here needs this service to be honest.
+      </p>
+    </div>
+  );
+}
+
 function ContractRow({ name, address, explorer }: { name: string; address: string | null; explorer: string | null }) {
   return (
     <div
@@ -100,6 +190,7 @@ export function Ledger() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [contracts, setContracts] = useState<Contracts | null>(null);
   const [kind, setKind] = useState<string>('all');
+  const [openReceipt, setOpenReceipt] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -187,7 +278,8 @@ export function Ledger() {
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 620 }}>
                 <tbody>
                   {rows.map(row => (
-                    <tr key={row.id} style={{ borderTop: '1px solid var(--color-line)' }}>
+                    <Fragment key={row.id}>
+                    <tr style={{ borderTop: '1px solid var(--color-line)' }}>
                       <td style={{ padding: '13px 22px', fontSize: 14 }}>{row.kind}</td>
                       <td className="mono" style={{ padding: '13px 12px', fontSize: 12.5 }}>
                         <a href={`/agent/${encodeURIComponent(row.agent)}`} style={{ color: 'var(--color-dim)' }}>
@@ -214,6 +306,27 @@ export function Ledger() {
                           'no transaction'
                         )}
                       </td>
+                      <td className="mono" style={{ padding: '13px 12px', fontSize: 12.5 }}>
+                        {row.receipt ? (
+                          <button
+                            onClick={() => setOpenReceipt(openReceipt === row.receipt ? null : row.receipt)}
+                            className="mono"
+                            style={{
+                              padding: 0,
+                              fontSize: 12.5,
+                              cursor: 'pointer',
+                              background: 'none',
+                              border: 'none',
+                              borderBottom: '1px dotted var(--color-line)',
+                              color: openReceipt === row.receipt ? 'var(--color-accent-light)' : 'var(--color-dim)',
+                            }}
+                          >
+                            receipt
+                          </button>
+                        ) : (
+                          <span style={{ color: 'var(--color-muted)' }}>—</span>
+                        )}
+                      </td>
                       <td
                         style={{
                           padding: '13px 22px',
@@ -226,6 +339,14 @@ export function Ledger() {
                         {timeAgo(row.at)}
                       </td>
                     </tr>
+                    {openReceipt && openReceipt === row.receipt && (
+                      <tr>
+                        <td colSpan={6} style={{ padding: 0 }}>
+                          <ReceiptDetail id={openReceipt} issuer={contracts?.receiptIssuer ?? null} />
+                        </td>
+                      </tr>
+                    )}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
@@ -237,6 +358,15 @@ export function Ledger() {
           <ContractRow name="AgentIdentity" address={contracts?.identity.address ?? null} explorer={contracts?.identity.explorer ?? null} />
           <ContractRow name="ResourceMarket" address={contracts?.market.address ?? null} explorer={contracts?.market.explorer ?? null} />
           <ContractRow name="AgentTreasury" address={contracts?.treasury.address ?? null} explorer={contracts?.treasury.explorer ?? null} />
+          <ContractRow
+            name="Receipt issuer"
+            address={contracts?.receiptIssuer ?? null}
+            explorer={
+              contracts?.receiptIssuer
+                ? `https://hashscan.io/${contracts.network.split(':')[1] ?? 'testnet'}/account/${contracts.receiptIssuer}`
+                : null
+            }
+          />
         </Panel>
       </main>
       <Footer />

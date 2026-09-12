@@ -37,7 +37,36 @@ export interface Purchase {
   network: string;
   transaction: string | null;
   explorer: string | null;
+  /** The signed receipt issued for this purchase, if one was. */
+  receipt: string | null;
   at: string;
+}
+
+export interface Receipt {
+  version: string;
+  id: string;
+  agent: string;
+  kind: string;
+  resource: string;
+  amount: string;
+  asset: string;
+  network: string;
+  settlement: string | null;
+  issuedAt: string;
+  issuer: string;
+  digest: string;
+  signature: string;
+  explorer?: string;
+}
+
+export interface NumberOption {
+  phoneNumber: string;
+  country: string;
+  region: string;
+  monthly: string | null;
+  upfront: string | null;
+  currency: string | null;
+  features: string[];
 }
 
 export interface Stats {
@@ -57,6 +86,9 @@ export interface Contracts {
   identity: ContractRef;
   market: ContractRef;
   treasury: ContractRef;
+  /** The address a receipt's signature must recover to. */
+  receiptIssuer: string | null;
+  receiptVersion: string;
 }
 
 export interface AgentRecord {
@@ -91,6 +123,17 @@ export const getPurchases = (agent?: string, limit = 100) =>
   get<{ purchases: Purchase[] }>(
     `/v1/purchases?limit=${limit}${agent ? `&agent=${encodeURIComponent(agent)}` : ''}`,
   ).then(r => r.purchases);
+
+export const getReceipt = (id: string) =>
+  get<{ receipt: Receipt; verify: Record<string, string> }>(`/v1/receipts/${encodeURIComponent(id)}`);
+
+/** Numbers available to buy. Free to call, which is why the page can call it. */
+export const searchNumbers = (params: { country?: string; area?: string; limit?: number }) => {
+  const query = new URLSearchParams({ limit: String(params.limit ?? 6) });
+  if (params.country) query.set('country', params.country);
+  if (params.area) query.set('area', params.area);
+  return get<{ numbers: NumberOption[]; error?: string }>(`/v1/phone/search?${query}`);
+};
 
 /* --- formatting ----------------------------------------------------------- */
 
