@@ -2,7 +2,7 @@
   "name": "warrant",
   "version": "0.1.0",
   "private": true,
-  "description": "Scoped spending authority for autonomous agents. Agents buy real resources; humans sign the limits.",
+  "description": "An agent with its own wallet that discovers and buys what it needs, per request, on Hedera. Spending limits are enforced on chain.",
   "type": "commonjs",
   "engines": {
     "node": ">=20"
@@ -12,13 +12,14 @@
     "start": "node dist/server.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "agent": "tsx src/agent/buy.ts",
-    "sign": "tsx scripts/sign-warrant.ts",
-    "revoke": "tsx scripts/revoke-warrant.ts",
+    "agent": "tsx src/agent/run.ts",
     "build:web": "npm --prefix frontend install && npm --prefix frontend run build",
-    "dev:web": "npm --prefix frontend run dev"
+    "dev:web": "npm --prefix frontend run dev",
+    "contracts:test": "cd contracts && forge test",
+    "contracts:deploy": "cd contracts && forge script script/Deploy.s.sol --rpc-url hedera_testnet --broadcast --skip-simulation"
   },
   "dependencies": {
+    "@hiero-ledger/sdk": "2.85.0",
     "@x402/core": "2.25.0",
     "@x402/express": "2.25.0",
     "@x402/fetch": "2.25.0",
