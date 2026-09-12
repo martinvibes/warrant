@@ -1,193 +1,151 @@
 # Warrant
 
-**A signed purchase order in front of every payment an agent makes.**
+**An agent with its own wallet, buying what it needs.**
 
-An agent can buy real resources — inference, email — by paying per request in
-stablecoin over HTTP. Warrant is the layer that decides whether it was *allowed
-to*, refuses the purchase before money moves when it wasn't, and writes a
-receipt binding what was bought to the human who authorised it.
+A name. An inbox it can receive replies at. A phone number. Inference. Memory
+that outlives the process. Each bought per call in stablecoin over plain HTTP,
+in under a second, with nobody to ask.
 
-A spending cap is a fuel gauge. This is a purchase order.
+The spending limit lives in a contract on Hedera, not in this service's
+database. It holds even if this service disappears.
 
-Built for **ETHOnline 2026**.
+```
+npm run fund  -- --agent 0x9aE1… --amount 5 --cap 5 --per day --kinds inference,email.send
+npm run agent -- "introduce yourself to agent 0x7510 and keep a note of it"
+```
 
 ---
 
-## Why a cap is not enough
+## What it does
 
-Agent payment rails are finished work. x402 settles a stablecoin payment over
-HTTP in about two seconds, and facilitators now sponsor the network fee so the
-buyer does not even need gas. What is missing is on either side of the payment.
-
-A wallet-level spending limit can say *spend no more than $50*. It cannot say
-spend only on inference, only for this campaign, only until Friday — and it
-cannot tell you afterwards what each dollar bought. So the failure it cannot
-prevent is the ordinary one: an agent with a funded wallet, a well-formed
-request, and an instruction it should never have followed.
-
-Google's AP2 defines signed mandates for intent and cart. A mandate that
-nothing enforces is a document, not a control. Warrant is the enforcement.
-
-## The path of one purchase
+An agent is given a goal in plain English. It reads the catalogue, works out
+what it needs, pays for each call as it makes it, and reports what that cost.
+No approval step, no queue, no human in the loop.
 
 ```
-  human                    Warrant service                      Hedera
-   │                            │                                  │
-   │  1. sign a warrant  ──────▶│                                  │
-   │     (EIP-712, no gas)      │                                  │
-   │                            │                                  │
- agent  2. POST /v1/inference ─▶│                                  │
-   │     + X-Warrant            │ 3. the gate, before any price:   │
-   │                            │    ├─ no warrant?        403     │
-   │                            │    ├─ bad signature?     403     │
-   │                            │    ├─ revoked/expired?   403     │
-   │                            │    ├─ resource unlisted? 403     │
-   │                            │    ├─ wrong asset?       403     │
-   │                            │    └─ over the cap?      403     │
-   │                            │                                  │
-   │   4. 402 payment required ◀┤   (only if the gate passed)      │
-   │   5. signed transfer ─────▶│ 6. is the payer the named agent? │
-   │                            │ ── verify + settle ─────────────▶│
-   │   7. 200 + the deliverable ◀┤ 8. receipt written              │
-   │                            │    agent · warrant · purpose ·   │
-   │                            │    amount · tx id                │
+  goal    introduce yourself to agent 0x7510 and keep a note of it
+  budget  $1.00 this window, $5.00 remaining overall
+
+  BUY     identity.mint    $0.1    PAID 2841ms   token #7, soulbound · key published
+  BUY     email.inbox      $1      PAID 1104ms   scout@0gent.xyz
+  BUY     email.sealed     $0.25   PAID  967ms   sealed to 0x7510 · we never saw the body
+  BUY     memory.write     $0.05   PAID 3218ms   file 0.0.6841923, immutable
+  BUY     inference        $0.02   REFUSED       daily limit spent, reopens 00:00Z
+
+  total   $1.40 over 4 purchases
 ```
 
-Three stages, each placed at the earliest moment its check is possible:
+That last line is the interesting one. The chain refused it, not us.
 
-| Stage | State of the money | What it can ask |
-| --- | --- | --- |
-| `onProtectedRequest` | nothing asked for, nothing paid | Is this purchase authorised at all? A refusal here means the agent was never even quoted a price. |
-| `onAfterVerify` | payment signed, not settled | Is the payer the agent this warrant names? Unanswerable earlier, because before a signature there is no payer. |
-| `onAfterSettle` | money has moved | Write the receipt. Nothing is recorded as bought before it is paid for. |
+## What is for sale
 
-A refused request never becomes a payment, so there is nothing to refund and
-nothing to reconcile.
+Read `GET /v1/catalogue` for the live list. It is the same list the server
+charges against, so the page cannot advertise a price that will not be honoured.
 
-## What a warrant binds
+| Kind | What you get | Price |
+|---|---|---|
+| `identity.mint` | A soulbound token on Hedera, plus the public key others seal mail to | $0.10 |
+| `inference` | One language model call, returned in OpenAI shape | $0.02 |
+| `email.inbox` | An address the agent owns **and receives replies at** | $1.00 |
+| `email.send` | Ordinary mail from an address the agent owns | $0.20 |
+| `email.sealed` | Mail encrypted to another agent, unreadable by this service | $0.25 |
+| `memory.write` | A permanent Hedera file nobody, us included, can edit | $0.05 |
+| `phone.provision` | A real number, SMS capable, 170+ countries | $0.50 |
+| `sms.send` | One text from a number the agent owns | $0.01 |
 
-An EIP-712 typed message signed by the human who owns the agent. Its id is the
-hash of its own contents, so an edited warrant is a different warrant rather
-than a tampered one, and tampering reads as forgery: the signature recovers to
-a different address.
+Nothing is listed as coming soon. An offer whose provider is not configured is
+not shown and not sold.
 
-| Field | Meaning |
-| --- | --- |
-| `owner` | EVM address of the human who signed. All authority derives from here. |
-| `agent` | The one Hedera account id authorised to spend under this warrant. |
-| `asset` | HTS token id of the settlement asset. Signed, so a cap cannot be walked past by changing the unit. |
-| `cap` | Total ceiling, in the asset's smallest unit. Atomic rather than decimal, because a cap that drifts by a rounding step is a cap that can be walked past. |
-| `resources` | Allowlist of resource types. An empty list authorises nothing. |
-| `purpose` | Free text, copied onto every receipt, so a line of spend stays explicable a month later. |
-| `expiry` | Unix seconds. Dead at and after this instant. |
-| `nonce` | Per-owner replay guard, and what makes two otherwise identical warrants distinct documents. |
+## Why the limit is on chain
 
-Spend is recomputed on every request by summing settled receipts, not read from
-a counter. A cap is only as trustworthy as the number it is compared against.
+Fund an agent directly and its limit is a suggestion, because the agent holds
+the keys. Keeping the balance one step away makes the limit real without
+putting a person in the loop.
 
-Revoking is a second signed message, not a transaction: no gas, no block time,
-effective on the agent's next request. Killing a warrant has to be cheaper than
-issuing one or nobody does it in the moment that matters.
+| | The usual answer | Here |
+|---|---|---|
+| Where the limit lives | The provider's database | A contract on Hedera |
+| If the service goes down | The cap goes with it | The limit still holds |
+| Can it say *five dollars a day*? | No, a balance cap bounds the total, never the rate | Yes, a rolling window sits beside the lifetime cap |
+| Who approves a purchase | Increasingly, a human in a queue | Nobody |
+| Can the agent inflate a draw? | It names the amount | It names a listing; the price comes from the chain |
+
+## Contracts
+
+Three, on Hedera's EVM. 27 tests: `npm run contracts:test`.
+
+| Contract | What it holds |
+|---|---|
+| `AgentIdentity` | One soulbound token per agent, plus its encryption key. Anyone may register, nobody may transfer. |
+| `ResourceMarket` | Who sells what, at what price, which URL to pay. Listing is permissionless. |
+| `AgentTreasury` | The money and the ceilings. Draws are priced from the market, so an agent cannot inflate them. |
+
+Registration and listing are open on purpose. The registries this learned from
+gate both behind an admin key, which makes the result a customer list rather
+than a registry.
+
+## Sealed mail
+
+Two agents can already pay each other. Sealed mail lets them say something the
+carrier cannot read, and it needs no key exchange because the recipient's key is
+already on chain beside its identity.
+
+ECIES over secp256k1, the same curve the identity is keyed to, so an agent needs
+one keypair rather than two. The recipient's key is read from the contract and
+never from the request, so a sender cannot be talked into sealing to an
+attacker's key. This service holds no private key, so being unable to read the
+traffic is a property of the construction rather than a promise about conduct.
 
 ## Running it
 
 ```bash
-cp .env.example .env      # Hedera account, owner key, OpenAI key
-npm install
-npm run build:web         # build the console
-npm run dev               # service and console together on :8090
+git clone https://github.com/martinvibes/warrant && cd warrant
+npm install && cp .env.example .env      # fill in the Hedera keys
+npm run build:web                        # build the console
+npm run dev                              # service and console on :8090
+
+cd contracts && ./setup.sh && forge test # 27 tests
 ```
 
-The console is served from the same origin as the API, which matters for more
-than convenience: it means the console is demonstrably reading the service it
-claims to read.
+The agent needs a Hedera account holding testnet USDC. It does not need HBAR:
+the facilitator sponsors the network fee, so stablecoin is the only balance it
+carries.
 
-Then, as the human:
-
-```bash
-npm run sign -- --agent 0.0.4242 --cap 1.00 \
-                --resources inference \
-                --purpose "support triage" --hours 24
-```
-
-Then, as the agent — once inside the warrant, once outside it:
-
-```bash
-npm run agent -- inference "summarise ticket #8812"
-  BOUGHT   inference  $0.05
-
-npm run agent -- injected
-  REFUSED  403  resource_not_authorised
-  This warrant covers inference. It does not cover email.send.
-  No payment was attempted.
-```
-
-The second request was well formed and the wallet was funded. A wallet cap
-would have allowed it. It was refused on scope, not on price.
-
-The web app — landing page, operator console and public ledger — lives in
-[`frontend/`](frontend). `npm run dev:web` runs it against a service on another
-host during development.
-
-## Settlement
-
-USDC on **Hedera testnet** (token `0.0.429274`, 6 decimals) over **x402 v2**,
-through the [Blocky402](https://blocky402.com) facilitator at
-`https://api.testnet.blocky402.com`. The facilitator sponsors the Hedera
-network fee, so a paying agent needs USDC and no HBAR — which is the difference
-between an agent that can pay and one stuck holding the wrong asset.
-
-Pay-per-request only makes sense where the fee is not the purchase. Five cents
-of inference cannot carry a cent of gas.
+**Stack.** Node 22, TypeScript, Express, better-sqlite3, viem, Hedera SDK.
+Solidity 0.8.24 with Foundry. Vite, React and Tailwind for the page.
+x402 v2 on `hedera:testnet`, settled in USDC `0.0.429274` through the
+[Blocky402](https://api.testnet.blocky402.com) facilitator.
 
 ## What this does not do
 
-Worth stating plainly, because the gaps are where the next version goes.
-
-| Limit | Consequence |
-| --- | --- |
-| Enforcement is per service | A warrant binds spending at the service that reads it. Two services each honouring a $1 cap can cost the owner $2. Caps across services need a shared ledger this does not have. |
-| Spend is recorded locally | Receipts live in the service's own database. They reference real Hedera transactions and can be checked against the ledger, but the tally itself is not on-chain. |
-| The cap is a total, not a rate | A warrant can be spent to its ceiling in a second. It has no notion of per-hour or per-day. |
-| One agent per warrant | Authorising a fleet means one warrant each. That is deliberate — it is what makes payer binding meaningful — but it does mean issuing many documents. |
+| Bound | Why |
+|---|---|
+| The limit binds draws, not the wallet | Once drawn, the float is the agent's. Smaller tranches narrow the window; they do not close it. |
+| One service, one catalogue | The market is permissionless, but only this service is listed on it today. |
+| Memory is 4096 bytes | A permanent file is written in one transaction. Longer content has to be split and linked. |
+| Purchases are recorded here as well as on chain | The local row is fast to read. Anything you need to trust, read from the chain. |
 
 ## Provenance
 
-This repository is new work, written during ETHOnline 2026. `git log` is the
-whole record: there is no imported history, so every line arrived here inside
-the event window.
+New work, written during ETHOnline 2026. `git log` is the whole record; there is
+no squashed import and no backdated history.
 
-Two things came from the author's prior work and are marked as such in the
-commits that introduced them:
+Two things are carried over and are identified as carried over in the commit
+that introduced them: the visual shell began as the author's earlier 0GENT
+front end and was rebuilt around a new palette and type system, and the idea of
+an agent buying real resources per request comes from that same earlier project
+and from [Palmyr](https://palmyr.ai). Neither is entered in this hackathon. What
+is new here is the on-chain limit with a rolling window, permissionless identity
+and listing, sealed agent-to-agent mail, and the move to Hedera.
 
-- The web app's visual shell — layout, animation, the orb, component chrome —
-  was carried over from the author's own earlier project 0GENT and then
-  rebranded and rewired. The commits that add it say so.
-- The idea of selling real resources to agents per request over x402 is that
-  project's, continued here. Everything that makes this Warrant rather than
-  0GENT is new: the warrant model and its signing and verification, the
-  pre-payment gate, payer binding, the receipt ledger, revocation, the Hedera
-  settlement path, the operator console and the public ledger.
+## AI disclosure
 
-## AI usage disclosure
-
-Built with Claude Code (Anthropic) as a pair programmer. By area:
-
-| Area | Human | AI |
-| --- | --- | --- |
-| Problem selection, product design, threat model, warrant field set | Author | Research on documented gaps |
-| `src/warrant/*` — typed data, signing, verification, the gate | Reviewed and corrected | Drafted |
-| `src/x402/*` — resource server, three-stage enforcement | Reviewed and corrected | Drafted |
-| `src/store/*` — schema and queries | Reviewed | Drafted |
-| `src/resources/*` — inference and email | Reviewed | Drafted |
-| `src/agent/*`, `scripts/*` — buyer agent, injection demo, owner CLI | Reviewed | Drafted |
-| `frontend/*` — console, ledger, landing copy | Reviewed | Drafted |
-| Hedera and Blocky402 integration decisions, key handling | Author | API surface research |
-| This README and `docs/*` | Author edited | Drafted |
-
-Prompts and planning notes are committed under [`docs/`](docs) rather than
-gitignored, per event rules.
+Written with Claude Code (Opus 5) under direction, as recorded in
+[`docs/prompts.md`](docs/prompts.md). Architecture, contract design and the
+product decisions were directed by the author; the model wrote most of the
+implementation and all of the tests. Every claim in this README was checked
+against a running service or a passing test before it was written down.
 
 ## Licence
 
-MIT
+MIT.

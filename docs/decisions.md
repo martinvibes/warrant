@@ -1,122 +1,114 @@
 # Decisions
 
-The choices that shaped this repository, and what each one cost.
+The non-obvious choices, each with what it cost.
 
-## The product is a purchase order, not a spending cap
+## The agent is not asked for permission
 
-Wallet-level spending limits already exist and several teams ship them. A cap
-answers one question — how much — and it answers it after the fact, as a
-balance that went down.
+The first version of this project put a human signature in front of every
+purchase. It worked, and it was the wrong product. An agent that has to wait for
+a person is not an autonomous buyer, it is a form with extra steps. What people
+actually want is the thing they already have with a card: a limit, set once,
+that they do not think about again.
 
-The failures worth preventing are not "the agent spent too much". They are
-"the agent spent the right amount on the wrong thing", "the agent was talked
-into a purchase nobody asked for", and "nobody can say what this line of spend
-was for". None of those are quantity problems, so none of them are solved by a
-smaller number.
+**Cost.** Nothing prevents a compromised agent buying the wrong permitted thing.
+The limit bounds how much damage, not what kind.
 
-So a warrant names the agent, the resources, the purpose and the deadline as
-well as the ceiling — and refuses on any of them.
+## The money lives one step away from the agent
 
-**Cost:** more to sign, and an owner has to think about scope up front. That is
-mitigated by making signing free and instant; if it cost gas, nobody would
-scope tightly.
+The obvious design funds the agent's wallet and calls the balance a cap. That
+cap is a suggestion, because the agent holds the keys and can spend it all in an
+hour. Putting the balance in a contract the agent draws from makes the limit
+real while leaving the agent free to draw without asking anyone.
 
-## Checks run at the earliest moment they are possible
+**Cost.** A draw is a transaction, so it costs gas and takes seconds. The agent
+keeps a float to avoid paying that on every purchase, which means the limit
+binds draws rather than the wallet. Smaller tranches narrow the window; they do
+not close it.
 
-The x402 SDK offers three hooks, and the temptation is to do all the work in
-one of them. Instead each check sits at the first point it can be answered.
+## Two ceilings, not one
 
-| Hook | Money | Why here |
-| --- | --- | --- |
-| `onProtectedRequest` | none asked for | Authorisation needs no payment to evaluate, so evaluating it after a payment would be charging for the privilege of being refused. |
-| `onAfterVerify` | signed, unsettled | Before a signature there is no payer to compare against the warrant. This is the first moment the question exists. |
-| `onAfterSettle` | moved | A receipt is a claim that something was bought. Writing one before settlement would make it a prediction. |
+A lifetime cap bounds total damage. A rolling window cap bounds how fast the
+damage can happen. Every wallet-cap product has the first and none of them have
+the second, which is why none of them can express "five dollars a day", the
+limit most people actually want.
 
-**Consequence:** a refused request never becomes a payment, so there is nothing
-to refund and nothing to reconcile.
+**Cost.** A fixed window, not a sliding one. An agent can spend the end of one
+window and the start of the next back to back. Sliding would need per-purchase
+history on chain, and the storage is not worth it.
 
-## The warrant id is the hash of the warrant
+## A draw is priced from the chain, not from the request
 
-Rather than assigning an id, the id is the EIP-712 hash of the contents.
+`draw(listingId, calls)` rather than `draw(amount)`. The agent names what it
+wants to buy and how much of it; the contract reads the price from the market.
+There is no argument an agent can use to inflate the sum.
 
-Two parties can name the same warrant without coordinating. More usefully,
-tampering stops being a category: an edited warrant is a *different* warrant
-with a different id, and its signature recovers to a different address. The
-service reports which address it recovered, because a mismatch is an attempt
-rather than a typo.
+**Cost.** A seller can raise a price between the agent's plan and its draw. The
+agent sees the new price in the revert, so it is visible rather than silent.
 
-**Cost:** a warrant cannot be amended, only replaced. That is the right trade
-for a document whose whole job is to be fixed at signing time.
+## Registration and listing are permissionless
 
-## Spend is summed, never counted
+The registries this borrows from gate both behind an admin key. That makes the
+result a customer list with a blockchain attached: an agent browsing the
+catalogue is browsing one company's inventory and trusting that company's API to
+report the price honestly.
 
-Every request recomputes spend by summing settled receipts for that warrant
-instead of reading a running total.
+**Cost.** Anyone can list anything, including a listing that points at an
+endpoint that never delivers. Reputation has to come from history, which is why
+identity is soulbound.
 
-A cap is only as trustworthy as the number it is compared against. A counter
-drifts: a crash between settlement and increment, a double-increment on retry,
-a migration that resets it. The sum cannot drift, because it is derived from
-the same rows a human would audit.
+## Identity cannot be transferred
 
-**Cost:** an aggregate query per request. At these volumes it is a SQLite index
-scan; if it ever stops being cheap, the fix is a materialised total checked
-against the sum, not a counter that replaces it.
+An agent's history is the only thing that makes its identity worth anything, and
+history does not survive a sale. Transfer is refused rather than discouraged.
 
-## Money is atomic everywhere
+**Cost.** An operator who loses the key loses the identity, permanently. The
+operator can be changed; the token cannot move.
 
-Prices, caps and spend are integers in the asset's smallest unit, from the CLI
-through the signature to the console. The only conversion is at display.
+## The encryption key is published on chain
 
-A cap that drifts by a rounding step is a cap that can be walked past, and
-floats drift. `0.1 + 0.2` is the whole argument.
+An EVM address is a hash of a public key and cannot be turned back into one, so
+sealing a message to an agent needs the key itself somewhere both sides already
+trust. Putting it beside the identity means sealed mail needs no key exchange
+and no directory to trust.
 
-## Revocation is a message, not a transaction
+**Cost.** One more field to keep current. Rotating it makes older ciphertext
+undecryptable by the new key, which is correct but is a footgun if unnoticed.
 
-Withdrawing a warrant is a second signed message. No gas, no block time,
-effective on the agent's next request.
+## Memory is written to keyless Hedera files
 
-If revoking cost money or took a block, it would happen slowly and reluctantly
-and sometimes not at all, which is exactly wrong for the one control you reach
-for when something has already gone wrong.
+A file created with no keys cannot be updated or deleted by anyone, this service
+included. An agent writing a memory is not trusting us to stay honest about it
+afterwards.
 
-It is signed rather than merely asserted because "stop this agent spending" is
-precisely the instruction an attacker would like to forge in the other
-direction. Revocations older than five minutes are rejected so a leaked one
-cannot be held and replayed against a warrant issued later.
+**Cost.** Nothing can be corrected and nothing can be taken back. Content is
+capped at one transaction's worth and oversized writes are refused rather than
+truncated, because a memory silently cut short is permanent too.
 
-**Cost:** revocation is only as available as the service. A service that is
-down cannot be told to stop — but it also cannot settle a payment, so the
-failure is safe.
+## The claimed account must be the paying account
 
-## The audit surface needs no credentials
+Everything an agent owns here is keyed to its account: its inboxes, its numbers,
+its memory. Without this check an agent could pay from its own account while
+claiming another's and buy things into someone else's name. The check runs after
+signing and before settlement, so a refusal costs nothing.
 
-Every read the console makes is public: warrants, receipts, refusals, pricing.
+**Cost.** One header the caller has to get right, and a refusal that reads as
+pedantic until you see why it exists.
 
-A ledger that publishes only its successes says nothing about what it
-prevented. The refusals are the claim this product makes, so they have to be as
-visible as the purchases, and verifiable by somebody who does not trust the
-operator.
+## Purchases are recorded twice
 
-**Cost:** purposes and agent ids are public. For this service that is the
-point. A deployment with sensitive purposes would need a per-owner read scope,
-which is a change to who may read rather than to what is recorded.
+The local row is fast to read and carries the response body. The on-chain
+settlement record is slow, costs gas, and cannot be edited by us. Anything a
+buyer needs to trust should be read from the second one.
 
-## Hedera and a sponsored fee
+**Cost.** Two records that can disagree if a settlement write fails. The
+on-chain one is authoritative and the local one is a cache, which is stated
+rather than implied.
 
-Pay-per-request only makes sense where the fee is not the purchase. Five cents
-of inference cannot carry a cent of gas.
+## Every read is public
 
-Hedera gives fixed fractional-cent fees, seconds to finality, and USDC as a
-native token. The Blocky402 facilitator sponsors the network fee, so a paying
-agent needs USDC and no HBAR. An agent that must hold two assets to buy one
-thing is an agent that gets stuck holding the wrong one.
+No wallet, no login, no key on the ledger, the agent pages or the catalogue. An
+audit trail you have to authenticate into is not an audit trail.
 
-## The browser signs, it does not pay
-
-The console has no payment path. Paying is the agent's job, from a Hedera
-account, in a process the human does not run.
-
-Keeping the owner's key and the agent's key in different processes is what
-makes the separation real rather than a comment in a file. It also means the
-console needs no funded account at all — there is nothing to top up and nothing
-to lose by opening it.
+**Cost.** An agent's spending is visible to anyone who knows its account id.
+That is the trade: spending history is only useful as reputation if the people
+who would rely on it can see it.
