@@ -56,6 +56,34 @@ charges against, so the page cannot advertise a price that will not be honoured.
 Nothing is listed as coming soon. An offer whose provider is not configured is
 not shown and not sold.
 
+## Receipts
+
+Every settled purchase is signed. A settlement id on its own is a pointer into a
+mirror node, and a row in this service's database is only our word for it. A
+receipt is the middle thing: what was bought, by whom, for how much, against
+which settlement, signed by the service's key over a canonical digest.
+
+```
+digest = sha256(version|id|agent|kind|resource|amount|asset|network|settlement|issuedAt)
+```
+
+Checking one needs nothing from this service:
+
+```bash
+npm run verify -- rcp_mtyuk9d0146b7ae6e5
+```
+
+That rebuilds the digest from the fields, recovers the signer, compares it with
+the issuer published at `/v1/contracts`, and reads the settlement back from
+Hedera's mirror node rather than from us.
+
+A receipt is collected rather than returned with the goods, and that is the
+protocol rather than a shortcut. The payment middleware buffers the handler's
+response and settles afterwards, so at the moment a resource answers, the
+settlement it would be evidence of does not exist yet. The response carries that
+id in its `PAYMENT-RESPONSE` header, which is enough to collect the receipt from
+`/v1/receipts?settlement=…` a moment later.
+
 ## Why the limit is on chain
 
 Fund an agent directly and its limit is a suggestion, because the agent holds
@@ -95,6 +123,21 @@ one keypair rather than two. The recipient's key is read from the contract and
 never from the request, so a sender cannot be talked into sealing to an
 attacker's key. This service holds no private key, so being unable to read the
 traffic is a property of the construction rather than a promise about conduct.
+
+## Checking it works
+
+```bash
+npm run smoke                       # buys one of everything, reports what worked
+npm run smoke -- --to you@mail.com  # also proves a mail is delivered
+npm run smoke -- --with-phone       # also orders a real number, which costs
+```
+
+Searching for a phone number is free, here and for the agent, because an agent
+that cannot see the price before it commits is not choosing:
+
+```bash
+curl 'localhost:8090/v1/phone/search?country=US&area=415'
+```
 
 ## Running it
 

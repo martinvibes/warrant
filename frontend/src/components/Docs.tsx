@@ -269,13 +269,45 @@ draw(listingId, calls) -> (drawId, amount)
             <Endpoint method="POST" path="/v1/email/inbox" cost="$1.00" body='{ "name" }' desc="Claims name@domain. Refused rather than renamed if taken." />
             <Endpoint method="POST" path="/v1/email/sealed" cost="$0.25" body='{ "from", "to", "toAgent", "subject", "body" }' desc="Encrypts to toAgent's on-chain key before sending." />
             <Endpoint method="POST" path="/v1/memory" cost="$0.05" body='{ "content" }' desc="Writes a keyless Hedera file. Permanent, 4096 bytes." />
+            <Endpoint method="POST" path="/v1/phone/provision" cost="$0.50" body='{ "country?", "phoneNumber?" }' desc="Orders a number. Pass one from the search to get the number you were quoted." />
+            <Endpoint method="GET" path="/v1/phone/search" cost="free" desc="Numbers available now, with region and monthly cost. Filters: country, area, limit." />
+            <Endpoint method="GET" path="/v1/receipts" cost="free" desc="Receipts, newest first. Pass settlement=… to find the one for a payment you just made." />
+            <Endpoint method="GET" path="/v1/receipts/:id" cost="free" desc="One receipt, in the form it was signed in." />
             <Endpoint method="GET" path="/v1/catalogue" cost="free" desc="What is for sale, and at what price." />
             <Endpoint method="GET" path="/v1/purchases" cost="free" desc="Everything sold, newest first. Optional agent filter." />
             <Endpoint method="GET" path="/v1/agents/:agent" cost="free" desc="One agent's spend and what it owns." />
             <Endpoint method="GET" path="/v1/contracts" cost="free" desc="The deployed addresses, with explorer links." />
           </Section>
 
-          <Section id="settlement" kicker="06" title="Settlement" intro="x402 version 2, exact scheme, on Hedera. The facilitator sponsors the network fee, so a paying agent needs USDC and no HBAR.">
+          <Section id="receipts" kicker="06" title="Receipts" intro="Every settled purchase is signed. Checking one needs nothing from this service.">
+            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8 }}>
+              A settlement id on its own is a pointer into a mirror node, and a row in this
+              service's database is only our word for it. A receipt is the middle thing: what was
+              bought, by whom, for how much, against which settlement, signed by the service's key
+              over a canonical digest.
+            </p>
+            <Code lang="digest">{`sha256(
+  version | id | agent | kind | resource |
+  amount | asset | network | settlement | issuedAt
+)`}</Code>
+            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, marginTop: 14 }}>
+              The signature is an ordinary personal_sign over that digest string. Recover the signer
+              and compare it with <code className="mono">receiptIssuer</code> from{' '}
+              <code className="mono">/v1/contracts</code>. Then read the settlement back from
+              Hedera's mirror node rather than from us. <code className="mono">npm run verify -- rcp_…</code>{' '}
+              does all four.
+            </p>
+            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, marginTop: 14 }}>
+              A receipt is collected rather than returned with the goods, and that is the protocol
+              rather than a shortcut. The payment middleware buffers the handler's response and
+              settles afterwards, so at the moment a resource answers, the settlement it would be
+              evidence of does not exist yet. The response carries that id in its{' '}
+              <code className="mono">PAYMENT-RESPONSE</code> header, which is enough to collect the
+              receipt a moment later.
+            </p>
+          </Section>
+
+          <Section id="settlement" kicker="07" title="Settlement" intro="x402 version 2, exact scheme, on Hedera. The facilitator sponsors the network fee, so a paying agent needs USDC and no HBAR.">
             <Code lang="402 response">{`{
   "scheme":   "exact",
   "network":  "hedera:testnet",
@@ -293,7 +325,7 @@ draw(listingId, calls) -> (drawId, amount)
             </p>
           </Section>
 
-          <Section id="contracts" kicker="07" title="Contracts" intro="Three, on Hedera's EVM. Twenty-seven tests, run with npm run contracts:test.">
+          <Section id="contracts" kicker="08" title="Contracts" intro="Three, on Hedera's EVM. Twenty-eight tests, run with npm run contracts:test.">
             <Table
               head={['Contract', 'What it holds']}
               rows={[
@@ -304,7 +336,7 @@ draw(listingId, calls) -> (drawId, amount)
             />
           </Section>
 
-          <Section id="bounds" kicker="08" title="What this does not do" intro="The honest list. Each of these is a real bound, not a roadmap item dressed as one.">
+          <Section id="bounds" kicker="09" title="What this does not do" intro="The honest list. Each of these is a real bound, not a roadmap item dressed as one.">
             <Table
               head={['Bound', 'Why']}
               rows={[
