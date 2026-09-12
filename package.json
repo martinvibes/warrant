@@ -14,7 +14,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "agent": "tsx src/agent/buy.ts",
     "sign": "tsx scripts/sign-warrant.ts",
-    "revoke": "tsx scripts/revoke-warrant.ts"
+    "revoke": "tsx scripts/revoke-warrant.ts",
+    "build:web": "npm --prefix frontend install && npm --prefix frontend run build",
+    "dev:web": "npm --prefix frontend run dev"
   },
   "dependencies": {
     "@x402/core": "2.25.0",

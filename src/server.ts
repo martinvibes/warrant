@@ -1,4 +1,5 @@
 import express from "express";
+import fs from "node:fs";
 import path from "node:path";
 import { paymentMiddlewareFromHTTPServer } from "@x402/express";
 import { assertServerConfig, config } from "./config.js";
@@ -34,7 +35,7 @@ async function main(): Promise<void> {
   app.use(paymentMiddlewareFromHTTPServer(httpServer, undefined, undefined, false));
   app.use(paid);
 
-  app.use(express.static(path.join(process.cwd(), "public")));
+  serveConsole(app);
 
   app.listen(config.port, () => {
     console.log(`warrant listening on :${config.port}`);
@@ -48,6 +49,41 @@ async function main(): Promise<void> {
         : `  warrants from any valid signer (set OWNER_ADDRESS to restrict)`,
     );
   });
+}
+
+
+/**
+ * Serves the built console from the same origin as the API.
+ *
+ * Same origin matters for more than convenience: it means the console is
+ * demonstrably reading the service it claims to read, rather than a different
+ * deployment that happens to agree with it.
+ *
+ * The routes are client-side, so anything that is not a file and not an API
+ * path has to return index.html or a reload of /console is a 404.
+ */
+function serveConsole(app: express.Express): void {
+  const dist = path.join(process.cwd(), "frontend", "dist");
+  const index = path.join(dist, "index.html");
+  if (!fs.existsSync(index)) {
+    console.log(`  console     not built (run: cd frontend && npm run build)`);
+    return;
+  }
+
+  app.use(express.static(dist, { index: false }));
+  app.get("*", (req, res, next) => {
+    // Never shadow the API: an unmatched /v1 path should 404 as an API call,
+    // not quietly return a web page to something expecting JSON.
+    if (req.path.startsWith("/v1/") || req.path === "/health") return next();
+    res.sendFile(index);
+  });
+
+  // An unmatched API path is an API error, so it answers in the content type
+  // the caller asked for rather than in a web page.
+  app.use("/v1", (req, res) => {
+    res.status(404).json({ error: `This service has no ${req.method} /v1${req.path}.` });
+  });
+  console.log(`  console     /  (built)`);
 }
 
 main().catch((err) => {

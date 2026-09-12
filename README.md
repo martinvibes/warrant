@@ -94,8 +94,13 @@ issuing one or nobody does it in the moment that matters.
 ```bash
 cp .env.example .env      # Hedera account, owner key, OpenAI key
 npm install
-npm run dev               # service on :8090
+npm run build:web         # build the console
+npm run dev               # service and console together on :8090
 ```
+
+The console is served from the same origin as the API, which matters for more
+than convenience: it means the console is demonstrably reading the service it
+claims to read.
 
 Then, as the human:
 
@@ -121,7 +126,8 @@ The second request was well formed and the wallet was funded. A wallet cap
 would have allowed it. It was refused on scope, not on price.
 
 The web app — landing page, operator console and public ledger — lives in
-[`frontend/`](frontend).
+[`frontend/`](frontend). `npm run dev:web` runs it against a service on another
+host during development.
 
 ## Settlement
 
