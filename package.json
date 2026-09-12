@@ -4,17 +4,19 @@
   "private": true,
   "description": "Scoped spending authority for autonomous agents. Agents buy real resources; humans sign the limits.",
   "type": "commonjs",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "agent": "tsx src/agent/buy.ts",
-    "sign": "tsx scripts/sign-warrant.ts"
+    "sign": "tsx scripts/sign-warrant.ts",
+    "revoke": "tsx scripts/revoke-warrant.ts"
   },
   "dependencies": {
-    "@hiero-ledger/sdk": "^2.78.0",
     "@x402/core": "2.25.0",
     "@x402/express": "2.25.0",
     "@x402/fetch": "2.25.0",
