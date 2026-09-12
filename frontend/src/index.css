@@ -1,0 +1,557 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #050508;
+  --color-surface: #0c0c14;
+  --color-surface-2: #121220;
+  --color-accent: #00B8D4;
+  --color-accent-light: #00E5FF;
+  --color-accent-soft: #4DD0E1;
+  --color-accent-glow: rgba(0, 229, 255, 0.15);
+  --color-accent-pale: #80DEEA;
+  --color-green: #3fb950;
+  --color-red: #f85149;
+  --color-text: #FEFEFE;
+  --color-dim: rgba(254, 254, 254, 0.5);
+  --color-muted: rgba(254, 254, 254, 0.3);
+  --color-faint: rgba(254, 254, 254, 0.12);
+  --color-line: rgba(0, 229, 255, 0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: #050508;
+  color: #FEFEFE;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection { background: #00B8D4; color: #000; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0, 229, 255,0.2); border-radius: 4px; }
+
+a { color: inherit; text-decoration: none; }
+.mono { font-family: 'JetBrains Mono', 'Geist Mono', ui-monospace, monospace; }
+
+/* ─── Grain ─── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ─── Glow border ─── */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.glow-border {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.glow-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--angle, 0deg), transparent 35%, #00E5FF 50%, transparent 65%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spin 5s linear infinite;
+  pointer-events: none;
+}
+@keyframes spin { to { --angle: 360deg; } }
+
+/* ─── Animations ─── */
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+@keyframes fadeIn { from{opacity:0;transform:translateX(-4px)} to{opacity:1;transform:translateX(0)} }
+@keyframes eqBar { 0% { transform: scaleY(0.3); } 100% { transform: scaleY(1); } }
+.pulse { animation: pulse 2s ease-in-out infinite; }
+.blink { animation: blink 0.6s step-end infinite; }
+.fade-in { animation: fadeIn 0.25s ease-out; }
+.wave-bar { transform-origin: bottom; }
+
+/* ─── Reveal (top-level wrapper, used by App.tsx) ─── */
+.reveal { opacity:0; transform:translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* ─── Reveal-up (per-element, used inside sections for staggered entry) ─── */
+/* Children of a `.reveal.visible` parent are animated in via a CSS sibling delay */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.visible .reveal-up,
+.reveal-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Card (legacy class, still used by some panels) ─── */
+.card {
+  background: #0c0c14;
+  border: 1px solid rgba(0, 229, 255,0.1);
+  border-radius: 12px;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.card:hover {
+  border-color: rgba(0, 229, 255,0.25);
+  transform: translateY(-2px);
+}
+
+/* ─── Feature card (Features.tsx) — subtle hover lift + icon box ─── */
+.feature-card {
+  position: relative;
+}
+.feature-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top right, rgba(0, 229, 255,0.08), transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.feature-card:hover::after { opacity: 1; }
+.feature-card:hover .feature-icon {
+  border-color: rgba(0, 229, 255,0.4);
+  background: linear-gradient(135deg, rgba(0, 229, 255,0.18) 0%, rgba(0, 229, 255,0.04) 100%);
+}
+
+/* ─── ZGIntegration card — subtle border + edge glow on hover ─── */
+.zg-card:hover {
+  border-color: rgba(0, 229, 255,0.3);
+  transform: translateY(-3px);
+}
+.zg-card:hover .zg-top-edge { opacity: 1; }
+
+/* ─── Wallet section step number badge ─── */
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(0, 229, 255,0.3);
+  background: linear-gradient(135deg, rgba(0, 229, 255,0.10) 0%, rgba(0, 229, 255,0.02) 100%);
+  color: #00E5FF;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* ─── Wallet card — subtle gradient border accent ─── */
+.wallet-card {
+  position: relative;
+  isolation: isolate;
+}
+.wallet-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 0;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(0, 229, 255,0.18), transparent 40%, transparent 60%, rgba(0, 229, 255,0.10));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ─── Section divider ─── */
+.section-line {
+  border-top: 1px solid rgba(0, 229, 255,0.1);
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  RESPONSIVE — overrides for inline styles via !important.             */
+/*  Scales: tablet < 1024px, mobile < 768px, small mobile < 480px.       */
+/* ════════════════════════════════════════════════════════════════════ */
+
+/* Tablet — hide secondary nav copy, soften big paddings */
+@media (max-width: 1024px) {
+  .hide-tablet { display: none !important; }
+  .docs-sidebar { display: none !important; }
+  .docs-layout { padding-left: 24px !important; padding-right: 24px !important; }
+}
+
+/* Mobile (< 768px) — most fixes happen here */
+@media (max-width: 768px) {
+  /* Nav: drop center links + tighten the pill */
+  .nav-links { display: none !important; }
+  .nav-pill { gap: 14px !important; padding: 10px 14px !important; }
+  .nav-pill .nav-cta {
+    height: 30px !important; padding: 0 14px !important; font-size: 10px !important;
+  }
+  /* Hero: bigger h1 floor, smaller stats, less vertical space */
+  .hero-section { padding-top: 130px !important; padding-bottom: 100px !important; }
+  .hero-h1 { font-size: clamp(40px, 11vw, 56px) !important; }
+  .hero-sub { font-size: 15px !important; padding: 0 8px !important; }
+  .hero-buttons { gap: 10px !important; flex-wrap: wrap !important; }
+  .hero-buttons a { height: 44px !important; padding: 0 22px !important; font-size: 13px !important; }
+  .hero-stats { gap: 28px !important; flex-wrap: wrap !important; }
+  .hero-stats-num { font-size: 22px !important; }
+
+  /* Generic: reduce 120px section padding everywhere */
+  .section-pad { padding-top: 70px !important; padding-bottom: 70px !important; }
+  .section-pad-x { padding-left: 16px !important; padding-right: 16px !important; }
+
+  /* Section h2 ceiling — `min(48px, 4vw)` collapses too much, use clamp */
+  .section-h2 { font-size: clamp(28px, 8vw, 40px) !important; }
+
+  /* HowItWorks: stack the two columns */
+  .hiw-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+  .hiw-preview { min-height: 280px !important; }
+
+  /* ZGIntegration: stack instead of 4-col */
+  .zg-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important; gap: 14px !important; }
+  .zg-grid > * { padding: 22px !important; }
+
+  /* WalletPanel: shave the giant top padding + tighten card interior */
+  .wallet-section { padding: 60px 16px 60px !important; }
+  .wallet-card { padding: 22px 18px 22px !important; }
+
+  /* AgentProfile: 4-col resource row reflows on mobile */
+  .ap-resource-row {
+    grid-template-columns: auto 1fr !important;
+    grid-template-rows: auto auto !important;
+  }
+  .ap-resource-row > :nth-child(3),
+  .ap-resource-row > :nth-child(4) {
+    grid-column: 2 !important;
+    justify-self: start !important;
+    margin-top: 6px;
+  }
+
+  /* Terminal: reduce min-heights / paddings on mobile */
+  .terminal-section { padding: 60px 16px 80px !important; }
+  .terminal-card { min-height: 0 !important; }
+
+  /* Footer + final CTA */
+  .final-cta { padding: 80px 16px !important; }
+  .footer-row { padding: 32px 16px !important; gap: 18px !important; }
+  .final-cta-h2 { font-size: clamp(28px, 8vw, 40px) !important; }
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  DASHBOARD — animations + interaction polish.                          */
+/* ════════════════════════════════════════════════════════════════════ */
+
+/* Card entrance — staggered fade + slide up. Index from CSS, not React. */
+@keyframes dashCardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dash-card {
+  animation: dashCardIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.3s ease;
+  will-change: transform;
+}
+.dash-card:nth-child(1) { animation-delay: 40ms; }
+.dash-card:nth-child(2) { animation-delay: 110ms; }
+.dash-card:nth-child(3) { animation-delay: 180ms; }
+.dash-card:nth-child(4) { animation-delay: 250ms; }
+.dash-card:nth-child(5) { animation-delay: 320ms; }
+.dash-card:nth-child(6) { animation-delay: 390ms; }
+.dash-card:hover {
+  border-color: rgba(0, 229, 255, 0.30);
+  transform: translateY(-2px);
+}
+
+/* Result panels (LLM completion, key value display, etc) — soft fade */
+@keyframes dashResultIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dash-result-in {
+  animation: dashResultIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Collapsible sections — drives max-height + opacity transitions cleanly */
+.dash-collapse {
+  overflow: hidden;
+  transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease, margin 0.35s ease;
+}
+
+/* Status dot — gently pulses when an action is in flight */
+@keyframes dashDotPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+.dash-pulse-dot { animation: dashDotPulse 1.6s ease-in-out infinite; }
+
+/* Primary buttons — subtle hover lift + press feedback */
+.dash-btn-primary {
+  transition: filter 0.18s ease, transform 0.12s ease, box-shadow 0.25s ease;
+}
+.dash-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 18px rgba(0, 229, 255, 0.30);
+}
+.dash-btn-primary:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+}
+.dash-btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: saturate(0.6);
+}
+
+/* Ghost buttons — quieter version of the same */
+.dash-btn-ghost {
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+.dash-btn-ghost:hover:not(:disabled) {
+  border-color: rgba(0, 229, 255, 0.35);
+  color: #fefefe;
+  background: rgba(0, 229, 255, 0.05);
+}
+.dash-btn-ghost:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Inputs — focus ring */
+.dash-input { transition: border-color 0.18s ease, background 0.18s ease; }
+.dash-input:focus { border-color: rgba(0, 229, 255, 0.45); background: rgba(0, 0, 0, 0.65); }
+
+/* Inbox / list-item rows — hoverable */
+.dash-row { transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease; }
+.dash-row:hover { border-color: rgba(0, 229, 255, 0.28); background: rgba(0, 229, 255, 0.03); }
+
+/* "Live" indicator strip used in the Phone card */
+.dash-live-stripe {
+  background: linear-gradient(90deg,
+    rgba(125, 239, 177, 0.0) 0%,
+    rgba(125, 239, 177, 0.45) 50%,
+    rgba(125, 239, 177, 0.0) 100%);
+  background-size: 200% 100%;
+  animation: dashLiveStripe 3s linear infinite;
+}
+@keyframes dashLiveStripe {
+  from { background-position: 200% 0%; }
+  to   { background-position: -200% 0%; }
+}
+
+/* Reduce motion honors user pref */
+@media (prefers-reduced-motion: reduce) {
+  .dash-card,
+  .dash-result-in,
+  .dash-collapse,
+  .dash-pulse-dot,
+  .dash-live-stripe { animation: none !important; transition: none !important; }
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/*  RESPONSIVE — Dashboard, Stats, Docs (mobile + small mobile)          */
+/* ════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* ── Page-level wrappers — tighten outer padding ── */
+  .page-wrap     { padding: 100px 14px 32px !important; }
+  .page-wrap-tight { padding: 96px 12px 32px !important; }
+
+  /* ── Dashboard ── */
+  .dash-card { padding: 18px !important; }
+  .dash-card h3 { font-size: 16px !important; }
+  /* Tab strip — tighter padding so all 5 fit better, but keep horizontal scroll */
+  .dash-tab-strip { padding: 4px !important; gap: 2px !important; }
+  .dash-tab-strip button {
+    padding: 8px 12px !important;
+    font-size: 10.5px !important;
+    letter-spacing: 0.04em !important;
+  }
+  .dash-tab-strip button > span:nth-child(3) { display: none !important; } /* hide cost label on small */
+
+  /* AccountBar — stack address + balance on narrow screens */
+  .dash-account-bar { padding: 14px 16px !important; gap: 10px !important; }
+
+  /* Identity card big numbers — smaller on mobile */
+  .dash-card h3 + div [style*="font-size: 28px"],
+  .dash-card [style*="fontSize: 28"] { font-size: 22px !important; }
+
+  /* ── Stats ── */
+  .stats-headlines { gap: 10px !important; }
+  .stats-headline-card { flex: 1 1 100% !important; padding: 22px 20px !important; }
+  .stats-headline-card > div:first-child { font-size: clamp(32px, 9vw, 44px) !important; }
+
+  /* Tx table — restack each row into a 3-row card layout on mobile.
+     No horizontal scroll, no truncated header columns. Each transaction
+     gets its own self-contained block with all 5 fields visible.
+        Row 1:  [service icon + name]      [amount]
+        Row 2:  [payer]                    [when]
+        Row 3:  [tx hash ↗]
+  */
+  .stats-tx-scroll { overflow-x: visible; }
+  .stats-tx-scroll > div { min-width: 0; }
+  /* Hide the desktop column headers — they don't make sense for a card layout */
+  .stats-tx-scroll > div > div:first-child { display: none !important; }
+  /* Restack each tx row */
+  .stats-tx-row {
+    grid-template-columns: 1fr auto !important;
+    grid-template-areas:
+      "service amount"
+      "payer when"
+      "hash hash" !important;
+    gap: 4px 12px !important;
+    padding: 14px 14px !important;
+    border-bottom: 1px solid rgba(0, 229, 255,0.10);
+  }
+  .stats-tx-row > :nth-child(1) { grid-area: service; }
+  .stats-tx-row > :nth-child(2) { grid-area: payer; font-size: 11.5px !important; }
+  .stats-tx-row > :nth-child(3) { grid-area: amount; justify-self: end; font-weight: 600; }
+  .stats-tx-row > :nth-child(4) { grid-area: hash; font-size: 11px !important; opacity: 0.85; }
+  .stats-tx-row > :nth-child(5) { grid-area: when; justify-self: end; font-size: 11px !important; text-align: right !important; }
+  /* Show the small "PAYER" / "TX" prefix labels on mobile so users can
+     tell two visually-similar 0x… strings apart at a glance. */
+  .stats-tx-prefix { display: inline-block !important; }
+
+  /* Filter pills — wrap, tighter spacing */
+  .stats-filter-row { gap: 4px !important; }
+  .stats-filter-row button { padding: 5px 10px !important; font-size: 10.5px !important; }
+
+  /* StatRow on small — tighter padding */
+  .stats-detail-card > div { padding: 12px 14px !important; }
+
+  /* ── Stats modal — go nearly full-screen on phones ── */
+  .stats-modal { padding: 16px 8px !important; }
+  .stats-modal > div { padding: 18px 14px !important; }
+
+  /* ── Docs ── */
+  .docs-page { padding: 100px 16px 24px !important; }
+  .docs-page section { padding: 44px 0 !important; }
+  .docs-page h2 { font-size: clamp(24px, 7vw, 32px) !important; }
+  .docs-page pre { font-size: 11.5px !important; padding: 14px !important; }
+  /* Quick-jump pills row in docs hero */
+  .docs-page-hero-pills { gap: 6px !important; }
+  .docs-page-hero-pills a { font-size: 11px !important; padding: 5px 10px !important; }
+
+  /* Restack the Services & Pricing + Smart Contracts tables as cards on mobile.
+     Each <tr> becomes a small 2-column card: data-label on the left, value
+     on the right. No more 4-cramped-columns or horizontal scroll. */
+  .docs-services-table { font-size: 12.5px !important; }
+  .docs-services-table thead { display: none !important; }
+  .docs-services-table tbody,
+  .docs-services-table tr,
+  .docs-services-table td { display: block !important; width: 100% !important; }
+  .docs-services-row {
+    padding: 12px 14px !important;
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    gap: 6px 12px !important;
+    border-top: 1px solid rgba(0, 229, 255,0.10) !important;
+  }
+  .docs-services-row td {
+    padding: 0 !important;
+    border: none !important;
+  }
+  /* Service name = first td, full width, larger */
+  .docs-services-row td:nth-child(1) {
+    grid-column: 1 / -1 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #fefefe !important;
+  }
+  /* Cost (col 2) on the left of next row */
+  .docs-services-row td:nth-child(2) {
+    grid-column: 1 !important;
+    font-size: 13px !important;
+  }
+  /* Status pill (col 3) on the right of same row */
+  .docs-services-row td:nth-child(3) {
+    grid-column: 2 !important;
+    justify-self: end !important;
+  }
+  /* "Backed by" (col 4) — full-width sub-line, dimmed */
+  .docs-services-row td:nth-child(4) {
+    grid-column: 1 / -1 !important;
+    font-size: 11.5px !important;
+    color: rgba(254,254,254,0.45) !important;
+    margin-top: 2px !important;
+  }
+  /* Each "Backed by" cell gets a small label prefix on mobile so users know what they're reading.
+     Uses the data-label attribute we added in the JSX. */
+  .docs-services-row td:nth-child(4)::before {
+    content: attr(data-label) " · ";
+    color: rgba(254,254,254,0.30);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-right: 4px;
+  }
+
+  /* ── Hero chips — extra row of links visible on mobile ── */
+  .hero-chips a { font-size: 10.5px !important; padding: 5px 10px !important; }
+
+  /* ── Terminal section ── */
+  /* Network tab — tighter padding, cards stack into 2-col then 1-col automatically */
+  .terminal-network { padding: 18px 14px !important; }
+  .terminal-stat-grid { gap: 10px !important; }
+  .terminal-stat-card { padding: 14px 14px !important; }
+  .terminal-stat-value { font-size: 22px !important; }
+  /* Status bar — let it wrap when "x402 · 0G mainnet · chain 16661" + "5 requests · Ln 2"
+     can't fit on one line. Better than truncation. */
+  .terminal-status-bar { font-size: 9.5px !important; padding: 6px 10px !important; }
+  /* Hide the middle dots if items wrap — they look weird at line ends */
+  .terminal-status-bar .terminal-status-dot { display: none !important; }
+  .terminal-status-left { gap: 8px !important; }
+  .terminal-status-right { gap: 8px !important; }
+}
+
+@media (max-width: 380px) {
+  /* Tightest: 1-card-per-row in network tab so even "100.0%" has breathing room */
+  .terminal-stat-grid { grid-template-columns: 1fr !important; }
+  .terminal-stat-card { padding: 12px 14px !important; }
+  .terminal-stat-value { font-size: 24px !important; }
+}
+
+/* Very small phones — last-mile tightening */
+@media (max-width: 420px) {
+  /* Account bar: address + balance go vertical to avoid cramping */
+  .dash-account-bar { flex-direction: column !important; align-items: flex-start !important; }
+  .dash-account-bar > :last-child { margin-left: 0 !important; flex-wrap: wrap !important; }
+
+  /* Card big numbers in dashboard — even smaller */
+  .dash-card [style*="fontSize: 28"] { font-size: 20px !important; }
+
+  /* Tab strip on tiny screens — show icons + label only, drop the cost completely */
+  .dash-tab-strip button { padding: 8px 10px !important; }
+
+  /* Modal margins on phones */
+  .stats-modal { padding: 8px 4px !important; }
+  .stats-modal > div { padding: 14px 10px !important; }
+}
+
+/* Small mobile (< 480px) — last-mile tightening */
+@media (max-width: 480px) {
+  .hero-h1 { font-size: clamp(36px, 12vw, 48px) !important; }
+  .hero-stats { gap: 20px !important; }
+  .hero-stats-num { font-size: 20px !important; }
+  .nav-pill { gap: 10px !important; padding: 8px 10px !important; }
+  .nav-pill .nav-brand { font-size: 14px !important; }
+  .nav-pill .nav-cta { padding: 0 12px !important; }
+
+  /* Section paddings further down */
+  .section-pad { padding-top: 56px !important; padding-bottom: 56px !important; }
+
+  /* Buttons span the row at very small sizes */
+  .hero-buttons a, .final-cta a { width: 100%; justify-content: center; }
+}
