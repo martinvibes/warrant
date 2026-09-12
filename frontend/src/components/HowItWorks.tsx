@@ -3,10 +3,30 @@ import { useEffect, useRef, useState } from 'react';
 const STEP_DURATION_MS = 4500;
 
 const steps = [
-  { n: '01', title: 'Agent reads skill.md',     body: 'Fetches GET /skill.md — a plain text file describing every endpoint, cost, and how to pay.', code: 'GET /skill.md\n\n# 0GENT — Real-World Infrastructure\n# for AI Agents\n#\n# Wallet = identity. Pay via x402.' },
-  { n: '02', title: 'Agent calls paid endpoint', body: 'Requests a resource. Without payment, server responds HTTP 402 with payment instructions.',  code: 'POST /phone/provision\n\n← 402 Payment Required\n{\n  "contract": "0x3F2a...91cB",\n  "value": "500000000000000000",\n  "nonce": "0xf7a3..."\n}' },
-  { n: '03', title: 'Payment on-chain',         body: 'Agent calls the payment contract with nonce + tokens. Verified on-chain.',                     code: 'ZeroGentPayment.pay(\n  nonce: 0xf7a3...,\n  type: "phone"\n) → $3.00 USDC\n\n✓ PaymentReceived emitted\n✓ Nonce marked used' },
-  { n: '04', title: 'Resource provisioned',     body: 'Backend verifies payment, provisions via Web2 API, registers on AgentRegistry.',              code: '✓ Payment verified on-chain\n✓ Telnyx: +1 (415) 555-0142\n✓ AgentRegistry.registerResource()\n\n→ owner: 0x742d...bD18\n→ resourceId: 3' },
+  {
+    n: '01',
+    title: 'A human signs',
+    body: 'The owner signs a warrant naming one agent, the resources it may buy, a ceiling, a purpose and an expiry. No transaction, no gas, no funded account. The signature is the authorisation.',
+    code: 'EIP-712 Warrant\n\n  agent      0.0.4242\n  resources  ["inference"]\n  cap        1000000   ($1.00)\n  purpose    "support triage"\n  expiry     +24h\n\n→ 0x07d266582acb47f6…7fe7edf0',
+  },
+  {
+    n: '02',
+    title: 'The gate reads it first',
+    body: 'The agent presents the warrant on every request. Before the service quotes a price, it recovers the signature, checks the resource against the allowlist, sums what has already settled and compares it to the cap.',
+    code: 'POST /v1/inference\nX-Warrant: eyJ3YXJyYW50Ijp7…\n\n  signature   recovers to owner ✓\n  inference   in allowlist   ✓\n  $0.05       under cap      ✓\n  expiry      21h remaining  ✓',
+  },
+  {
+    n: '03',
+    title: 'Only then, money',
+    body: 'An authorised request gets an HTTP 402 with terms. The agent signs a USDC transfer on Hedera. After the signature and before settlement, the payer is checked against the agent the warrant names.',
+    code: '← 402 Payment Required\n{\n  "scheme":  "exact",\n  "network": "hedera:testnet",\n  "amount":  "50000",\n  "asset":   "0.0.429274"\n}\n\n  payer 0.0.4242 = named agent ✓',
+  },
+  {
+    n: '04',
+    title: 'A receipt, or a reason',
+    body: 'Settled purchases write a receipt binding agent, warrant, purpose, amount and transaction. Refused ones write the code and the reason. Both are readable without credentials.',
+    code: '✓ settled  0.0.4242@1789189611.402118000\n✓ receipt  inference $0.05\n           purpose "support triage"\n\n✗ refused  resource_not_authorised\n           covers inference,\n           not email.send',
+  },
 ];
 
 export function HowItWorks() {
@@ -80,10 +100,10 @@ export function HowItWorks() {
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
         <div className="reveal-up" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#E8B55C', marginBottom: 16, fontWeight: 500 }}>
-          x402 Protocol
+          The path of one purchase
         </div>
-        <h2 className="reveal-up section-h2" style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 20, transitionDelay: '60ms' }}>
-          How it works
+        <h2 className="reveal-up section-h2 display" style={{ fontSize: 'min(44px, 4vw)', fontWeight: 500, letterSpacing: '-0.025em', lineHeight: 1.12, marginBottom: 20, transitionDelay: '60ms' }}>
+          Every check at the earliest moment it can be made
         </h2>
         <div className="reveal-up" style={{
           display: 'flex', alignItems: 'center', gap: 14,
@@ -91,7 +111,11 @@ export function HowItWorks() {
           fontSize: 16, color: 'rgba(247,246,243,0.5)', lineHeight: 1.7,
           transitionDelay: '120ms',
         }}>
-          <span>Call API → get 402 → pay on-chain → resource is yours.</span>
+          <span>
+            The order is the design. Asking whether a purchase is authorised costs nothing, so
+            it happens before the agent is asked to pay. Checking who paid needs a signature,
+            so it happens after one and before the money moves.
+          </span>
           <button
             type="button"
             onClick={() => setIsPlaying((p) => !p)}

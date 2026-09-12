@@ -1,12 +1,8 @@
 {
   "rewrites": [
-    { "source": "/skill.md", "destination": "https://api.0gent.xyz/skill.md" },
-    { "source": "/pricing",  "destination": "https://api.0gent.xyz/pricing"  },
-    { "source": "/logos", "destination": "/index.html" },
+    { "source": "/console", "destination": "/index.html" },
+    { "source": "/audit", "destination": "/index.html" },
     { "source": "/docs", "destination": "/index.html" },
-    { "source": "/stats", "destination": "/index.html" },
-    { "source": "/dashboard", "destination": "/index.html" },
-    { "source": "/try", "destination": "/index.html" },
-    { "source": "/agent/:address", "destination": "/index.html" }
+    { "source": "/agent/:id", "destination": "/index.html" }
   ]
 }

@@ -159,12 +159,12 @@ body::after {
   background: linear-gradient(135deg, rgba(232, 181, 92,0.18) 0%, rgba(232, 181, 92,0.04) 100%);
 }
 
-/* ─── ZGIntegration card — subtle border + edge glow on hover ─── */
-.zg-card:hover {
+/* ─── Settlement card — subtle border + edge glow on hover ─── */
+.settle-card:hover {
   border-color: rgba(232, 181, 92,0.3);
   transform: translateY(-3px);
 }
-.zg-card:hover .zg-top-edge { opacity: 1; }
+.settle-card:hover .settle-top-edge { opacity: 1; }
 
 /* ─── Wallet section step number badge ─── */
 .step-badge {
@@ -247,8 +247,8 @@ body::after {
   .hiw-preview { min-height: 280px !important; }
 
   /* ZGIntegration: stack instead of 4-col */
-  .zg-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important; gap: 14px !important; }
-  .zg-grid > * { padding: 22px !important; }
+  .settle-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important; gap: 14px !important; }
+  .settle-grid > * { padding: 22px !important; }
 
   /* WalletPanel: shave the giant top padding + tighten card interior */
   .wallet-section { padding: 60px 16px 60px !important; }

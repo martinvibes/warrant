@@ -1,42 +1,38 @@
 import type { ReactNode } from 'react';
 
-// ─── Icons (purple, consistent line weight) ───────────────────────────
+const stroke = {
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.6,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+};
 
-const ChainIcon = (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+const ProtocolIcon = (
+  <svg width="22" height="22" viewBox="0 0 24 24" {...stroke}>
+    <path d="M4 8h16M4 16h16" />
+    <circle cx="9" cy="8" r="2.2" />
+    <circle cx="15" cy="16" r="2.2" />
   </svg>
 );
 
-const StorageIcon = (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <ellipse cx="12" cy="5" rx="9" ry="3" />
-    <path d="M3 5v6c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
-    <path d="M3 11v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6" />
+const LedgerIcon = (
+  <svg width="22" height="22" viewBox="0 0 24 24" {...stroke}>
+    <path d="M12 3 3 7.5v9L12 21l9-4.5v-9z" />
+    <path d="M3 7.5 12 12l9-4.5M12 12v9" />
   </svg>
 );
 
-const IdentityIcon = (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="8" r="4" />
-    <circle cx="12" cy="8" r="1.5" fill="currentColor" stroke="none" />
+const SponsorIcon = (
+  <svg width="22" height="22" viewBox="0 0 24 24" {...stroke}>
+    <path d="M12 20s-7-4.3-7-9.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 7 3.5C19 15.7 12 20 12 20z" />
   </svg>
 );
 
-const PaymentIcon = (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="6" width="18" height="13" rx="2" />
-    <line x1="3" y1="11" x2="21" y2="11" />
-    <line x1="7" y1="15" x2="11" y2="15" />
-  </svg>
-);
-
-const ComputeIcon = (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
-    <circle cx="12" cy="12" r="3" />
+const ReceiptIcon = (
+  <svg width="22" height="22" viewBox="0 0 24 24" {...stroke}>
+    <path d="M6 3h12v18l-3-2-3 2-3-2-3 2z" />
+    <path d="M9 8h6M9 12h6" />
   </svg>
 );
 
@@ -48,15 +44,35 @@ interface Item {
 }
 
 const items: Item[] = [
-  { title: 'On-Chain Payments · x402', desc: 'Token payments via the x402 protocol. USDC on Celo, native tokens on 0G.',                  detail: 'Celo · 0G Chain',            icon: ChainIcon },
-  { title: '0G Storage',               desc: 'Agent memory, NFT metadata, session state on decentralized storage.',                        detail: '@0glabs/0g-ts-sdk',          icon: StorageIcon },
-  { title: '0G Compute Network',       desc: 'Pay-per-call AI inference via the 0G Compute serving network.',                              detail: '@0glabs/0g-serving-broker',  icon: ComputeIcon },
-  { title: 'Agent Identity',           desc: 'ERC-8004 on Celo, ERC-721 on 0G Chain. On-chain and permanent.',                             detail: 'ERC-8004 · ERC-721',         icon: IdentityIcon },
+  {
+    title: 'x402, pay per request',
+    desc: 'An HTTP 402 carries the terms, the agent signs a transfer, the request is retried with proof. No API key, no account, no invoice at the end of the month.',
+    detail: '@x402/express · @x402/hedera',
+    icon: ProtocolIcon,
+  },
+  {
+    title: 'Hedera, final in seconds',
+    desc: 'USDC as a native token with fixed, fractions-of-a-cent fees and consensus finality in seconds. A $0.05 purchase is only worth making where the fee is not the purchase.',
+    detail: 'hedera:testnet · USDC 0.0.429274',
+    icon: LedgerIcon,
+  },
+  {
+    title: 'The fee is sponsored',
+    desc: 'The facilitator pays the network fee, so a paying agent needs stablecoin and nothing else. One funded asset instead of two is the difference between an agent that can pay and one that gets stuck.',
+    detail: 'Blocky402 facilitator · feePayer 0.0.7162784',
+    icon: SponsorIcon,
+  },
+  {
+    title: 'Receipts, not log lines',
+    desc: 'Settlement writes a row binding the agent, the warrant, the purpose, the amount and the transaction id. That row is what turns a balance that went down into a purchase somebody can explain.',
+    detail: 'GET /v1/receipts',
+    icon: ReceiptIcon,
+  },
 ];
 
-export function ZGIntegration() {
+export function Settlement() {
   return (
-    <section id="stack" className="section-pad" style={{ padding: '120px 0', borderTop: '1px solid rgba(232,181,92,0.1)', position: 'relative', overflow: 'hidden' }}>
+    <section id="settlement" className="section-pad" style={{ padding: '120px 0', borderTop: '1px solid rgba(232,181,92,0.1)', position: 'relative', overflow: 'hidden' }}>
       {/* subtle decorative grid in the background */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
@@ -75,20 +91,22 @@ export function ZGIntegration() {
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', textAlign: 'center', position: 'relative' }}>
         <div className="reveal-up" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#E8B55C', marginBottom: 16, fontWeight: 500 }}>
-          Deep Integration
+          Settlement
         </div>
-        <h2 className="reveal-up section-h2" style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 20 }}>
-          Deep Chain Integration
+        <h2 className="reveal-up section-h2 display" style={{ fontSize: 'min(44px, 4vw)', fontWeight: 500, letterSpacing: '-0.025em', lineHeight: 1.12, marginBottom: 20 }}>
+          Small enough payments to be worth refusing
         </h2>
         <p className="reveal-up" style={{ fontSize: 16, color: 'rgba(247,246,243,0.5)', maxWidth: 540, margin: '0 auto 56px', lineHeight: 1.7 }}>
-          Multi-chain infrastructure — payments, storage, compute, identity — all on-chain.
+          A warrant is only interesting where the purchases are small and frequent. That needs a
+          rail where five cents is a sensible amount to move, and a protocol where the price
+          travels with the request rather than through a billing relationship.
         </p>
 
-        <div className="zg-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, textAlign: 'left' }}>
+        <div className="settle-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, textAlign: 'left' }}>
           {items.map((it, i) => (
             <div
               key={it.title}
-              className="reveal-up zg-card"
+              className="reveal-up settle-card"
               style={{
                 background: 'linear-gradient(180deg, #0e0e0f 0%, #0a0a0b 100%)',
                 border: '1px solid rgba(232,181,92,0.10)',
@@ -101,7 +119,7 @@ export function ZGIntegration() {
               }}
             >
               {/* subtle top-edge gradient accent that lights up on hover */}
-              <div className="zg-top-edge" style={{
+              <div className="settle-top-edge" style={{
                 position: 'absolute',
                 top: 0, left: 0, right: 0,
                 height: 1,
@@ -125,7 +143,7 @@ export function ZGIntegration() {
                 textTransform: 'uppercase',
                 color: 'rgba(247,246,243,0.3)',
                 marginBottom: 10, fontWeight: 500,
-              }}>Component</div>
+              }}>Layer</div>
 
               <h3 style={{
                 fontSize: 18, fontWeight: 600,

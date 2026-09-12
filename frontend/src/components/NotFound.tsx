@@ -95,8 +95,8 @@ export function NotFound() {
         }}>
           {([
             ['Home',       '/',          'Landing page'],
-            ['Dashboard',  '/dashboard', 'Mint, send email, ask AI'],
-            ['Stats',      '/stats',     'Live activity & transaction log'],
+            ['Console',    '/console',   'Issue and revoke warrants'],
+            ['Audit',      '/audit',     'Every receipt and every refusal'],
             ['Docs',       '/docs',      'Full developer reference'],
           ] as const).map(([label, href, sub]) => (
             <a
@@ -134,7 +134,7 @@ export function NotFound() {
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
           <a
-            href="/dashboard"
+            href="/console"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               height: 44, padding: '0 22px',
@@ -145,7 +145,7 @@ export function NotFound() {
             onMouseEnter={e => { e.currentTarget.style.filter = 'brightness(1.1)'; }}
             onMouseLeave={e => { e.currentTarget.style.filter = 'none'; }}
           >
-            Open Dashboard →
+            Open the console →
           </a>
         </div>
       </div>

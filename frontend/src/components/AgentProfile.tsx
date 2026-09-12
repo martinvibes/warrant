@@ -1,492 +1,250 @@
-import { useEffect, useState } from 'react';
-import { isAddress } from 'ethers';
-import { Glyph0G, LogoLockup } from './Logo';
-import { API_URL } from '../lib/api';
+/**
+ * One agent's record.
+ *
+ * The console answers "what is my agent doing". This page answers the question
+ * somebody else asks: given this Hedera account, what was it ever authorised to
+ * buy, what did it buy, and what was it stopped from buying. No signer, no
+ * credentials, nothing hidden — which is the only way a record of spending is
+ * worth anything to the person who did not issue it.
+ */
+import { useEffect, useMemo, useState } from 'react';
+import {
+  explorerAccount,
+  explorerTx,
+  formatUsdc,
+  getHealth,
+  listRefusals,
+  listReceipts,
+  listWarrants,
+  percentSpent,
+  shortId,
+  timeAgo,
+  untilExpiry,
+  type Receipt,
+  type Refusal,
+  type WarrantView,
+} from '../lib/api';
+import { LogoLockup } from './Logo';
+import { ExternalIcon } from './Icons';
 
-// ─── Tokens (matches the rest of the page) ─────────────────────────────
+const BRASS = '#E8B55C';
+const SETTLED = '#6FE3A5';
+const REFUSED = '#E5484D';
+const LINE = 'rgba(232, 181, 92,0.14)';
+const DIM = 'rgba(247,246,243,0.55)';
+const MUTED = 'rgba(247,246,243,0.35)';
 
-const PURPLE = '#C98A2E';
-const LILAC = '#E8B55C';
-const GREEN = '#46B860';
-const TEXT = '#f7f6f3';
-const TEXT_DIM = 'rgba(247,246,243,0.55)';
-const TEXT_FAINT = 'rgba(247,246,243,0.32)';
-const TEXT_GHOST = 'rgba(247,246,243,0.20)';
-const BG_PAGE = '#0a0a0b';
-const BG_CARD = '#0c0c0d';
-const BORDER = 'rgba(232,181,92,0.10)';
-const BORDER_HOVER = 'rgba(232,181,92,0.28)';
-
-// ─── Types matching the backend response ──────────────────────────────
-
-interface AgentResource {
-  id: number;
-  type: number;
-  typeLabel: string;
-  status: number;
-  statusLabel: string;
-  providerRef: string;
-  createdAt: string;
-  expiresAt: string | null;
-}
-
-interface AgentData {
-  address: string;
-  identity: { tokenId: number; metadataURI: string; resourceCount: number } | null;
-  resources: AgentResource[];
-  balance: string;
-  balanceWei: string;
-  chain: { chainId: number };
-  explorer: string;
-}
-
-// ─── Inline icons per resource type ───────────────────────────────────
-
-function ResourceIcon({ type, size = 22 }: { type: string; size?: number }) {
-  const stroke = LILAC;
-  switch (type) {
-    case 'email':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="5" width="18" height="14" rx="2" />
-          <polyline points="3 7 12 13 21 7" />
-        </svg>
-      );
-    case 'phone':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z" />
-        </svg>
-      );
-    case 'compute':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="3" width="18" height="7" rx="1.5" />
-          <rect x="3" y="14" width="18" height="7" rx="1.5" />
-          <line x1="7" y1="6.5" x2="7.01" y2="6.5" />
-          <line x1="7" y1="17.5" x2="7.01" y2="17.5" />
-        </svg>
-      );
-    case 'domain':
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M3 12h18" />
-          <path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
-        </svg>
-      );
-    default:
-      return (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="9" />
-        </svg>
-      );
-  }
-}
-
-function shortAddr(a: string): string {
-  return a.slice(0, 6) + '…' + a.slice(-4);
-}
-
-function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    year: 'numeric', month: 'short', day: 'numeric',
-  });
-}
-
-// ─── Page ──────────────────────────────────────────────────────────────
-
-export function AgentProfile({ address }: { address: string }) {
-  const [data, setData] = useState<AgentData | null>(null);
+export function AgentProfile({ agent }: { agent: string }) {
+  const [warrants, setWarrants] = useState<WarrantView[]>([]);
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
+  const [refusals, setRefusals] = useState<Refusal[]>([]);
+  const [network, setNetwork] = useState('hedera:testnet');
+  const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-
-  const validAddr = isAddress(address);
 
   useEffect(() => {
-    if (!validAddr) {
-      setError('Invalid wallet address.');
-      return;
-    }
-    let cancelled = false;
-    (async () => {
+    let live = true;
+    const load = async () => {
       try {
-        setError(null);
-        const res = await fetch(`${API_URL}/agent/${address}`);
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body?.error || `HTTP ${res.status}`);
+        const [h, w, rc, rf] = await Promise.all([
+          getHealth(),
+          listWarrants(),
+          listReceipts(),
+          listRefusals(),
+        ]);
+        if (!live) return;
+        setNetwork(h.network);
+        setWarrants(w.filter(x => x.agent === agent));
+        setReceipts(rc.filter(x => x.agent === agent));
+        setRefusals(rf.filter(x => x.agent === agent));
+        setState('ready');
+      } catch (err) {
+        if (live) {
+          setError((err as Error).message);
+          setState('error');
         }
-        const json = (await res.json()) as AgentData;
-        if (!cancelled) setData(json);
-      } catch (e: any) {
-        if (!cancelled) setError(e.message || 'Failed to load agent');
       }
-    })();
-    return () => { cancelled = true; };
-  }, [address, validAddr]);
+    };
+    load();
+    const id = setInterval(load, 10_000);
+    return () => { live = false; clearInterval(id); };
+  }, [agent]);
 
-  const copyAddr = async () => {
-    try {
-      await navigator.clipboard.writeText(address);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {}
-  };
+  const totals = useMemo(() => {
+    const sum = (rows: { amount: string }[]) =>
+      rows.reduce((a, r) => a + BigInt(r.amount), 0n).toString();
+    return {
+      authorised: warrants
+        .filter(w => w.status === 'live')
+        .reduce((a, w) => a + BigInt(w.cap), 0n)
+        .toString(),
+      settled: sum(receipts),
+      live: warrants.filter(w => w.status === 'live').length,
+    };
+  }, [warrants, receipts]);
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: BG_PAGE,
-      color: TEXT,
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      {/* Section bg glow */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 50% 35% at 50% 0%, rgba(232,181,92,0.12), transparent 70%)',
-      }} />
-
-      {/* Mini nav */}
-      <div style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        padding: '14px 24px',
-        background: 'rgba(10,10,11,0.85)',
-        backdropFilter: 'blur(18px)',
-        borderBottom: `1px solid ${BORDER}`,
-      }}>
-        <div style={{
-          maxWidth: 1100, margin: '0 auto',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
-        }}>
+    <div style={{ minHeight: '100vh', background: '#070707' }}>
+      <header style={{ borderBottom: `1px solid ${LINE}`, padding: '18px 28px' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap' }}>
           <a href="/" style={{ textDecoration: 'none' }}>
-            <LogoLockup size={20} color={LILAC} />
+            <LogoLockup size={21} />
           </a>
-          <a href="/" style={{
-            fontSize: 12, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace',
-            textDecoration: 'none', letterSpacing: '0.04em',
-          }}>← back to 0gent.xyz</a>
+          <a href="/audit" style={{ fontSize: 13, color: DIM, textDecoration: 'none' }}>
+            Full ledger →
+          </a>
         </div>
-      </div>
+      </header>
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '60px 24px 80px', position: 'relative' }}>
-        {/* Header */}
-        <div style={{ marginBottom: 48 }}>
-          <div style={{
-            fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase',
-            color: LILAC, marginBottom: 14, fontWeight: 500,
-          }}>agent profile</div>
-          <h1 style={{
-            fontSize: 'min(40px, 3.4vw)', fontWeight: 500,
-            letterSpacing: '-0.03em', lineHeight: 1.1, margin: 0, marginBottom: 14,
-          }}>
-            {data?.identity ? `Agent #${data.identity.tokenId}` : 'Unknown agent'}
-          </h1>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
-            fontFamily: 'IBM Plex Mono, monospace', fontSize: 13, color: TEXT_DIM,
-          }}>
-            <code style={{ color: LILAC, userSelect: 'all' }}>{address}</code>
-            <button
-              onClick={copyAddr}
-              style={{
-                fontSize: 11, padding: '4px 10px',
-                background: 'transparent',
-                border: `1px solid ${copied ? 'rgba(70,184,96,0.4)' : BORDER}`,
-                color: copied ? GREEN : TEXT_DIM,
-                cursor: 'pointer',
-                fontFamily: 'IBM Plex Mono, monospace',
-                transition: 'all 0.15s',
-              }}
-            >
-              {copied ? '✓ copied' : 'copy'}
-            </button>
-            {data && (
-              <a
-                href={data.explorer}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  fontSize: 11, padding: '4px 10px',
-                  border: `1px solid ${BORDER}`,
-                  color: TEXT_DIM,
-                  textDecoration: 'none',
-                  fontFamily: 'IBM Plex Mono, monospace',
-                  transition: 'all 0.15s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = BORDER_HOVER; e.currentTarget.style.color = TEXT; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT_DIM; }}
-              >
-                explorer ↗
-              </a>
-            )}
-          </div>
+      <main style={{ maxWidth: 1000, margin: '0 auto', padding: '48px 28px 100px' }}>
+        <div className="label" style={{ color: MUTED, marginBottom: 12 }}>
+          Agent
         </div>
+        <h1 className="mono" style={{ fontSize: 'clamp(26px, 4vw, 38px)', fontWeight: 500, margin: '0 0 14px', letterSpacing: '-0.01em' }}>
+          {agent}
+        </h1>
+        <a
+          href={explorerAccount(agent, network)}
+          target="_blank"
+          rel="noreferrer"
+          className="mono"
+          style={{ fontSize: 12, color: BRASS, display: 'inline-flex', alignItems: 'center', gap: 5, textDecoration: 'none' }}
+        >
+          View on HashScan <ExternalIcon size={10} />
+        </a>
 
-        {/* Error state */}
-        {error && (
-          <div style={{
-            padding: '16px 20px',
-            border: '1px solid rgba(229,72,77,0.3)',
-            background: 'rgba(229,72,77,0.06)',
-            color: '#E5484D',
-            fontSize: 14,
-            marginBottom: 32,
-          }}>
-            {error}
-          </div>
+        {state === 'loading' && (
+          <p style={{ marginTop: 40, fontSize: 14, color: MUTED }}>Reading the ledger…</p>
+        )}
+        {state === 'error' && (
+          <p style={{ marginTop: 40, fontSize: 14, color: REFUSED }}>{error}</p>
         )}
 
-        {/* Loading state */}
-        {!data && !error && validAddr && (
-          <div style={{
-            padding: '40px 0', textAlign: 'center',
-            fontSize: 13, color: TEXT_FAINT,
-            fontFamily: 'IBM Plex Mono, monospace',
-          }}>
-            Reading from 0G Chain…
-          </div>
-        )}
-
-        {/* Data */}
-        {data && (
+        {state === 'ready' && (
           <>
-            {/* Stat cards row */}
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: 14, marginBottom: 40,
+              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+              gap: 1, background: LINE, border: `1px solid ${LINE}`, margin: '36px 0 40px',
             }}>
-              <StatCard
-                label="identity"
-                value={data.identity ? `#${data.identity.tokenId}` : '—'}
-                detail={data.identity ? 'agent NFT' : 'not minted'}
-                accent={!!data.identity}
-              />
-              <StatCard
-                label="resources"
-                value={String(data.resources.length)}
-                detail={data.resources.filter(r => r.statusLabel === 'active').length + ' active'}
-                accent={data.resources.length > 0}
-              />
-              <StatCard
-                label="balance"
-                value={Number(data.balance).toFixed(4)}
-                unit="0G"
-                detail={`chain ${data.chain.chainId}`}
-                accent={Number(data.balance) > 0}
-              />
+              <Tile label="Live warrants" value={String(totals.live)} />
+              <Tile label="Authorised" value={formatUsdc(totals.authorised)} tone={BRASS} />
+              <Tile label="Settled" value={formatUsdc(totals.settled)} tone={SETTLED} />
+              <Tile label="Refused" value={String(refusals.length)} tone={refusals.length ? REFUSED : undefined} />
             </div>
 
-            {/* Identity card */}
-            {data.identity && (
-              <Section title="Identity">
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap',
-                  padding: '20px 22px',
-                  background: BG_CARD,
-                  border: `1px solid ${BORDER}`,
-                }}>
-                  <div style={{
-                    width: 56, height: 56,
-                    border: `1px solid ${BORDER}`,
-                    background: 'linear-gradient(135deg, rgba(232,181,92,0.10), rgba(232,181,92,0.02))',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0,
-                  }}>
-                    <Glyph0G size={32} color={LILAC} strokeWidth={3.6} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 240 }}>
-                    <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>
-                      Agent Identity NFT #{data.identity.tokenId}
-                    </div>
-                    <div style={{ fontSize: 12, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace', wordBreak: 'break-all' }}>
-                      {data.identity.metadataURI}
-                    </div>
-                  </div>
-                  <div style={{
-                    fontFamily: 'IBM Plex Mono, monospace', fontSize: 11,
-                    color: GREEN, padding: '5px 11px',
-                    border: '1px solid rgba(70,184,96,0.3)',
-                    background: 'rgba(70,184,96,0.06)',
-                    letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 600,
-                  }}>
-                    ERC-721
-                  </div>
-                </div>
-              </Section>
-            )}
+            {warrants.length === 0 && receipts.length === 0 && refusals.length === 0 ? (
+              <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.8, maxWidth: 520 }}>
+                This service has never seen {agent}. It has not been named in a warrant here, so
+                every paid request it made would have been refused for want of one.
+              </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
+                <Section title={`Warrants (${warrants.length})`}>
+                  {warrants.length === 0 ? (
+                    <Muted>No warrant here names this agent.</Muted>
+                  ) : (
+                    warrants.map(w => (
+                      <div key={w.id} style={{ padding: '16px 0', borderBottom: `1px solid rgba(247,246,243,0.05)` }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap', marginBottom: 10 }}>
+                          <strong style={{ fontSize: 14, fontWeight: 500 }}>{w.purpose}</strong>
+                          <span className="label" style={{ color: w.status === 'live' ? SETTLED : REFUSED, fontSize: 10 }}>
+                            {w.status}
+                          </span>
+                        </div>
+                        <div style={{ height: 3, background: 'rgba(247,246,243,0.07)', marginBottom: 9 }}>
+                          <div style={{ width: `${percentSpent(w)}%`, height: '100%', background: w.status === 'live' ? BRASS : MUTED }} />
+                        </div>
+                        <div className="mono" style={{ fontSize: 11, color: MUTED, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                          <span>{formatUsdc(w.spent)} of {formatUsdc(w.cap)}</span>
+                          <span>covers {w.resources.join(', ') || 'nothing'}</span>
+                          <span>{w.status === 'live' ? untilExpiry(w.expiry) : timeAgo(w.revokedAt ?? w.expiry)}</span>
+                          <span>{shortId(w.id)}</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </Section>
 
-            {/* Resources */}
-            <Section title={`Resources · ${data.resources.length}`}>
-              {data.resources.length === 0 ? (
-                <div style={{
-                  padding: '32px 24px',
-                  background: BG_CARD,
-                  border: `1px solid ${BORDER}`,
-                  fontSize: 13, color: TEXT_FAINT,
-                  fontFamily: 'IBM Plex Mono, monospace',
-                  textAlign: 'center',
-                }}>
-                  no resources provisioned yet
-                </div>
-              ) : (
-                <div style={{ display: 'grid', gap: 10 }}>
-                  {data.resources.map((r) => (
-                    <ResourceRow key={r.id} resource={r} />
-                  ))}
-                </div>
-              )}
-            </Section>
+                <Section title={`Bought (${receipts.length})`}>
+                  {receipts.length === 0 ? (
+                    <Muted>Nothing has settled for this agent.</Muted>
+                  ) : (
+                    receipts.map(r => (
+                      <Row key={r.id}>
+                        <span style={{ color: DIM }}>{timeAgo(r.created_at)}</span>
+                        <span style={{ color: '#F7F6F3' }}>{r.resource}</span>
+                        <span style={{ color: SETTLED, fontVariantNumeric: 'tabular-nums' }}>{formatUsdc(r.amount)}</span>
+                        <a href={explorerTx(r.tx_id, r.network)} target="_blank" rel="noreferrer" style={{ color: BRASS, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          {shortId(r.tx_id, 12, 4)} <ExternalIcon size={9} />
+                        </a>
+                      </Row>
+                    ))
+                  )}
+                </Section>
 
-            {/* CTA at the bottom */}
-            <div style={{
-              marginTop: 56, padding: '24px 28px',
-              background: 'linear-gradient(135deg, rgba(232,181,92,0.06), rgba(232,181,92,0.01))',
-              border: `1px solid ${BORDER}`,
-              display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap',
-            }}>
-              <div style={{ flex: 1, minWidth: 280 }}>
-                <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>
-                  Want a profile like this?
-                </div>
-                <div style={{ fontSize: 13, color: TEXT_DIM, lineHeight: 1.6 }}>
-                  Mint your own agent identity. Provision real email + phone. All paid on-chain.
-                </div>
+                <Section title={`Refused (${refusals.length})`}>
+                  {refusals.length === 0 ? (
+                    <Muted>Nothing was refused.</Muted>
+                  ) : (
+                    refusals.map(r => (
+                      <Row key={r.id}>
+                        <span style={{ color: DIM }}>{timeAgo(r.created_at)}</span>
+                        <span style={{ color: '#F7F6F3' }}>{r.resource}</span>
+                        <span style={{ color: REFUSED }}>{r.code}</span>
+                        <span style={{ color: MUTED, whiteSpace: 'normal' }}>{r.reason}</span>
+                      </Row>
+                    ))
+                  )}
+                </Section>
               </div>
-              <a
-                href="/#wallet"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', height: 42, padding: '0 22px',
-                  background: PURPLE, color: '#fff', fontSize: 13, fontWeight: 500,
-                  borderRadius: 100, border: 'none', textDecoration: 'none',
-                  transition: 'filter 0.2s',
-                }}
-              >
-                Create your wallet →
-              </a>
-            </div>
+            )}
           </>
         )}
-      </div>
+      </main>
     </div>
   );
 }
 
-// ─── Subcomponents ─────────────────────────────────────────────────────
-
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 36 }}>
-      <h2 style={{
-        fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase',
-        color: TEXT_FAINT, fontWeight: 500, marginBottom: 14,
-      }}>{title}</h2>
+    <section>
+      <h2 className="label" style={{ color: DIM, marginBottom: 12, paddingBottom: 10, borderBottom: `1px solid ${LINE}` }}>
+        {title}
+      </h2>
+      {children}
+    </section>
+  );
+}
+
+function Row({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="mono"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'minmax(70px,auto) minmax(90px,auto) minmax(80px,auto) 1fr',
+        gap: 16,
+        padding: '11px 0',
+        fontSize: 12,
+        borderBottom: `1px solid rgba(247,246,243,0.05)`,
+        alignItems: 'baseline',
+      }}
+    >
       {children}
     </div>
   );
 }
 
-function StatCard({
-  label, value, unit, detail, accent,
-}: {
-  label: string;
-  value: string;
-  unit?: string;
-  detail?: string;
-  accent?: boolean;
-}) {
-  return (
-    <div style={{
-      padding: '18px 20px',
-      background: BG_CARD,
-      border: `1px solid ${accent ? 'rgba(232,181,92,0.20)' : BORDER}`,
-    }}>
-      <div style={{
-        fontSize: 11, color: TEXT_FAINT,
-        letterSpacing: '0.06em', textTransform: 'uppercase',
-        marginBottom: 8, fontWeight: 500,
-      }}>{label}</div>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
-        <span style={{
-          fontFamily: 'IBM Plex Mono, monospace',
-          fontSize: 24, fontWeight: 500,
-          color: accent ? TEXT : TEXT_GHOST,
-          letterSpacing: '-0.01em', lineHeight: 1,
-        }}>{value}</span>
-        {unit && (
-          <span style={{
-            fontSize: 13, color: LILAC,
-            fontFamily: 'IBM Plex Mono, monospace', fontWeight: 500,
-          }}>{unit}</span>
-        )}
-      </div>
-      {detail && (
-        <div style={{
-          fontSize: 11, color: TEXT_FAINT,
-          fontFamily: 'IBM Plex Mono, monospace',
-        }}>{detail}</div>
-      )}
-    </div>
-  );
+function Muted({ children }: { children: React.ReactNode }) {
+  return <p style={{ fontSize: 13, color: MUTED, margin: '4px 0 0' }}>{children}</p>;
 }
 
-function ResourceRow({ resource }: { resource: AgentResource }) {
-  const isActive = resource.statusLabel === 'active';
+function Tile({ label, value, tone }: { label: string; value: string; tone?: string }) {
   return (
-    <div className="ap-resource-row" style={{
-      display: 'grid',
-      gridTemplateColumns: 'auto 1fr auto auto',
-      alignItems: 'center', gap: 14,
-      padding: '14px 18px',
-      background: BG_CARD,
-      border: `1px solid ${BORDER}`,
-      transition: 'border-color 0.2s',
-    }}
-      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = BORDER_HOVER; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = BORDER; }}
-    >
-      <div style={{
-        width: 40, height: 40,
-        border: `1px solid ${BORDER}`,
-        background: 'rgba(232,181,92,0.04)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0,
-      }}>
-        <ResourceIcon type={resource.typeLabel} />
-      </div>
-      <div style={{ minWidth: 0 }}>
-        <div style={{
-          fontFamily: 'IBM Plex Mono, monospace',
-          fontSize: 14, fontWeight: 500,
-          color: TEXT,
-          wordBreak: 'break-all',
-        }}>{resource.providerRef}</div>
-        <div style={{
-          fontSize: 11, color: TEXT_FAINT,
-          fontFamily: 'IBM Plex Mono, monospace',
-          marginTop: 2,
-        }}>
-          {resource.typeLabel} · #{resource.id} · created {fmtDate(resource.createdAt)}
-          {resource.expiresAt && <> · expires {fmtDate(resource.expiresAt)}</>}
-        </div>
-      </div>
-      <div style={{
-        fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
-        padding: '4px 10px',
-        color: isActive ? GREEN : TEXT_FAINT,
-        border: `1px solid ${isActive ? 'rgba(70,184,96,0.3)' : BORDER}`,
-        background: isActive ? 'rgba(70,184,96,0.06)' : 'transparent',
-        letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 600,
-      }}>
-        {resource.statusLabel}
-      </div>
-      <div style={{
-        fontSize: 11, color: TEXT_FAINT,
-        fontFamily: 'IBM Plex Mono, monospace',
-      }}>
-        {resource.typeLabel}
+    <div style={{ padding: '16px 18px', background: '#0e0e0f' }}>
+      <div className="label" style={{ color: MUTED, marginBottom: 8 }}>{label}</div>
+      <div className="mono" style={{ fontSize: 21, color: tone ?? '#F7F6F3', fontVariantNumeric: 'tabular-nums' }}>
+        {value}
       </div>
     </div>
   );

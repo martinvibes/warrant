@@ -1,4 +1,4 @@
-import { Glyph0G } from './Logo';
+import { WarrantMark } from './Logo';
 
 export function Nav() {
   return (
@@ -13,20 +13,21 @@ export function Nav() {
           className="nav-brand"
           style={{
             display: 'flex', alignItems: 'center', gap: 9,
-            fontWeight: 600, fontSize: 15, letterSpacing: '-0.01em',
+            fontFamily: "'IBM Plex Serif', Georgia, serif",
+            fontWeight: 500, fontSize: 16, letterSpacing: '-0.015em',
             color: '#f7f6f3', textDecoration: 'none',
           }}
         >
-          <Glyph0G size={22} color="#E8B55C" strokeWidth={3.6} />
-          0GENT
+          <WarrantMark size={20} color="#E8B55C" strokeWidth={3.6} />
+          Warrant
         </a>
 
         <div className="nav-links" style={{ display: 'flex', gap: 22 }}>
           {[
-            ['Dashboard',    '/dashboard'],
-            ['Stats',        '/stats'],
-            ['Features',     '#features'],
-            ['How it Works', '#how-it-works'],
+            ['How it works', '#how-it-works'],
+            ['Refusals',     '#refusals'],
+            ['Settlement',   '#settlement'],
+            ['Audit',        '/audit'],
             ['Docs',         '/docs'],
           ].map(([label, href]) => (
             <a
@@ -42,17 +43,16 @@ export function Nav() {
         </div>
 
         <a
-          href="/skill.md"
+          href="/console"
           className="nav-cta"
           style={{
             display: 'inline-flex', alignItems: 'center', height: 32, padding: '0 16px',
-            background: '#C98A2E', color: '#fff', fontSize: 11, fontWeight: 600,
+            background: '#C98A2E', color: '#0b0b0b', fontSize: 11, fontWeight: 600,
             textTransform: 'uppercase', letterSpacing: '0.06em', borderRadius: 100, border: 'none',
-            transition: 'filter 0.2s',
-            whiteSpace: 'nowrap',
+            transition: 'filter 0.2s', whiteSpace: 'nowrap', textDecoration: 'none',
           }}
         >
-          Try it
+          Console
         </a>
       </div>
     </nav>
