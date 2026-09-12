@@ -5,17 +5,17 @@ import { API_URL } from '../lib/api';
 
 // ─── Tokens (matches the rest of the page) ─────────────────────────────
 
-const PURPLE = '#00B8D4';
-const LILAC = '#00E5FF';
-const GREEN = '#3fb950';
-const TEXT = '#fefefe';
-const TEXT_DIM = 'rgba(254,254,254,0.55)';
-const TEXT_FAINT = 'rgba(254,254,254,0.32)';
-const TEXT_GHOST = 'rgba(254,254,254,0.20)';
-const BG_PAGE = '#08080d';
-const BG_CARD = '#0a0a12';
-const BORDER = 'rgba(0,229,255,0.10)';
-const BORDER_HOVER = 'rgba(0,229,255,0.28)';
+const PURPLE = '#C98A2E';
+const LILAC = '#E8B55C';
+const GREEN = '#46B860';
+const TEXT = '#f7f6f3';
+const TEXT_DIM = 'rgba(247,246,243,0.55)';
+const TEXT_FAINT = 'rgba(247,246,243,0.32)';
+const TEXT_GHOST = 'rgba(247,246,243,0.20)';
+const BG_PAGE = '#0a0a0b';
+const BG_CARD = '#0c0c0d';
+const BORDER = 'rgba(232,181,92,0.10)';
+const BORDER_HOVER = 'rgba(232,181,92,0.28)';
 
 // ─── Types matching the backend response ──────────────────────────────
 
@@ -145,14 +145,14 @@ export function AgentProfile({ address }: { address: string }) {
       {/* Section bg glow */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 50% 35% at 50% 0%, rgba(0,229,255,0.12), transparent 70%)',
+        background: 'radial-gradient(ellipse 50% 35% at 50% 0%, rgba(232,181,92,0.12), transparent 70%)',
       }} />
 
       {/* Mini nav */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 100,
         padding: '14px 24px',
-        background: 'rgba(8,8,13,0.85)',
+        background: 'rgba(10,10,11,0.85)',
         backdropFilter: 'blur(18px)',
         borderBottom: `1px solid ${BORDER}`,
       }}>
@@ -164,7 +164,7 @@ export function AgentProfile({ address }: { address: string }) {
             <LogoLockup size={20} color={LILAC} />
           </a>
           <a href="/" style={{
-            fontSize: 12, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace',
+            fontSize: 12, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace',
             textDecoration: 'none', letterSpacing: '0.04em',
           }}>← back to 0gent.xyz</a>
         </div>
@@ -185,7 +185,7 @@ export function AgentProfile({ address }: { address: string }) {
           </h1>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
-            fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: TEXT_DIM,
+            fontFamily: 'IBM Plex Mono, monospace', fontSize: 13, color: TEXT_DIM,
           }}>
             <code style={{ color: LILAC, userSelect: 'all' }}>{address}</code>
             <button
@@ -193,10 +193,10 @@ export function AgentProfile({ address }: { address: string }) {
               style={{
                 fontSize: 11, padding: '4px 10px',
                 background: 'transparent',
-                border: `1px solid ${copied ? 'rgba(63,185,80,0.4)' : BORDER}`,
+                border: `1px solid ${copied ? 'rgba(70,184,96,0.4)' : BORDER}`,
                 color: copied ? GREEN : TEXT_DIM,
                 cursor: 'pointer',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'IBM Plex Mono, monospace',
                 transition: 'all 0.15s',
               }}
             >
@@ -212,7 +212,7 @@ export function AgentProfile({ address }: { address: string }) {
                   border: `1px solid ${BORDER}`,
                   color: TEXT_DIM,
                   textDecoration: 'none',
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'IBM Plex Mono, monospace',
                   transition: 'all 0.15s',
                 }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = BORDER_HOVER; e.currentTarget.style.color = TEXT; }}
@@ -228,9 +228,9 @@ export function AgentProfile({ address }: { address: string }) {
         {error && (
           <div style={{
             padding: '16px 20px',
-            border: '1px solid rgba(248,81,73,0.3)',
-            background: 'rgba(248,81,73,0.06)',
-            color: '#f85149',
+            border: '1px solid rgba(229,72,77,0.3)',
+            background: 'rgba(229,72,77,0.06)',
+            color: '#E5484D',
             fontSize: 14,
             marginBottom: 32,
           }}>
@@ -243,7 +243,7 @@ export function AgentProfile({ address }: { address: string }) {
           <div style={{
             padding: '40px 0', textAlign: 'center',
             fontSize: 13, color: TEXT_FAINT,
-            fontFamily: 'JetBrains Mono, monospace',
+            fontFamily: 'IBM Plex Mono, monospace',
           }}>
             Reading from 0G Chain…
           </div>
@@ -291,7 +291,7 @@ export function AgentProfile({ address }: { address: string }) {
                   <div style={{
                     width: 56, height: 56,
                     border: `1px solid ${BORDER}`,
-                    background: 'linear-gradient(135deg, rgba(0,229,255,0.10), rgba(0,229,255,0.02))',
+                    background: 'linear-gradient(135deg, rgba(232,181,92,0.10), rgba(232,181,92,0.02))',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>
@@ -301,15 +301,15 @@ export function AgentProfile({ address }: { address: string }) {
                     <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 4 }}>
                       Agent Identity NFT #{data.identity.tokenId}
                     </div>
-                    <div style={{ fontSize: 12, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace', wordBreak: 'break-all' }}>
+                    <div style={{ fontSize: 12, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace', wordBreak: 'break-all' }}>
                       {data.identity.metadataURI}
                     </div>
                   </div>
                   <div style={{
-                    fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                    fontFamily: 'IBM Plex Mono, monospace', fontSize: 11,
                     color: GREEN, padding: '5px 11px',
-                    border: '1px solid rgba(63,185,80,0.3)',
-                    background: 'rgba(63,185,80,0.06)',
+                    border: '1px solid rgba(70,184,96,0.3)',
+                    background: 'rgba(70,184,96,0.06)',
                     letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 600,
                   }}>
                     ERC-721
@@ -326,7 +326,7 @@ export function AgentProfile({ address }: { address: string }) {
                   background: BG_CARD,
                   border: `1px solid ${BORDER}`,
                   fontSize: 13, color: TEXT_FAINT,
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'IBM Plex Mono, monospace',
                   textAlign: 'center',
                 }}>
                   no resources provisioned yet
@@ -343,7 +343,7 @@ export function AgentProfile({ address }: { address: string }) {
             {/* CTA at the bottom */}
             <div style={{
               marginTop: 56, padding: '24px 28px',
-              background: 'linear-gradient(135deg, rgba(0,229,255,0.06), rgba(0,229,255,0.01))',
+              background: 'linear-gradient(135deg, rgba(232,181,92,0.06), rgba(232,181,92,0.01))',
               border: `1px solid ${BORDER}`,
               display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap',
             }}>
@@ -401,7 +401,7 @@ function StatCard({
     <div style={{
       padding: '18px 20px',
       background: BG_CARD,
-      border: `1px solid ${accent ? 'rgba(0,229,255,0.20)' : BORDER}`,
+      border: `1px solid ${accent ? 'rgba(232,181,92,0.20)' : BORDER}`,
     }}>
       <div style={{
         fontSize: 11, color: TEXT_FAINT,
@@ -410,7 +410,7 @@ function StatCard({
       }}>{label}</div>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 4 }}>
         <span style={{
-          fontFamily: 'JetBrains Mono, monospace',
+          fontFamily: 'IBM Plex Mono, monospace',
           fontSize: 24, fontWeight: 500,
           color: accent ? TEXT : TEXT_GHOST,
           letterSpacing: '-0.01em', lineHeight: 1,
@@ -418,14 +418,14 @@ function StatCard({
         {unit && (
           <span style={{
             fontSize: 13, color: LILAC,
-            fontFamily: 'JetBrains Mono, monospace', fontWeight: 500,
+            fontFamily: 'IBM Plex Mono, monospace', fontWeight: 500,
           }}>{unit}</span>
         )}
       </div>
       {detail && (
         <div style={{
           fontSize: 11, color: TEXT_FAINT,
-          fontFamily: 'JetBrains Mono, monospace',
+          fontFamily: 'IBM Plex Mono, monospace',
         }}>{detail}</div>
       )}
     </div>
@@ -450,7 +450,7 @@ function ResourceRow({ resource }: { resource: AgentResource }) {
       <div style={{
         width: 40, height: 40,
         border: `1px solid ${BORDER}`,
-        background: 'rgba(0,229,255,0.04)',
+        background: 'rgba(232,181,92,0.04)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         flexShrink: 0,
       }}>
@@ -458,14 +458,14 @@ function ResourceRow({ resource }: { resource: AgentResource }) {
       </div>
       <div style={{ minWidth: 0 }}>
         <div style={{
-          fontFamily: 'JetBrains Mono, monospace',
+          fontFamily: 'IBM Plex Mono, monospace',
           fontSize: 14, fontWeight: 500,
           color: TEXT,
           wordBreak: 'break-all',
         }}>{resource.providerRef}</div>
         <div style={{
           fontSize: 11, color: TEXT_FAINT,
-          fontFamily: 'JetBrains Mono, monospace',
+          fontFamily: 'IBM Plex Mono, monospace',
           marginTop: 2,
         }}>
           {resource.typeLabel} · #{resource.id} · created {fmtDate(resource.createdAt)}
@@ -473,18 +473,18 @@ function ResourceRow({ resource }: { resource: AgentResource }) {
         </div>
       </div>
       <div style={{
-        fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+        fontFamily: 'IBM Plex Mono, monospace', fontSize: 10,
         padding: '4px 10px',
         color: isActive ? GREEN : TEXT_FAINT,
-        border: `1px solid ${isActive ? 'rgba(63,185,80,0.3)' : BORDER}`,
-        background: isActive ? 'rgba(63,185,80,0.06)' : 'transparent',
+        border: `1px solid ${isActive ? 'rgba(70,184,96,0.3)' : BORDER}`,
+        background: isActive ? 'rgba(70,184,96,0.06)' : 'transparent',
         letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 600,
       }}>
         {resource.statusLabel}
       </div>
       <div style={{
         fontSize: 11, color: TEXT_FAINT,
-        fontFamily: 'JetBrains Mono, monospace',
+        fontFamily: 'IBM Plex Mono, monospace',
       }}>
         {resource.typeLabel}
       </div>

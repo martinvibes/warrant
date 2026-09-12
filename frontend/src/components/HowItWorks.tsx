@@ -75,11 +75,11 @@ export function HowItWorks() {
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 50% 40% at 80% 70%, rgba(0,229,255,0.06), transparent 70%)',
+        background: 'radial-gradient(ellipse 50% 40% at 80% 70%, rgba(232,181,92,0.06), transparent 70%)',
       }} />
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
-        <div className="reveal-up" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#00E5FF', marginBottom: 16, fontWeight: 500 }}>
+        <div className="reveal-up" style={{ fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#E8B55C', marginBottom: 16, fontWeight: 500 }}>
           x402 Protocol
         </div>
         <h2 className="reveal-up section-h2" style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 20, transitionDelay: '60ms' }}>
@@ -88,7 +88,7 @@ export function HowItWorks() {
         <div className="reveal-up" style={{
           display: 'flex', alignItems: 'center', gap: 14,
           maxWidth: 520, marginBottom: 56,
-          fontSize: 16, color: 'rgba(254,254,254,0.5)', lineHeight: 1.7,
+          fontSize: 16, color: 'rgba(247,246,243,0.5)', lineHeight: 1.7,
           transitionDelay: '120ms',
         }}>
           <span>Call API → get 402 → pay on-chain → resource is yours.</span>
@@ -100,15 +100,15 @@ export function HowItWorks() {
               marginLeft: 'auto',
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               width: 30, height: 30,
-              border: '1px solid rgba(0,229,255,0.2)',
+              border: '1px solid rgba(232,181,92,0.2)',
               background: 'transparent',
-              color: '#00E5FF',
+              color: '#E8B55C',
               cursor: 'pointer',
               transition: 'all 0.2s',
               flexShrink: 0,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#00E5FF'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(0,229,255,0.2)'; }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#E8B55C'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(232,181,92,0.2)'; }}
           >
             {isPlaying ? (
               <svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><rect x="2" y="2" width="3" height="8" /><rect x="7" y="2" width="3" height="8" /></svg>
@@ -129,9 +129,9 @@ export function HowItWorks() {
                   style={{
                     padding: '24px 0',
                     cursor: 'pointer',
-                    borderBottom: '1px solid rgba(0,229,255,0.1)',
+                    borderBottom: '1px solid rgba(232,181,92,0.1)',
                     position: 'relative',
-                    ...(i === 0 ? { borderTop: '1px solid rgba(0,229,255,0.1)' } : {}),
+                    ...(i === 0 ? { borderTop: '1px solid rgba(232,181,92,0.1)' } : {}),
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -147,11 +147,11 @@ export function HowItWorks() {
                         inset: 4,
                         borderRadius: '50%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 13, fontWeight: 600, fontFamily: 'JetBrains Mono, monospace',
+                        fontSize: 13, fontWeight: 600, fontFamily: 'IBM Plex Mono, monospace',
                         transition: 'all 0.3s',
                         ...(isActive
-                          ? { background: '#00B8D4', color: '#000' }
-                          : { color: '#00E5FF', border: '1px solid rgba(0,229,255,0.3)' }),
+                          ? { background: '#C98A2E', color: '#000' }
+                          : { color: '#E8B55C', border: '1px solid rgba(232,181,92,0.3)' }),
                       }}>{s.n}</div>
 
                       {/* Progress ring (active only) — keyed so it restarts on step change */}
@@ -169,7 +169,7 @@ export function HowItWorks() {
                           <circle
                             cx="20" cy="20" r="17"
                             fill="none"
-                            stroke="rgba(0,229,255,0.18)"
+                            stroke="rgba(232,181,92,0.18)"
                             strokeWidth="2"
                           />
                           {/* Filled portion */}
@@ -177,13 +177,13 @@ export function HowItWorks() {
                             className={`hiw-ring-fill ${animationsRunning ? '' : 'hiw-paused'}`}
                             cx="20" cy="20" r="17"
                             fill="none"
-                            stroke="#00E5FF"
+                            stroke="#E8B55C"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeDasharray="106.8146"
                             strokeDashoffset="106.8146"
                             style={{
-                              filter: 'drop-shadow(0 0 4px rgba(0,229,255,0.4))',
+                              filter: 'drop-shadow(0 0 4px rgba(232,181,92,0.4))',
                             }}
                           />
                         </svg>
@@ -193,7 +193,7 @@ export function HowItWorks() {
                   </div>
                   <div style={{
                     paddingLeft: 56, marginTop: 12,
-                    fontSize: 14, color: 'rgba(254,254,254,0.55)', lineHeight: 1.7,
+                    fontSize: 14, color: 'rgba(247,246,243,0.55)', lineHeight: 1.7,
                     maxHeight: isActive ? 200 : 0, overflow: 'hidden',
                     transition: 'max-height 0.4s ease, opacity 0.3s ease',
                     opacity: isActive ? 1 : 0,
@@ -209,7 +209,7 @@ export function HowItWorks() {
                         position: 'absolute',
                         bottom: 0, left: 0, right: 0,
                         height: 2,
-                        background: 'rgba(0,229,255,0.10)',
+                        background: 'rgba(232,181,92,0.10)',
                       }} />
                       {/* Fill — keyed so it restarts on step change. onAnimationEnd advances. */}
                       <div
@@ -223,8 +223,8 @@ export function HowItWorks() {
                           bottom: 0, left: 0,
                           height: 2,
                           width: 0,
-                          background: 'linear-gradient(90deg, rgba(0,229,255,0.4), #00E5FF, #4DD0E1)',
-                          boxShadow: '0 0 8px rgba(0,229,255,0.5)',
+                          background: 'linear-gradient(90deg, rgba(232,181,92,0.4), #E8B55C, #D9A85C)',
+                          boxShadow: '0 0 8px rgba(232,181,92,0.5)',
                         }}
                       />
                     </>
@@ -235,7 +235,7 @@ export function HowItWorks() {
           </div>
 
           <div className="hiw-preview" style={{
-            border: '1px solid rgba(0,229,255,0.1)',
+            border: '1px solid rgba(232,181,92,0.1)',
             borderRadius: 12,
             minHeight: 380,
             display: 'flex',
@@ -249,13 +249,13 @@ export function HowItWorks() {
               position: 'absolute',
               inset: 0,
               pointerEvents: 'none',
-              background: 'radial-gradient(ellipse at top left, rgba(0,229,255,0.06), transparent 60%)',
+              background: 'radial-gradient(ellipse at top left, rgba(232,181,92,0.06), transparent 60%)',
             }} />
             <pre
               key={active}
               className="mono fade-in"
               style={{
-                fontSize: 12, color: 'rgba(254,254,254,0.5)',
+                fontSize: 12, color: 'rgba(247,246,243,0.5)',
                 padding: 28, lineHeight: 2, width: '100%',
                 whiteSpace: 'pre-wrap', margin: 0,
                 position: 'relative',
@@ -263,10 +263,10 @@ export function HowItWorks() {
             >
               {steps[active].code.split('\n').map((l, i) => (
                 <div key={i}>
-                  {l.startsWith('✓') ? <><span style={{ color: '#3fb950', fontWeight: 700 }}>✓</span>{l.slice(1)}</> :
-                   l.startsWith('←') ? <><span style={{ color: '#f85149', fontWeight: 700 }}>←</span>{l.slice(1)}</> :
-                   l.startsWith('→') ? <><span style={{ color: '#00E5FF', fontWeight: 700 }}>→</span>{l.slice(1)}</> :
-                   l.startsWith('#') ? <span style={{ color: 'rgba(254,254,254,0.2)' }}>{l}</span> : l}
+                  {l.startsWith('✓') ? <><span style={{ color: '#46B860', fontWeight: 700 }}>✓</span>{l.slice(1)}</> :
+                   l.startsWith('←') ? <><span style={{ color: '#E5484D', fontWeight: 700 }}>←</span>{l.slice(1)}</> :
+                   l.startsWith('→') ? <><span style={{ color: '#E8B55C', fontWeight: 700 }}>→</span>{l.slice(1)}</> :
+                   l.startsWith('#') ? <span style={{ color: 'rgba(247,246,243,0.2)' }}>{l}</span> : l}
                 </div>
               ))}
             </pre>

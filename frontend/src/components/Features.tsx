@@ -77,22 +77,22 @@ const features: Feature[] = [
 const S = {
   section: { padding: '120px 0' } as const,
   container: { maxWidth: 1100, margin: '0 auto', padding: '0 24px' } as const,
-  label: { fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#00E5FF', marginBottom: 16, fontWeight: 500 },
+  label: { fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: '#E8B55C', marginBottom: 16, fontWeight: 500 },
   h2: { fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.1, maxWidth: 600, marginBottom: 20 },
-  sub: { fontSize: 16, color: 'rgba(254,254,254,0.5)', maxWidth: 500, lineHeight: 1.7, marginBottom: 56 },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 2, background: 'rgba(0,229,255,0.06)' } as const,
-  card: { background: '#050508', padding: 0, position: 'relative' as const, overflow: 'hidden' as const, transition: 'all 0.3s' },
+  sub: { fontSize: 16, color: 'rgba(247,246,243,0.5)', maxWidth: 500, lineHeight: 1.7, marginBottom: 56 },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 2, background: 'rgba(232,181,92,0.06)' } as const,
+  card: { background: '#070707', padding: 0, position: 'relative' as const, overflow: 'hidden' as const, transition: 'all 0.3s' },
   inner: { padding: 32, display: 'flex', flexDirection: 'column' as const, height: '100%' },
   iconBox: {
     width: 40, height: 40,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    border: '1px solid rgba(0,229,255,0.18)',
-    background: 'linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(0,229,255,0.02) 100%)',
-    color: '#00E5FF',
+    border: '1px solid rgba(232,181,92,0.18)',
+    background: 'linear-gradient(135deg, rgba(232,181,92,0.08) 0%, rgba(232,181,92,0.02) 100%)',
+    color: '#E8B55C',
     transition: 'all 0.3s',
   },
-  code: { marginTop: 'auto', paddingTop: 20, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'rgba(254,254,254,0.4)', lineHeight: 1.8, padding: 16, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(0,229,255,0.08)', marginBlockStart: 24 },
-  tag: { display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: 'rgba(254,254,254,0.35)', textTransform: 'uppercase' as const, letterSpacing: '0.05em', border: '1px solid rgba(0,229,255,0.08)', padding: '3px 10px', width: 'fit-content' },
+  code: { marginTop: 'auto', paddingTop: 20, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'rgba(247,246,243,0.4)', lineHeight: 1.8, padding: 16, background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(232,181,92,0.08)', marginBlockStart: 24 },
+  tag: { display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, color: 'rgba(247,246,243,0.35)', textTransform: 'uppercase' as const, letterSpacing: '0.05em', border: '1px solid rgba(232,181,92,0.08)', padding: '3px 10px', width: 'fit-content' },
 };
 
 export function Features() {
@@ -103,7 +103,7 @@ export function Features() {
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 45% 35% at 25% 55%, rgba(0,229,255,0.06), transparent 70%)',
+        background: 'radial-gradient(ellipse 45% 35% at 25% 55%, rgba(232,181,92,0.06), transparent 70%)',
       }} />
       <div style={{ ...S.container, position: 'relative' }}>
         <div className="reveal-up" style={S.label}>Services</div>
@@ -127,38 +127,38 @@ export function Features() {
                   <span
                     title={f.status === 'live' ? 'Live in production' : 'Code wired, awaiting external credentials'}
                     style={{
-                      fontFamily: 'JetBrains Mono, monospace',
+                      fontFamily: 'IBM Plex Mono, monospace',
                       fontSize: 9,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
                       padding: '3px 7px',
-                      border: f.status === 'live' ? '1px solid rgba(80,220,140,0.35)' : '1px solid rgba(255,180,80,0.30)',
-                      color: f.status === 'live' ? '#7DEFB1' : '#FFC97A',
-                      background: f.status === 'live' ? 'rgba(80,220,140,0.06)' : 'rgba(255,180,80,0.05)',
+                      border: f.status === 'live' ? '1px solid rgba(111,227,165,0.35)' : '1px solid rgba(232,181,92,0.30)',
+                      color: f.status === 'live' ? '#6FE3A5' : '#E8B55C',
+                      background: f.status === 'live' ? 'rgba(111,227,165,0.06)' : 'rgba(232,181,92,0.05)',
                     }}
                   >
                     {f.status === 'live' ? '● live' : '○ in dev'}
                   </span>
                 </div>
-                <p style={{ fontSize: 13, color: 'rgba(254,254,254,0.5)', lineHeight: 1.7 }}>{f.desc}</p>
+                <p style={{ fontSize: 13, color: 'rgba(247,246,243,0.5)', lineHeight: 1.7 }}>{f.desc}</p>
 
                 <div style={S.code}>
                   {f.code.split('\n').map((line, idx) => (
                     <div key={idx}>
                       {line.startsWith('→') ? (
                         <>
-                          <span style={{ color: '#00E5FF', fontWeight: 700 }}>→</span>
+                          <span style={{ color: '#E8B55C', fontWeight: 700 }}>→</span>
                           {line.slice(1)}
                         </>
                       ) : (
-                        <span style={{ color: '#00E5FF', fontWeight: 700 }}>{line}</span>
+                        <span style={{ color: '#E8B55C', fontWeight: 700 }}>{line}</span>
                       )}
                     </div>
                   ))}
                 </div>
 
                 <div style={S.tag}>
-                  <span style={{ width: 5, height: 5, background: '#00B8D4', display: 'inline-block' }} />
+                  <span style={{ width: 5, height: 5, background: '#C98A2E', display: 'inline-block' }} />
                   Powered by {f.tag}
                 </div>
               </div>

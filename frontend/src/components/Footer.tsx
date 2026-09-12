@@ -13,7 +13,7 @@ export function Footer() {
         <h2 className="final-cta-h2" style={{ fontSize: 'min(48px, 4vw)', fontWeight: 500, letterSpacing: '-0.03em', marginBottom: 20 }}>
           Give your agent superpowers
         </h2>
-        <p style={{ fontSize: 17, color: 'rgba(254,254,254,0.5)', maxWidth: 500, margin: '0 auto 36px', lineHeight: 1.7 }}>
+        <p style={{ fontSize: 17, color: 'rgba(247,246,243,0.5)', maxWidth: 500, margin: '0 auto 36px', lineHeight: 1.7 }}>
           Real infrastructure. On-chain identity. Persistent memory. Multi-chain.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', padding: '0 24px' }}>
@@ -23,7 +23,7 @@ export function Footer() {
             rel="noreferrer"
             style={{
               display: 'inline-flex', alignItems: 'center', height: 48, padding: '0 28px',
-              background: '#00B8D4', color: '#fff', fontSize: 14, fontWeight: 500, borderRadius: 100,
+              background: '#C98A2E', color: '#fff', fontSize: 14, fontWeight: 500, borderRadius: 100,
               border: 'none', transition: 'filter 0.2s', textDecoration: 'none',
             }}
           >
@@ -36,26 +36,26 @@ export function Footer() {
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8, height: 48, padding: '0 24px',
               background: 'transparent', color: '#fff', fontSize: 14, fontWeight: 500,
-              borderRadius: 100, border: '1px solid rgba(0, 229, 255,0.25)',
+              borderRadius: 100, border: '1px solid rgba(232, 181, 92,0.25)',
               transition: 'border-color 0.2s', textDecoration: 'none',
-              fontFamily: 'JetBrains Mono, monospace',
+              fontFamily: 'IBM Plex Mono, monospace',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#00E5FF'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.25)'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#E8B55C'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(232, 181, 92,0.25)'; }}
           >
             npm i -g @0gent/core
           </a>
         </div>
       </section>
 
-      <footer className="footer-row" style={{ borderTop: '1px solid rgba(0, 229, 255,0.1)', padding: '48px 24px' }}>
+      <footer className="footer-row" style={{ borderTop: '1px solid rgba(232, 181, 92,0.1)', padding: '48px 24px' }}>
         <div style={{
           maxWidth: 1100, margin: '0 auto',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           gap: 24, flexWrap: 'wrap',
         }}>
           <a href="/" style={{ textDecoration: 'none' }}>
-            <LogoLockup size={22} color="#00E5FF" />
+            <LogoLockup size={22} color="#E8B55C" />
           </a>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
             {[
@@ -72,9 +72,9 @@ export function Footer() {
                 href={h as string}
                 target={ext ? '_blank' : undefined}
                 rel={ext ? 'noreferrer' : undefined}
-                style={{ fontSize: 14, color: 'rgba(254,254,254,0.35)', transition: 'color 0.2s', textDecoration: 'none' }}
+                style={{ fontSize: 14, color: 'rgba(247,246,243,0.35)', transition: 'color 0.2s', textDecoration: 'none' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(254,254,254,0.35)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(247,246,243,0.35)')}
               >
                 {l}
               </a>
@@ -92,13 +92,13 @@ export function Footer() {
               style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 width: 34, height: 34,
-                color: 'rgba(254,254,254,0.45)',
-                border: '1px solid rgba(0, 229, 255,0.15)',
+                color: 'rgba(247,246,243,0.45)',
+                border: '1px solid rgba(232, 181, 92,0.15)',
                 transition: 'all 0.2s ease',
                 textDecoration: 'none',
               }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.40)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.45)'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.15)'; }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(232, 181, 92,0.40)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(247,246,243,0.45)'; e.currentTarget.style.borderColor = 'rgba(232, 181, 92,0.15)'; }}
             >
               <XIcon size={13} />
             </a>
@@ -111,13 +111,13 @@ export function Footer() {
               style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 width: 34, height: 34,
-                color: 'rgba(254,254,254,0.45)',
-                border: '1px solid rgba(0, 229, 255,0.15)',
+                color: 'rgba(247,246,243,0.45)',
+                border: '1px solid rgba(232, 181, 92,0.15)',
                 transition: 'all 0.2s ease',
                 textDecoration: 'none',
               }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.40)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.45)'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.15)'; }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(232, 181, 92,0.40)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(247,246,243,0.45)'; e.currentTarget.style.borderColor = 'rgba(232, 181, 92,0.15)'; }}
             >
               <TelegramIcon size={14} />
             </a>

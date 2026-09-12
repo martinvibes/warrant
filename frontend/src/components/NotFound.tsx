@@ -7,14 +7,14 @@ import { Nav } from './Nav';
 import { Footer } from './Footer';
 import { LogoLockup } from './Logo';
 
-const LILAC = '#00E5FF';
-const TEXT = '#fefefe';
-const TEXT_DIM = 'rgba(254,254,254,0.7)';
-const TEXT_FAINT = 'rgba(254,254,254,0.5)';
-const BG_PAGE = '#050508';
-const BG_CARD = '#0c0c14';
-const BORDER = 'rgba(0,229,255,0.12)';
-const PURPLE = '#00B8D4';
+const LILAC = '#E8B55C';
+const TEXT = '#f7f6f3';
+const TEXT_DIM = 'rgba(247,246,243,0.7)';
+const TEXT_FAINT = 'rgba(247,246,243,0.5)';
+const BG_PAGE = '#070707';
+const BG_CARD = '#0e0e0f';
+const BORDER = 'rgba(232,181,92,0.12)';
+const PURPLE = '#C98A2E';
 
 export function NotFound() {
   const path = typeof window !== 'undefined' ? window.location.pathname : '';
@@ -34,14 +34,14 @@ export function NotFound() {
 
         {/* Big 404 */}
         <div style={{
-          fontFamily: 'JetBrains Mono, monospace',
+          fontFamily: 'IBM Plex Mono, monospace',
           fontSize: 'clamp(72px, 18vw, 140px)',
           fontWeight: 600,
           color: LILAC,
           letterSpacing: '-0.04em',
           lineHeight: 1,
           marginBottom: 12,
-          background: 'linear-gradient(180deg, #00E5FF 30%, rgba(0,229,255,0.4))',
+          background: 'linear-gradient(180deg, #E8B55C 30%, rgba(232,181,92,0.4))',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
@@ -72,7 +72,7 @@ export function NotFound() {
                 color: LILAC,
                 background: BG_CARD,
                 padding: '2px 8px',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'IBM Plex Mono, monospace',
                 fontSize: 13,
                 wordBreak: 'break-all',
               }}>
@@ -112,8 +112,8 @@ export function NotFound() {
                 transition: 'all 0.18s ease',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'rgba(0,229,255,0.40)';
-                e.currentTarget.style.background = 'rgba(0,229,255,0.04)';
+                e.currentTarget.style.borderColor = 'rgba(232,181,92,0.40)';
+                e.currentTarget.style.background = 'rgba(232,181,92,0.04)';
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.borderColor = BORDER;
@@ -122,7 +122,7 @@ export function NotFound() {
             >
               <div style={{
                 fontSize: 14, fontWeight: 500, color: LILAC,
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'IBM Plex Mono, monospace',
                 marginBottom: 4,
               }}>
                 {label} →

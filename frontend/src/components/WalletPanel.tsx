@@ -4,19 +4,19 @@ import { shortAddress, FAUCET_URL, EXPLORER_BASE } from '../lib/wallet';
 
 // ─── Tokens (matches Features.tsx vibe — quiet, minimal, subtle accent) ──
 
-const LILAC = '#00E5FF';
-const GREEN = '#3fb950';
-const RED = '#f85149';
-const AMBER = '#febc2e';
-const TEXT = '#fefefe';
-const TEXT_DIM = 'rgba(254,254,254,0.7)';
-const TEXT_FAINT = 'rgba(254,254,254,0.45)';
-const TEXT_GHOST = 'rgba(254,254,254,0.25)';
-const BG_PAGE = '#08080d';
-const BG_CARD = '#050508';
+const LILAC = '#E8B55C';
+const GREEN = '#46B860';
+const RED = '#E5484D';
+const AMBER = '#E8B55C';
+const TEXT = '#f7f6f3';
+const TEXT_DIM = 'rgba(247,246,243,0.7)';
+const TEXT_FAINT = 'rgba(247,246,243,0.45)';
+const TEXT_GHOST = 'rgba(247,246,243,0.25)';
+const BG_PAGE = '#0a0a0b';
+const BG_CARD = '#070707';
 const BG_INPUT = 'rgba(0,0,0,0.45)';
-const BORDER = 'rgba(0,229,255,0.10)';
-const BORDER_HOVER = 'rgba(0,229,255,0.28)';
+const BORDER = 'rgba(232,181,92,0.10)';
+const BORDER_HOVER = 'rgba(232,181,92,0.28)';
 
 // ─── Section + heading wrappers (mirrors Features.tsx layout) ───────────
 
@@ -32,7 +32,7 @@ const sectionGlow: React.CSSProperties = {
   position: 'absolute',
   inset: 0,
   pointerEvents: 'none',
-  background: 'radial-gradient(ellipse 50% 40% at 20% 30%, rgba(0,229,255,0.07), transparent 70%)',
+  background: 'radial-gradient(ellipse 50% 40% at 20% 30%, rgba(232,181,92,0.07), transparent 70%)',
 };
 
 const containerStyle: React.CSSProperties = {
@@ -63,7 +63,7 @@ const h2Style: React.CSSProperties = {
 
 const subStyle: React.CSSProperties = {
   fontSize: 15,
-  color: 'rgba(254,254,254,0.5)',
+  color: 'rgba(247,246,243,0.5)',
   maxWidth: 540,
   lineHeight: 1.7,
   margin: 0,
@@ -97,7 +97,7 @@ const inputStyle: React.CSSProperties = {
   background: BG_INPUT,
   border: `1px solid ${BORDER}`,
   color: TEXT,
-  fontFamily: 'JetBrains Mono, monospace',
+  fontFamily: 'IBM Plex Mono, monospace',
   fontSize: 13,
   outline: 'none',
   borderRadius: 0,
@@ -111,7 +111,7 @@ const primaryBtn: React.CSSProperties = {
   fontWeight: 500,
   padding: '12px 22px',
   border: `1px solid ${LILAC}`,
-  background: 'linear-gradient(180deg, #00B8D4 0%, #6a00a8 100%)',
+  background: 'linear-gradient(180deg, #C98A2E 0%, #6a00a8 100%)',
   color: TEXT,
   cursor: 'pointer',
   letterSpacing: '0.01em',
@@ -121,7 +121,7 @@ const primaryBtn: React.CSSProperties = {
 };
 
 const PRIMARY_BTN_HOVER_BG = 'linear-gradient(180deg, #a30dff 0%, #7a13c0 100%)';
-const PRIMARY_BTN_HOVER_SHADOW = '0 0 24px rgba(0,229,255,0.35)';
+const PRIMARY_BTN_HOVER_SHADOW = '0 0 24px rgba(232,181,92,0.35)';
 
 const ghostBtn: React.CSSProperties = {
   fontSize: 12,
@@ -153,7 +153,7 @@ function StatusTag({
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 8,
-      fontSize: 11, color: colors.fg, fontFamily: 'JetBrains Mono, monospace',
+      fontSize: 11, color: colors.fg, fontFamily: 'IBM Plex Mono, monospace',
       letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 500,
     }}>
       <span style={{
@@ -180,7 +180,7 @@ function CopyButton({ text, label = 'copy', size = 'sm' as 'sm' | 'md' }: { text
     display: 'inline-flex', alignItems: 'center', gap: 6,
   };
   const styled: React.CSSProperties = copied
-    ? { ...base, color: GREEN, borderColor: 'rgba(63,185,80,0.3)' }
+    ? { ...base, color: GREEN, borderColor: 'rgba(70,184,96,0.3)' }
     : base;
 
   return (
@@ -287,9 +287,9 @@ export function WalletPanel() {
                 fontSize: 11,
                 padding: '5px 11px',
                 color: TEXT_FAINT,
-                background: 'rgba(0,229,255,0.04)',
+                background: 'rgba(232,181,92,0.04)',
                 border: `1px solid ${BORDER}`,
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'IBM Plex Mono, monospace',
                 letterSpacing: '0.02em',
               }}>
                 <span style={{ color: LILAC, display: 'inline-flex' }}>{icon}</span>
@@ -307,8 +307,8 @@ export function WalletPanel() {
               <div style={{
                 marginBottom: 22,
                 padding: unlockMode ? '14px 16px 16px' : '11px 14px',
-                border: `1px solid ${unlockMode ? 'rgba(254,188,46,0.35)' : 'rgba(254,188,46,0.18)'}`,
-                background: unlockMode ? 'rgba(254,188,46,0.05)' : 'rgba(254,188,46,0.025)',
+                border: `1px solid ${unlockMode ? 'rgba(232,181,92,0.35)' : 'rgba(232,181,92,0.18)'}`,
+                background: unlockMode ? 'rgba(232,181,92,0.05)' : 'rgba(232,181,92,0.025)',
                 transition: 'all 0.2s ease',
               }}>
                 <div style={{
@@ -316,7 +316,7 @@ export function WalletPanel() {
                   flexWrap: 'wrap',
                 }}>
                   <span style={{ color: AMBER, fontSize: 13, lineHeight: 1, display: 'inline-flex' }}>🔒</span>
-                  <span style={{ fontSize: 12, color: TEXT_DIM, fontFamily: 'JetBrains Mono, monospace' }}>
+                  <span style={{ fontSize: 12, color: TEXT_DIM, fontFamily: 'IBM Plex Mono, monospace' }}>
                     existing wallet ·
                     <span style={{ color: TEXT, marginLeft: 6 }}>{shortAddress(lockedStored.address)}</span>
                   </span>
@@ -329,15 +329,15 @@ export function WalletPanel() {
                           background: 'transparent',
                           color: AMBER,
                           fontSize: 11,
-                          fontFamily: 'JetBrains Mono, monospace',
+                          fontFamily: 'IBM Plex Mono, monospace',
                           textTransform: 'uppercase',
                           letterSpacing: '0.06em',
                           padding: '4px 10px',
-                          border: '1px solid rgba(254,188,46,0.35)',
+                          border: '1px solid rgba(232,181,92,0.35)',
                           cursor: 'pointer',
                           transition: 'all 0.2s',
                         }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(254,188,46,0.08)'; }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(232,181,92,0.08)'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
                       >
                         unlock
@@ -350,7 +350,7 @@ export function WalletPanel() {
                           background: 'transparent',
                           color: TEXT_FAINT,
                           fontSize: 11,
-                          fontFamily: 'JetBrains Mono, monospace',
+                          fontFamily: 'IBM Plex Mono, monospace',
                           textTransform: 'uppercase',
                           letterSpacing: '0.06em',
                           padding: '4px 10px',
@@ -394,8 +394,8 @@ export function WalletPanel() {
                       <p style={{
                         color: RED, fontSize: 11, marginBottom: 10,
                         padding: '7px 10px',
-                        border: '1px solid rgba(248,81,73,0.25)',
-                        background: 'rgba(248,81,73,0.06)',
+                        border: '1px solid rgba(229,72,77,0.25)',
+                        background: 'rgba(229,72,77,0.06)',
                       }}>{err}</p>
                     )}
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -412,10 +412,10 @@ export function WalletPanel() {
                         type="button"
                         style={{
                           marginLeft: 'auto',
-                          background: 'transparent', color: 'rgba(248,81,73,0.7)',
-                          fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+                          background: 'transparent', color: 'rgba(229,72,77,0.7)',
+                          fontSize: 11, fontFamily: 'IBM Plex Mono, monospace',
                           padding: '6px 10px',
-                          border: '1px solid rgba(248,81,73,0.18)',
+                          border: '1px solid rgba(229,72,77,0.18)',
                           cursor: 'pointer',
                         }}
                         onClick={() => { if (confirm('Delete this wallet from this browser? Make sure you have your recovery phrase.')) forget(); }}
@@ -433,7 +433,7 @@ export function WalletPanel() {
               <p style={{
                 fontSize: 11, color: TEXT_FAINT,
                 marginBottom: 18,
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'IBM Plex Mono, monospace',
                 letterSpacing: '0.04em',
               }}>
                 — or generate a new wallet below —
@@ -500,8 +500,8 @@ export function WalletPanel() {
               {err && (
                 <p style={{
                   color: RED, fontSize: 12, marginBottom: 16,
-                  padding: '8px 12px', border: '1px solid rgba(248,81,73,0.25)',
-                  background: 'rgba(248,81,73,0.06)',
+                  padding: '8px 12px', border: '1px solid rgba(229,72,77,0.25)',
+                  background: 'rgba(229,72,77,0.06)',
                 }}>{err}</p>
               )}
               <button
@@ -518,9 +518,9 @@ export function WalletPanel() {
                 display: 'flex', alignItems: 'center', gap: 9,
                 padding: '10px 12px',
                 fontSize: 11, color: AMBER, lineHeight: 1.6,
-                fontFamily: 'JetBrains Mono, monospace',
-                background: 'rgba(254,188,46,0.05)',
-                border: '1px solid rgba(254,188,46,0.18)',
+                fontFamily: 'IBM Plex Mono, monospace',
+                background: 'rgba(232,181,92,0.05)',
+                border: '1px solid rgba(232,181,92,0.18)',
               }}>
                 <span style={{ flexShrink: 0, display: 'inline-flex' }}>{WarnIcon}</span>
                 <span>forget your passphrase = lose access. there is no reset.</span>
@@ -540,7 +540,7 @@ export function WalletPanel() {
         <div style={sectionGlow} />
         <div style={containerStyle}>
           <div className="reveal-up" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-            <span className="step-badge" style={{ borderColor: 'rgba(254,188,46,0.4)', color: AMBER, background: 'linear-gradient(135deg, rgba(254,188,46,0.08), rgba(254,188,46,0.02))' }}>!</span>
+            <span className="step-badge" style={{ borderColor: 'rgba(232,181,92,0.4)', color: AMBER, background: 'linear-gradient(135deg, rgba(232,181,92,0.08), rgba(232,181,92,0.02))' }}>!</span>
             <span style={{ ...kickerStyle, color: AMBER, marginBottom: 0 }}>backup</span>
           </div>
           <h2 className="reveal-up" style={{ ...h2Style, transitionDelay: '60ms' }}>
@@ -562,7 +562,7 @@ export function WalletPanel() {
                   padding: '10px 14px',
                   background: BG_INPUT,
                   border: `1px solid ${BORDER}`,
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'IBM Plex Mono, monospace',
                 }}>
                   <span style={{ fontSize: 10, color: TEXT_GHOST, minWidth: 18, fontWeight: 500 }}>
                     {(i + 1).toString().padStart(2, '0')}
@@ -626,7 +626,7 @@ export function WalletPanel() {
           display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
           marginBottom: 14,
         }}>
-          <span className="step-badge" style={{ borderColor: 'rgba(63,185,80,0.4)', color: GREEN, background: 'linear-gradient(135deg, rgba(63,185,80,0.08), rgba(63,185,80,0.02))' }}>✓</span>
+          <span className="step-badge" style={{ borderColor: 'rgba(70,184,96,0.4)', color: GREEN, background: 'linear-gradient(135deg, rgba(70,184,96,0.08), rgba(70,184,96,0.02))' }}>✓</span>
           <span style={{ ...kickerStyle, marginBottom: 0 }}>your agent</span>
           <StatusTag kind="active">active</StatusTag>
         </div>
@@ -647,7 +647,7 @@ export function WalletPanel() {
             }}>
               <code style={{
                 color: TEXT, fontSize: 13,
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'IBM Plex Mono, monospace',
                 userSelect: 'all', wordBreak: 'break-all',
                 flex: 1, minWidth: 260,
               }}>{w.address}</code>
@@ -677,14 +677,14 @@ export function WalletPanel() {
               <div style={labelStyle}>balance</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                 <span style={{
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'IBM Plex Mono, monospace',
                   fontSize: 28, fontWeight: 500, color: TEXT,
                   letterSpacing: '-0.01em', lineHeight: 1,
                 }}>
                   {balance ? Number(balance.zg).toFixed(4) : '0.0000'}
                 </span>
                 <span style={{
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'IBM Plex Mono, monospace',
                   fontSize: 14, color: LILAC, fontWeight: 500,
                 }}>0G</span>
               </div>
@@ -705,11 +705,11 @@ export function WalletPanel() {
           {balance && !isFunded && (
             <div style={{
               padding: '14px 16px',
-              background: 'rgba(254,188,46,0.04)',
-              border: '1px solid rgba(254,188,46,0.18)',
+              background: 'rgba(232,181,92,0.04)',
+              border: '1px solid rgba(232,181,92,0.18)',
               marginBottom: 24,
               fontSize: 12, color: TEXT_DIM, lineHeight: 1.7,
-              fontFamily: 'JetBrains Mono, monospace',
+              fontFamily: 'IBM Plex Mono, monospace',
             }}>
               <div style={{ marginBottom: 6, color: AMBER, fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: 10 }}>
                 fund this wallet to start
@@ -732,7 +732,7 @@ export function WalletPanel() {
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
-                ...(isFunded ? {} : { borderColor: 'rgba(254,188,46,0.3)', color: AMBER }),
+                ...(isFunded ? {} : { borderColor: 'rgba(232,181,92,0.3)', color: AMBER }),
               }}
             >
               faucet ↗
@@ -753,7 +753,7 @@ export function WalletPanel() {
             </button>
             <button
               type="button"
-              style={{ ...ghostBtn, marginLeft: 'auto', color: 'rgba(248,81,73,0.7)', borderColor: 'rgba(248,81,73,0.18)' }}
+              style={{ ...ghostBtn, marginLeft: 'auto', color: 'rgba(229,72,77,0.7)', borderColor: 'rgba(229,72,77,0.18)' }}
               onClick={() => { if (confirm('Delete this wallet from this browser?')) forget(); }}
             >
               forget wallet

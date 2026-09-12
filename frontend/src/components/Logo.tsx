@@ -3,7 +3,7 @@
  * A typographic "0" with a horizontal notch suggesting the "G".
  *
  * Use this everywhere we need the logo. `color` defaults to the brand cyan
- * `#00E5FF`; pass `color="#00B8D4"` for the deeper cyan, or any color when
+ * `#E8B55C`; pass `color="#C98A2E"` for the deeper cyan, or any color when
  * placing on light backgrounds.
  */
 
@@ -14,7 +14,7 @@ interface LogoProps {
   strokeWidth?: number;
 }
 
-export function Glyph0G({ size = 24, color = '#00E5FF', strokeWidth = 3.2 }: LogoProps) {
+export function Glyph0G({ size = 24, color = '#E8B55C', strokeWidth = 3.2 }: LogoProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-label="0GENT">
       <path
@@ -38,8 +38,8 @@ export function Glyph0G({ size = 24, color = '#00E5FF', strokeWidth = 3.2 }: Log
  */
 export function LogoLockup({
   size = 24,
-  color = '#00E5FF',
-  textColor = '#fefefe',
+  color = '#E8B55C',
+  textColor = '#f7f6f3',
   gap = 10,
   fontSize,
 }: {
@@ -57,7 +57,7 @@ export function LogoLockup({
     }}>
       <Glyph0G size={size} color={color} />
       <span style={{
-        fontFamily: 'JetBrains Mono, monospace',
+        fontFamily: 'IBM Plex Mono, monospace',
         fontSize: fontSize ?? Math.round(size * 0.7),
         fontWeight: 600,
         letterSpacing: '-0.01em',

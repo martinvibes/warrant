@@ -5,8 +5,8 @@ export function Nav() {
     <nav style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', zIndex: 100, maxWidth: 'calc(100vw - 24px)' }}>
       <div className="nav-pill" style={{
         display: 'inline-flex', alignItems: 'center', gap: 28, padding: '12px 22px',
-        background: 'rgba(12,12,20,0.9)', backdropFilter: 'blur(24px)',
-        border: '1px solid rgba(0, 229, 255,0.15)', borderRadius: 100,
+        background: 'rgba(14,14,15,0.9)', backdropFilter: 'blur(24px)',
+        border: '1px solid rgba(232, 181, 92,0.15)', borderRadius: 100,
       }}>
         <a
           href="/"
@@ -14,10 +14,10 @@ export function Nav() {
           style={{
             display: 'flex', alignItems: 'center', gap: 9,
             fontWeight: 600, fontSize: 15, letterSpacing: '-0.01em',
-            color: '#fefefe', textDecoration: 'none',
+            color: '#f7f6f3', textDecoration: 'none',
           }}
         >
-          <Glyph0G size={22} color="#00E5FF" strokeWidth={3.6} />
+          <Glyph0G size={22} color="#E8B55C" strokeWidth={3.6} />
           0GENT
         </a>
 
@@ -32,9 +32,9 @@ export function Nav() {
             <a
               key={label}
               href={href}
-              style={{ fontSize: 13, color: 'rgba(254,254,254,0.5)', transition: 'color 0.2s', textDecoration: 'none' }}
+              style={{ fontSize: 13, color: 'rgba(247,246,243,0.5)', transition: 'color 0.2s', textDecoration: 'none' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(254,254,254,0.5)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(247,246,243,0.5)')}
             >
               {label}
             </a>
@@ -46,7 +46,7 @@ export function Nav() {
           className="nav-cta"
           style={{
             display: 'inline-flex', alignItems: 'center', height: 32, padding: '0 16px',
-            background: '#00B8D4', color: '#fff', fontSize: 11, fontWeight: 600,
+            background: '#C98A2E', color: '#fff', fontSize: 11, fontWeight: 600,
             textTransform: 'uppercase', letterSpacing: '0.06em', borderRadius: 100, border: 'none',
             transition: 'filter 0.2s',
             whiteSpace: 'nowrap',

@@ -6,18 +6,18 @@ import { shortAddress } from '../lib/wallet';
 // ─────────────────────────────────────────────────────────────────────────────
 //  Color tokens (0G purple palette)
 // ─────────────────────────────────────────────────────────────────────────────
-const LILAC = '#00E5FF';
-const GREEN = '#3fb950';
-const RED = '#f85149';
-const YELLOW = '#febc2e';
-const TEXT = '#e6edf3';
-const DIM = 'rgba(254,254,254,0.5)';
-const FAINT = 'rgba(254,254,254,0.25)';
-const W12 = 'rgba(254,254,254,0.12)';
-const W08 = 'rgba(254,254,254,0.08)';
-const BG = '#08080d';
-const BG2 = 'rgba(0,229,255,0.04)';
-const BORDER = 'rgba(0,229,255,0.12)';
+const LILAC = '#E8B55C';
+const GREEN = '#46B860';
+const RED = '#E5484D';
+const YELLOW = '#E8B55C';
+const TEXT = '#f0efec';
+const DIM = 'rgba(247,246,243,0.5)';
+const FAINT = 'rgba(247,246,243,0.25)';
+const W12 = 'rgba(247,246,243,0.12)';
+const W08 = 'rgba(247,246,243,0.08)';
+const BG = '#0a0a0b';
+const BG2 = 'rgba(232,181,92,0.04)';
+const BORDER = 'rgba(232,181,92,0.12)';
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Simulated commands (purely cosmetic — running these doesn't pay anything)
@@ -125,9 +125,9 @@ function fmtTime(ts: number): string {
 function WindowDots() {
   return (
     <div style={{ display: 'flex', gap: 5, padding: '14px 18px' }}>
-      <div style={{ width: 11, height: 11, border: `1px solid ${RED}`, background: 'rgba(248,81,73,0.18)' }} />
-      <div style={{ width: 11, height: 11, border: `1px solid ${YELLOW}`, background: 'rgba(254,188,46,0.18)' }} />
-      <div style={{ width: 11, height: 11, border: `1px solid ${GREEN}`, background: 'rgba(63,185,80,0.18)' }} />
+      <div style={{ width: 11, height: 11, border: `1px solid ${RED}`, background: 'rgba(229,72,77,0.18)' }} />
+      <div style={{ width: 11, height: 11, border: `1px solid ${YELLOW}`, background: 'rgba(232,181,92,0.18)' }} />
+      <div style={{ width: 11, height: 11, border: `1px solid ${GREEN}`, background: 'rgba(70,184,96,0.18)' }} />
     </div>
   );
 }
@@ -146,12 +146,12 @@ function Tab({
       onClick={onClick}
       style={{
         padding: '14px 20px',
-        fontFamily: 'JetBrains Mono, monospace',
+        fontFamily: 'IBM Plex Mono, monospace',
         fontSize: 11,
         fontWeight: 600,
         textTransform: 'lowercase',
         letterSpacing: '0.04em',
-        color: active ? LILAC : 'rgba(254,254,254,0.35)',
+        color: active ? LILAC : 'rgba(247,246,243,0.35)',
         borderBottom: active ? `2px solid ${LILAC}` : '2px solid transparent',
         background: 'transparent',
         border: 'none',
@@ -161,8 +161,8 @@ function Tab({
         gap: 8,
         transition: 'color 0.15s',
       }}
-      onMouseEnter={e => { if (!active) (e.currentTarget as HTMLButtonElement).style.color = 'rgba(254,254,254,0.7)'; }}
-      onMouseLeave={e => { if (!active) (e.currentTarget as HTMLButtonElement).style.color = 'rgba(254,254,254,0.35)'; }}
+      onMouseEnter={e => { if (!active) (e.currentTarget as HTMLButtonElement).style.color = 'rgba(247,246,243,0.7)'; }}
+      onMouseLeave={e => { if (!active) (e.currentTarget as HTMLButtonElement).style.color = 'rgba(247,246,243,0.35)'; }}
     >
       <span
         style={{
@@ -207,9 +207,9 @@ function ConnectionStatus({ connected }: { connected: boolean }) {
         alignItems: 'center',
         gap: 6,
         padding: '0 16px',
-        fontFamily: 'JetBrains Mono, monospace',
+        fontFamily: 'IBM Plex Mono, monospace',
         fontSize: 10,
-        color: connected ? 'rgba(254,254,254,0.55)' : 'rgba(254,254,254,0.3)',
+        color: connected ? 'rgba(247,246,243,0.55)' : 'rgba(247,246,243,0.3)',
       }}
     >
       <span
@@ -235,9 +235,9 @@ function StatusBar({ requests, lineNum }: { requests: number; lineNum: number })
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '6px 14px',
-        background: 'rgba(0,229,255,0.06)',
+        background: 'rgba(232,181,92,0.06)',
         borderTop: `1px solid ${BORDER}`,
-        fontFamily: 'JetBrains Mono, monospace',
+        fontFamily: 'IBM Plex Mono, monospace',
         fontSize: 10,
         color: DIM,
         gap: 10,
@@ -248,7 +248,7 @@ function StatusBar({ requests, lineNum }: { requests: number; lineNum: number })
         <span
           style={{
             padding: '2px 7px',
-            background: 'rgba(0,229,255,0.18)',
+            background: 'rgba(232,181,92,0.18)',
             color: LILAC,
             fontWeight: 700,
             letterSpacing: '0.04em',
@@ -257,13 +257,13 @@ function StatusBar({ requests, lineNum }: { requests: number; lineNum: number })
         >
           x402
         </span>
-        <span style={{ color: 'rgba(254,254,254,0.4)' }}>Celo · 0G Chain</span>
-        <span className="terminal-status-dot" style={{ color: 'rgba(254,254,254,0.25)' }}>·</span>
-        <span style={{ color: 'rgba(254,254,254,0.4)' }}>multi-chain</span>
+        <span style={{ color: 'rgba(247,246,243,0.4)' }}>Celo · 0G Chain</span>
+        <span className="terminal-status-dot" style={{ color: 'rgba(247,246,243,0.25)' }}>·</span>
+        <span style={{ color: 'rgba(247,246,243,0.4)' }}>multi-chain</span>
       </div>
       <div className="terminal-status-right" style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
         <span>{requests} {requests === 1 ? 'request' : 'requests'}</span>
-        <span style={{ color: 'rgba(254,254,254,0.25)' }}>·</span>
+        <span style={{ color: 'rgba(247,246,243,0.25)' }}>·</span>
         <span>Ln {lineNum}</span>
       </div>
     </div>
@@ -322,9 +322,9 @@ function ShellTab({
             width: 44,
             padding: '14px 0',
             textAlign: 'right',
-            fontFamily: 'JetBrains Mono, monospace',
+            fontFamily: 'IBM Plex Mono, monospace',
             fontSize: 11,
-            color: 'rgba(254,254,254,0.18)',
+            color: 'rgba(247,246,243,0.18)',
             userSelect: 'none',
             borderRight: `1px solid ${W08}`,
             background: 'rgba(0,0,0,0.2)',
@@ -344,7 +344,7 @@ function ShellTab({
           style={{
             flex: 1,
             padding: '14px 18px',
-            fontFamily: 'JetBrains Mono, monospace',
+            fontFamily: 'IBM Plex Mono, monospace',
             fontSize: 13,
             lineHeight: '22px',
             color: TEXT,
@@ -359,16 +359,16 @@ function ShellTab({
               return (
                 <div key={i} style={{ color: '#fff', marginBottom: 2 }}>
                   <span style={{ color: GREEN, fontWeight: 700 }}>agent</span>
-                  <span style={{ color: 'rgba(254,254,254,0.4)' }}> @ </span>
+                  <span style={{ color: 'rgba(247,246,243,0.4)' }}> @ </span>
                   <span style={{ color: LILAC, fontWeight: 700 }}>0gent</span>
-                  <span style={{ color: 'rgba(254,254,254,0.4)' }}> ❯ </span>
+                  <span style={{ color: 'rgba(247,246,243,0.4)' }}> ❯ </span>
                   <span>{l.text}</span>
                 </div>
               );
             }
             if (l.type === 'ok') {
               return (
-                <div key={i} className="fade-in" style={{ fontSize: 13, color: 'rgba(254,254,254,0.7)' }}>
+                <div key={i} className="fade-in" style={{ fontSize: 13, color: 'rgba(247,246,243,0.7)' }}>
                   <span style={{ color: GREEN, fontWeight: 700, marginRight: 8 }}>✓</span>
                   {l.text}
                 </div>
@@ -376,7 +376,7 @@ function ShellTab({
             }
             if (l.type === 'err') {
               return (
-                <div key={i} className="fade-in" style={{ fontSize: 13, color: 'rgba(254,254,254,0.55)' }}>
+                <div key={i} className="fade-in" style={{ fontSize: 13, color: 'rgba(247,246,243,0.55)' }}>
                   <span style={{ color: RED, fontWeight: 700, marginRight: 8 }}>✗</span>
                   {l.text}
                 </div>
@@ -390,7 +390,7 @@ function ShellTab({
               );
             }
             return (
-              <div key={i} className="fade-in" style={{ fontSize: 13, color: 'rgba(254,254,254,0.7)', whiteSpace: 'pre-wrap' }}>
+              <div key={i} className="fade-in" style={{ fontSize: 13, color: 'rgba(247,246,243,0.7)', whiteSpace: 'pre-wrap' }}>
                 {l.text}
               </div>
             );
@@ -399,9 +399,9 @@ function ShellTab({
           {/* Input on the same line treatment */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
             <span style={{ color: GREEN, fontWeight: 700 }}>agent</span>
-            <span style={{ color: 'rgba(254,254,254,0.4)' }}>@</span>
+            <span style={{ color: 'rgba(247,246,243,0.4)' }}>@</span>
             <span style={{ color: LILAC, fontWeight: 700 }}>0gent</span>
-            <span style={{ color: 'rgba(254,254,254,0.4)' }}>❯</span>
+            <span style={{ color: 'rgba(247,246,243,0.4)' }}>❯</span>
             <input
               autoFocus
               spellCheck={false}
@@ -416,7 +416,7 @@ function ShellTab({
                 border: 'none',
                 outline: 'none',
                 color: TEXT,
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'IBM Plex Mono, monospace',
                 fontSize: 13,
                 caretColor: LILAC,
               }}
@@ -442,12 +442,12 @@ function ShellTab({
             onClick={() => onChip(s)}
             disabled={busy}
             style={{
-              fontFamily: 'JetBrains Mono, monospace',
+              fontFamily: 'IBM Plex Mono, monospace',
               fontSize: 11,
               padding: '5px 12px',
-              background: 'rgba(0,229,255,0.06)',
+              background: 'rgba(232,181,92,0.06)',
               border: `1px solid ${BORDER}`,
-              color: 'rgba(254,254,254,0.55)',
+              color: 'rgba(247,246,243,0.55)',
               cursor: busy ? 'not-allowed' : 'pointer',
               opacity: busy ? 0.4 : 1,
               transition: 'all 0.15s',
@@ -458,13 +458,13 @@ function ShellTab({
               const el = e.currentTarget;
               el.style.borderColor = LILAC;
               el.style.color = LILAC;
-              el.style.background = 'rgba(0,229,255,0.14)';
+              el.style.background = 'rgba(232,181,92,0.14)';
             }}
             onMouseLeave={e => {
               const el = e.currentTarget;
               el.style.borderColor = BORDER;
-              el.style.color = 'rgba(254,254,254,0.55)';
-              el.style.background = 'rgba(0,229,255,0.06)';
+              el.style.color = 'rgba(247,246,243,0.55)';
+              el.style.background = 'rgba(232,181,92,0.06)';
             }}
           >
             {s}
@@ -487,7 +487,7 @@ function LogsTab({ logs }: { logs: readonly RequestLog[] }) {
         maxHeight: 360,
         padding: '16px 22px',
         overflowY: 'auto',
-        fontFamily: 'JetBrains Mono, monospace',
+        fontFamily: 'IBM Plex Mono, monospace',
         fontSize: 13,
         lineHeight: '24px',
         color: TEXT,
@@ -500,11 +500,11 @@ function LogsTab({ logs }: { logs: readonly RequestLog[] }) {
       ) : (
         logs.map(l => (
           <div key={l.id} style={{ display: 'flex', gap: 14 }}>
-            <span style={{ color: 'rgba(254,254,254,0.3)' }}>{fmtTime(l.timestamp)}</span>
+            <span style={{ color: 'rgba(247,246,243,0.3)' }}>{fmtTime(l.timestamp)}</span>
             <span style={{ color: methodColor(l.method), fontWeight: 700, minWidth: 44 }}>{l.method}</span>
             <span style={{ color: '#79c0ff', flex: 1 }}>{l.path}</span>
             <span style={{ color: statusColor(l.status), fontWeight: 700 }}>{l.status || '--'}</span>
-            <span style={{ color: 'rgba(254,254,254,0.4)', minWidth: 60, textAlign: 'right' }}>{l.durationMs}ms</span>
+            <span style={{ color: 'rgba(247,246,243,0.4)', minWidth: 60, textAlign: 'right' }}>{l.durationMs}ms</span>
           </div>
         ))
       )}
@@ -528,7 +528,7 @@ function NetworkTab({ stats }: { stats: ReturnType<typeof summary> }) {
       </div>
 
       {/* Traffic chart */}
-      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10, color: FAINT, letterSpacing: '0.1em', marginBottom: 10, textTransform: 'uppercase' }}>
+      <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, color: FAINT, letterSpacing: '0.1em', marginBottom: 10, textTransform: 'uppercase' }}>
         Traffic — last 60s
       </div>
       <div
@@ -549,7 +549,7 @@ function NetworkTab({ stats }: { stats: ReturnType<typeof summary> }) {
               flex: 1,
               minHeight: 2,
               height: `${(v / max) * 100}%`,
-              background: v > 0 ? LILAC : 'rgba(0,229,255,0.15)',
+              background: v > 0 ? LILAC : 'rgba(232,181,92,0.15)',
               opacity: v > 0 ? 0.85 : 1,
               transition: 'height 0.4s',
             }}
@@ -567,14 +567,14 @@ function StatCard({ label, value, accent }: { label: string; value: string; acce
       style={{
         border: `1px solid ${BORDER}`,
         padding: '18px 20px',
-        background: 'rgba(0,229,255,0.03)',
+        background: 'rgba(232,181,92,0.03)',
         minWidth: 0,
       }}
     >
       <div
         className="terminal-stat-label"
         style={{
-          fontFamily: 'JetBrains Mono, monospace',
+          fontFamily: 'IBM Plex Mono, monospace',
           fontSize: 10,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
@@ -587,7 +587,7 @@ function StatCard({ label, value, accent }: { label: string; value: string; acce
       <div
         className="terminal-stat-value"
         style={{
-          fontFamily: 'JetBrains Mono, monospace',
+          fontFamily: 'IBM Plex Mono, monospace',
           fontSize: 'clamp(20px, 5vw, 28px)',
           fontWeight: 700,
           color: accent ? LILAC : '#fff',
@@ -612,17 +612,17 @@ function CardOutput({ card }: { card: Card }) {
   const okStatus = card.status >= 200 && card.status < 400;
 
   const badgeColors = {
-    ok:   { fg: GREEN,  bg: 'rgba(63,185,80,0.10)',  border: 'rgba(63,185,80,0.5)' },
-    info: { fg: LILAC,  bg: 'rgba(0,229,255,0.14)', border: 'rgba(0,229,255,0.5)' },
-    warn: { fg: YELLOW, bg: 'rgba(254,188,46,0.10)', border: 'rgba(254,188,46,0.5)' },
-    err:  { fg: RED,    bg: 'rgba(248,81,73,0.10)',  border: 'rgba(248,81,73,0.5)' },
+    ok:   { fg: GREEN,  bg: 'rgba(70,184,96,0.10)',  border: 'rgba(70,184,96,0.5)' },
+    info: { fg: LILAC,  bg: 'rgba(232,181,92,0.14)', border: 'rgba(232,181,92,0.5)' },
+    warn: { fg: YELLOW, bg: 'rgba(232,181,92,0.10)', border: 'rgba(232,181,92,0.5)' },
+    err:  { fg: RED,    bg: 'rgba(229,72,77,0.10)',  border: 'rgba(229,72,77,0.5)' },
   };
 
   return (
     <div className="fade-in" style={{ margin: '8px 0 14px', maxWidth: 580 }}>
       {/* status header */}
       <div style={{
-        fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+        fontFamily: 'IBM Plex Mono, monospace', fontSize: 12,
         marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
       }}>
         {isPaid ? (
@@ -631,14 +631,14 @@ function CardOutput({ card }: { card: Card }) {
             <span style={{ color: FAINT }}>·</span>
             <span style={{ color: TEXT }}>{card.payment}</span>
             <span style={{ color: FAINT }}>→</span>
-            <span style={{ color: 'rgba(254,254,254,0.5)' }}>paid</span>
+            <span style={{ color: 'rgba(247,246,243,0.5)' }}>paid</span>
             <span style={{ color: okStatus ? GREEN : RED, fontWeight: 700 }}>
               {card.status} {okStatus ? 'OK' : ''}
             </span>
           </>
         ) : (
           <>
-            <span style={{ color: 'rgba(254,254,254,0.5)' }}>free</span>
+            <span style={{ color: 'rgba(247,246,243,0.5)' }}>free</span>
             <span style={{ color: FAINT }}>·</span>
             <span style={{ color: okStatus ? GREEN : RED, fontWeight: 700 }}>
               {card.status} {okStatus ? 'OK' : ''}
@@ -663,7 +663,7 @@ function CardOutput({ card }: { card: Card }) {
             )}
             <span style={{
               color: TEXT,
-              fontFamily: 'JetBrains Mono, monospace',
+              fontFamily: 'IBM Plex Mono, monospace',
               fontWeight: 700,
               fontSize: card.titleSize === 'lg' ? 18 : 14,
               letterSpacing: '-0.005em',
@@ -681,14 +681,14 @@ function CardOutput({ card }: { card: Card }) {
                   gridTemplateColumns: '120px 1fr',
                   gap: 14,
                   alignItems: 'baseline',
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'IBM Plex Mono, monospace',
                   fontSize: 12,
                 }}
               >
                 <span style={{ color: FAINT, letterSpacing: '0.02em' }}>{r.label}</span>
                 <span style={{
                   color: r.valueColor || TEXT,
-                  fontFamily: r.mono === false ? 'inherit' : 'JetBrains Mono, monospace',
+                  fontFamily: r.mono === false ? 'inherit' : 'IBM Plex Mono, monospace',
                   wordBreak: 'break-all',
                 }}>{r.value}</span>
               </div>
@@ -701,7 +701,7 @@ function CardOutput({ card }: { card: Card }) {
             marginTop: 12,
             paddingTop: 12,
             borderTop: `1px solid ${W08}`,
-            fontFamily: 'JetBrains Mono, monospace',
+            fontFamily: 'IBM Plex Mono, monospace',
             fontSize: 11,
             color: FAINT,
             lineHeight: 1.6,
@@ -713,7 +713,7 @@ function CardOutput({ card }: { card: Card }) {
             <span style={{
               display: 'inline-block',
               padding: '4px 12px',
-              fontFamily: 'JetBrains Mono, monospace',
+              fontFamily: 'IBM Plex Mono, monospace',
               fontSize: 10,
               fontWeight: 700,
               letterSpacing: '0.1em',
@@ -1041,7 +1041,7 @@ export function Terminal() {
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 45% 40% at 80% 25%, rgba(0,229,255,0.06), transparent 70%)',
+        background: 'radial-gradient(ellipse 45% 40% at 80% 25%, rgba(232,181,92,0.06), transparent 70%)',
       }} />
 
       {/* Section kicker — first numbered step on the page */}
@@ -1051,7 +1051,7 @@ export function Terminal() {
           fontSize: 12,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
-          color: '#00E5FF',
+          color: '#E8B55C',
           fontWeight: 500,
         }}>try it live</span>
       </div>
@@ -1063,19 +1063,19 @@ export function Terminal() {
         maxWidth: 640,
         margin: 0,
         marginBottom: 16,
-        color: '#fefefe',
+        color: '#f7f6f3',
         transitionDelay: '60ms',
       }}>The actual API, in your browser.</h2>
       <p className="reveal-up" style={{
         fontSize: 15,
-        color: 'rgba(254,254,254,0.5)',
+        color: 'rgba(247,246,243,0.5)',
         maxWidth: 540,
         lineHeight: 1.7,
         margin: 0,
         marginBottom: 36,
         transitionDelay: '120ms',
       }}>
-        Free commands run live against <span style={{ color: '#00E5FF' }}>api.0gent.xyz</span> right
+        Free commands run live against <span style={{ color: '#E8B55C' }}>api.0gent.xyz</span> right
         now. Paid commands work the same way once your wallet is funded.
       </p>
 
@@ -1087,7 +1087,7 @@ export function Terminal() {
             borderRadius: 14,
             overflow: 'hidden',
             textAlign: 'left',
-            boxShadow: '0 30px 80px -30px rgba(0,229,255,0.35)',
+            boxShadow: '0 30px 80px -30px rgba(232,181,92,0.35)',
           }}
         >
           {/* ─── Header bar ─── */}

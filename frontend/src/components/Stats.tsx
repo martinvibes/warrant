@@ -18,17 +18,17 @@ import {
 const API = (import.meta.env.VITE_API_URL as string) || 'https://api.0gent.xyz';
 
 // ─── Tokens ───────────────────────────────────────────────────────────
-const LILAC = '#00E5FF';
-const TEXT = '#fefefe';
-const TEXT_DIM = 'rgba(254,254,254,0.7)';
-const TEXT_FAINT = 'rgba(254,254,254,0.5)';
-const TEXT_GHOST = 'rgba(254,254,254,0.35)';
-const BG_PAGE = '#050508';
-const BG_CARD = '#0c0c14';
-const BG_ROW = 'rgba(0,229,255,0.025)';
-const BORDER = 'rgba(0,229,255,0.12)';
-const BORDER_HOVER = 'rgba(0,229,255,0.30)';
-const GREEN = '#7DEFB1';
+const LILAC = '#E8B55C';
+const TEXT = '#f7f6f3';
+const TEXT_DIM = 'rgba(247,246,243,0.7)';
+const TEXT_FAINT = 'rgba(247,246,243,0.5)';
+const TEXT_GHOST = 'rgba(247,246,243,0.35)';
+const BG_PAGE = '#070707';
+const BG_CARD = '#0e0e0f';
+const BG_ROW = 'rgba(232,181,92,0.025)';
+const BORDER = 'rgba(232,181,92,0.12)';
+const BORDER_HOVER = 'rgba(232,181,92,0.30)';
+const GREEN = '#6FE3A5';
 
 // ─── Types ────────────────────────────────────────────────────────────
 interface StatsResponse {
@@ -56,15 +56,15 @@ interface Tx {
 
 const ENDPOINT_META: Record<string, { label: string; icon: ReactNode; color: string }> = {
   identity:        { label: 'Identity NFT mint',  icon: <IdentityIcon size={14} color={LILAC} />,        color: LILAC },
-  email:           { label: 'Email inbox',        icon: <EmailIcon    size={14} color="#7DEFB1" />,      color: '#7DEFB1' },
-  'email-send':    { label: 'Email sent',         icon: <SendIcon     size={14} color="#7DEFB1" />,      color: '#7DEFB1' },
-  'email-read':    { label: 'Email read',         icon: <InboxIcon    size={14} color="#7DEFB1" />,      color: '#7DEFB1' },
-  'email-threads': { label: 'Email threads',      icon: <ThreadIcon   size={14} color="#7DEFB1" />,      color: '#7DEFB1' },
-  phone:           { label: 'Phone number',       icon: <PhoneIcon    size={14} color="#FFC97A" />,      color: '#FFC97A' },
-  sms:             { label: 'SMS sent',           icon: <SmsIcon      size={14} color="#FFC97A" />,      color: '#FFC97A' },
-  'compute-infer': { label: 'AI inference',       icon: <BrainIcon    size={14} color="#4DD0E1" />,      color: '#4DD0E1' },
-  compute:         { label: 'Compute VPS',        icon: <ServerIcon   size={14} color="#4DD0E1" />,      color: '#4DD0E1' },
-  domain:          { label: 'Domain register',    icon: <GlobeIcon    size={14} color="#FFC97A" />,      color: '#FFC97A' },
+  email:           { label: 'Email inbox',        icon: <EmailIcon    size={14} color="#6FE3A5" />,      color: '#6FE3A5' },
+  'email-send':    { label: 'Email sent',         icon: <SendIcon     size={14} color="#6FE3A5" />,      color: '#6FE3A5' },
+  'email-read':    { label: 'Email read',         icon: <InboxIcon    size={14} color="#6FE3A5" />,      color: '#6FE3A5' },
+  'email-threads': { label: 'Email threads',      icon: <ThreadIcon   size={14} color="#6FE3A5" />,      color: '#6FE3A5' },
+  phone:           { label: 'Phone number',       icon: <PhoneIcon    size={14} color="#E8B55C" />,      color: '#E8B55C' },
+  sms:             { label: 'SMS sent',           icon: <SmsIcon      size={14} color="#E8B55C" />,      color: '#E8B55C' },
+  'compute-infer': { label: 'AI inference',       icon: <BrainIcon    size={14} color="#D9A85C" />,      color: '#D9A85C' },
+  compute:         { label: 'Compute VPS',        icon: <ServerIcon   size={14} color="#D9A85C" />,      color: '#D9A85C' },
+  domain:          { label: 'Domain register',    icon: <GlobeIcon    size={14} color="#E8B55C" />,      color: '#E8B55C' },
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────
@@ -123,13 +123,13 @@ function HeadlineCard({ value, label, sub }: { value: string; label: string; sub
       background: BG_CARD, border: `1px solid ${BORDER}`, padding: '32px 28px',
       flex: '1 1 220px', minWidth: 0,
     }}>
-      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 'clamp(36px, 5vw, 52px)', fontWeight: 600, color: LILAC, lineHeight: 1, letterSpacing: '-0.02em' }}>
+      <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 'clamp(36px, 5vw, 52px)', fontWeight: 600, color: LILAC, lineHeight: 1, letterSpacing: '-0.02em' }}>
         {value}
       </div>
-      <div style={{ marginTop: 12, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace' }}>
+      <div style={{ marginTop: 12, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace' }}>
         {label}
       </div>
-      {sub && <div style={{ marginTop: 8, fontSize: 11, color: TEXT_GHOST, fontFamily: 'JetBrains Mono, monospace' }}>{sub}</div>}
+      {sub && <div style={{ marginTop: 8, fontSize: 11, color: TEXT_GHOST, fontFamily: 'IBM Plex Mono, monospace' }}>{sub}</div>}
     </div>
   );
 }
@@ -141,7 +141,7 @@ function StatRow({ label, icon, value }: { label: string; icon?: ReactNode; valu
         {icon && <span style={{ display: 'inline-flex', color: TEXT_FAINT }}>{icon}</span>}
         <span>{label}</span>
       </div>
-      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, color: TEXT, fontWeight: 500 }}>{value}</div>
+      <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 14, color: TEXT, fontWeight: 500 }}>{value}</div>
     </div>
   );
 }
@@ -156,13 +156,13 @@ function TxRow({ tx, idx }: { tx: Tx; idx: number }) {
     gridTemplateColumns: 'minmax(140px,1.2fr) minmax(140px,1fr) minmax(110px,0.9fr) minmax(180px,1.1fr) minmax(120px,0.9fr)',
     gap: 12, alignItems: 'center', padding: '12px 16px',
     background: idx % 2 === 0 ? BG_ROW : 'transparent',
-    fontSize: 12.5, fontFamily: 'JetBrains Mono, monospace',
+    fontSize: 12.5, fontFamily: 'IBM Plex Mono, monospace',
   };
   const prefix = (label: string) => (
     <span className="stats-tx-prefix" style={{
       display: 'none',
-      fontSize: 9, color: 'rgba(254,254,254,0.30)',
-      fontFamily: 'JetBrains Mono, monospace',
+      fontSize: 9, color: 'rgba(247,246,243,0.30)',
+      fontFamily: 'IBM Plex Mono, monospace',
       textTransform: 'uppercase', letterSpacing: '0.10em',
       marginRight: 6,
     }}>{label}</span>
@@ -263,7 +263,7 @@ export function Stats() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
             <span className="pulse" style={{ width: 8, height: 8, borderRadius: '50%', background: GREEN, display: 'inline-block', boxShadow: `0 0 8px ${GREEN}` }} />
-            <span style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: GREEN, fontFamily: 'JetBrains Mono, monospace' }}>
+            <span style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: GREEN, fontFamily: 'IBM Plex Mono, monospace' }}>
               live · {stats ? 'updated ' + timeAgo(stats.updated_at) : 'connecting…'}
             </span>
           </div>
@@ -278,7 +278,7 @@ export function Stats() {
         </div>
 
         {errorMsg && (
-          <div style={{ background: 'rgba(248,81,73,0.06)', border: '1px solid rgba(248,81,73,0.25)', color: '#f85149', padding: '12px 16px', marginBottom: 24, fontSize: 13 }}>
+          <div style={{ background: 'rgba(229,72,77,0.06)', border: '1px solid rgba(229,72,77,0.25)', color: '#E5484D', padding: '12px 16px', marginBottom: 24, fontSize: 13 }}>
             {errorMsg}
           </div>
         )}
@@ -305,7 +305,7 @@ export function Stats() {
         {/* ── Detailed totals ─────────────────── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14, marginBottom: 40 }}>
           <div style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-            <div style={{ padding: '14px 18px', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: LILAC, fontFamily: 'JetBrains Mono, monospace' }}>
+            <div style={{ padding: '14px 18px', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: LILAC, fontFamily: 'IBM Plex Mono, monospace' }}>
               All-time totals
             </div>
             <StatRow label="Total transactions"  value={stats ? fmtN(stats.totals.transactions) : '…'} />
@@ -315,7 +315,7 @@ export function Stats() {
           </div>
 
           <div style={{ background: BG_CARD, border: `1px solid ${BORDER}` }}>
-            <div style={{ padding: '14px 18px', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: LILAC, fontFamily: 'JetBrains Mono, monospace' }}>
+            <div style={{ padding: '14px 18px', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: LILAC, fontFamily: 'IBM Plex Mono, monospace' }}>
               By service
             </div>
             <StatRow icon={<IdentityIcon size={14} />} label="Identity NFTs minted" value={stats ? fmtN(stats.totals.identities_minted) : '…'} />
@@ -332,7 +332,7 @@ export function Stats() {
         {/* ── Transaction log (capped at 30 inline) ──────── */}
         <div style={{ marginBottom: 16, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: LILAC, fontFamily: 'JetBrains Mono, monospace', marginBottom: 6 }}>
+            <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: LILAC, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
               Recent transactions
             </div>
             <div style={{ fontSize: 22, fontWeight: 500 }}>Every paid call on 0GENT</div>
@@ -345,9 +345,9 @@ export function Stats() {
               onClick={() => setModalOpen(true)}
               className="dash-btn-ghost"
               style={{
-                fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+                fontFamily: 'IBM Plex Mono, monospace', fontSize: 12,
                 padding: '10px 18px', cursor: 'pointer',
-                border: `1px solid ${BORDER_HOVER}`, background: 'rgba(0,229,255,0.06)',
+                border: `1px solid ${BORDER_HOVER}`, background: 'rgba(232,181,92,0.06)',
                 color: LILAC, fontWeight: 500,
               }}
             >
@@ -364,7 +364,7 @@ export function Stats() {
               display: 'grid',
               gridTemplateColumns: 'minmax(140px,1.2fr) minmax(140px,1fr) minmax(110px,0.9fr) minmax(180px,1.1fr) minmax(120px,0.9fr)',
               gap: 12, padding: '12px 16px', borderBottom: `1px solid ${BORDER}`,
-              fontSize: 10, letterSpacing: '0.10em', textTransform: 'uppercase', color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 10, letterSpacing: '0.10em', textTransform: 'uppercase', color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace',
             }}>
               <div>Service</div><div>Payer</div><div>Amount</div><div>Tx hash</div><div style={{ textAlign: 'right' }}>When</div>
             </div>
@@ -388,9 +388,9 @@ export function Stats() {
               onClick={() => setModalOpen(true)}
               className="dash-btn-ghost"
               style={{
-                fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+                fontFamily: 'IBM Plex Mono, monospace', fontSize: 12,
                 padding: '12px 22px', cursor: 'pointer',
-                border: `1px solid ${BORDER_HOVER}`, background: 'rgba(0,229,255,0.04)',
+                border: `1px solid ${BORDER_HOVER}`, background: 'rgba(232,181,92,0.04)',
                 color: LILAC, fontWeight: 500,
               }}
             >
@@ -482,7 +482,7 @@ function TransactionsModal({ open, onClose }: { open: boolean; onClose: () => vo
         {/* Modal header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, gap: 10, flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: LILAC, fontFamily: 'JetBrains Mono, monospace', marginBottom: 4 }}>
+            <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: LILAC, fontFamily: 'IBM Plex Mono, monospace', marginBottom: 4 }}>
               All transactions
             </div>
             <div style={{ fontSize: 18, fontWeight: 500 }}>
@@ -523,10 +523,10 @@ function TransactionsModal({ open, onClose }: { open: boolean; onClose: () => vo
                 onClick={() => { setFilter(v); setPagination(p => ({ ...p, offset: 0 })); }}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 8,
-                  fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 11,
                   padding: '6px 12px',
                   border: `1px solid ${active ? BORDER_HOVER : BORDER}`,
-                  background: active ? 'rgba(0,229,255,0.10)' : 'transparent',
+                  background: active ? 'rgba(232,181,92,0.10)' : 'transparent',
                   color: active ? LILAC : TEXT_DIM,
                   cursor: 'pointer', transition: 'all 0.15s',
                 }}
@@ -545,7 +545,7 @@ function TransactionsModal({ open, onClose }: { open: boolean; onClose: () => vo
               display: 'grid',
               gridTemplateColumns: 'minmax(140px,1.2fr) minmax(140px,1fr) minmax(110px,0.9fr) minmax(180px,1.1fr) minmax(120px,0.9fr)',
               gap: 12, padding: '12px 16px', borderBottom: `1px solid ${BORDER}`,
-              fontSize: 10, letterSpacing: '0.10em', textTransform: 'uppercase', color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 10, letterSpacing: '0.10em', textTransform: 'uppercase', color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace',
             }}>
               <div>Service</div><div>Payer</div><div>Amount</div><div>Tx hash</div><div style={{ textAlign: 'right' }}>When</div>
             </div>
@@ -568,21 +568,21 @@ function TransactionsModal({ open, onClose }: { open: boolean; onClose: () => vo
               onClick={() => setPagination(p => ({ ...p, offset: Math.max(0, p.offset - p.limit) }))}
               disabled={pagination.offset === 0}
               style={{
-                fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+                fontFamily: 'IBM Plex Mono, monospace', fontSize: 12,
                 padding: '8px 16px', cursor: pagination.offset === 0 ? 'not-allowed' : 'pointer',
                 border: `1px solid ${BORDER}`, background: 'transparent',
                 color: pagination.offset === 0 ? TEXT_GHOST : TEXT_DIM,
                 opacity: pagination.offset === 0 ? 0.5 : 1,
               }}
             >← Previous</button>
-            <div style={{ fontSize: 11, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace' }}>
+            <div style={{ fontSize: 11, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace' }}>
               {pagination.offset + 1}–{Math.min(pagination.offset + pagination.limit, pagination.total)} of {fmtN(pagination.total)}
             </div>
             <button
               onClick={() => setPagination(p => ({ ...p, offset: p.offset + p.limit }))}
               disabled={!pagination.has_more}
               style={{
-                fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+                fontFamily: 'IBM Plex Mono, monospace', fontSize: 12,
                 padding: '8px 16px', cursor: !pagination.has_more ? 'not-allowed' : 'pointer',
                 border: `1px solid ${BORDER}`, background: 'transparent',
                 color: !pagination.has_more ? TEXT_GHOST : TEXT_DIM,

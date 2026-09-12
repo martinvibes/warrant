@@ -88,14 +88,14 @@ export function Hero() {
       <div style={{
         position:'absolute', top:-300, left:'50%', transform:'translateX(-50%)',
         width:1200, height:900, pointerEvents:'none',
-        background:'radial-gradient(ellipse 50% 50%, rgba(0, 229, 255,0.12) 0%, rgba(0, 229, 255,0.04) 40%, transparent 70%)',
+        background:'radial-gradient(ellipse 50% 50%, rgba(232, 181, 92,0.12) 0%, rgba(232, 181, 92,0.04) 40%, transparent 70%)',
         zIndex: 0,
       }} />
 
       {/* Grid lines */}
       <div style={{
         position:'absolute', inset:0, pointerEvents:'none',
-        backgroundImage:'linear-gradient(rgba(0, 229, 255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255,0.04) 1px, transparent 1px)',
+        backgroundImage:'linear-gradient(rgba(232, 181, 92,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(232, 181, 92,0.04) 1px, transparent 1px)',
         backgroundSize:'60px 60px',
         maskImage:'linear-gradient(to bottom, transparent 10%, black 30%, black 70%, transparent 90%)',
         WebkitMaskImage:'linear-gradient(to bottom, transparent 10%, black 30%, black 70%, transparent 90%)',
@@ -106,11 +106,11 @@ export function Hero() {
         {/* Badge */}
         <div style={{
           display:'inline-flex', alignItems:'center', gap:8, padding:'8px 18px', marginBottom:32,
-          background:'rgba(0, 229, 255,0.1)', border:'1px solid rgba(0, 229, 255,0.25)', borderRadius:100,
-          fontSize:13, fontWeight:500, color:'#00E5FF',
+          background:'rgba(232, 181, 92,0.1)', border:'1px solid rgba(232, 181, 92,0.25)', borderRadius:100,
+          fontSize:13, fontWeight:500, color:'#E8B55C',
           pointerEvents: 'auto',
         }}>
-          <span className="pulse" style={{ width:6, height:6, borderRadius:'50%', background:'#00E5FF', display:'inline-block' }} />
+          <span className="pulse" style={{ width:6, height:6, borderRadius:'50%', background:'#E8B55C', display:'inline-block' }} />
           Built on Celo & 0G Chain
         </div>
 
@@ -118,14 +118,14 @@ export function Hero() {
         <h1 className="hero-h1" style={{
           fontSize:'clamp(40px, 6vw, 72px)', fontWeight:500, letterSpacing:'-0.04em', lineHeight:1.05,
           marginBottom:24,
-          background:'linear-gradient(180deg, #FEFEFE 30%, rgba(254,254,254,0.5))',
+          background:'linear-gradient(180deg, #F7F6F3 30%, rgba(247,246,243,0.5))',
           WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text',
           pointerEvents: 'auto',
         }}>
           Infrastructure for<br />Autonomous AI Agents
         </h1>
 
-        <p className="hero-sub" style={{ fontSize:17, color:'rgba(254,254,254,0.7)', maxWidth:520, margin:'0 auto 40px', lineHeight:1.7, pointerEvents: 'auto' }}>
+        <p className="hero-sub" style={{ fontSize:17, color:'rgba(247,246,243,0.7)', maxWidth:520, margin:'0 auto 40px', lineHeight:1.7, pointerEvents: 'auto' }}>
           Your AI agent gets real phone numbers, email inboxes, AI brain, and persistent memory, and pays for everything itself using crypto. No accounts. No humans needed.
         </p>
 
@@ -134,13 +134,13 @@ export function Hero() {
         <div className="hero-buttons" style={{ display:'flex', gap:14, justifyContent:'center', marginBottom:56, pointerEvents: 'auto', flexWrap: 'wrap' }}>
           <a href="/dashboard" style={{
             display:'inline-flex', alignItems:'center', gap:8, height:48, padding:'0 28px',
-            background:'#00B8D4', color:'#fff', fontSize:14, fontWeight:500, borderRadius:100,
+            background:'#C98A2E', color:'#fff', fontSize:14, fontWeight:500, borderRadius:100,
             transition:'all 0.2s', border:'none', textDecoration: 'none'
           }}>Open Dashboard →</a>
           <a href="#terminal" style={{
             display:'inline-flex', alignItems:'center', gap:8, height:48, padding:'0 28px',
-            background:'rgba(254,254,254,0.04)', color:'#fff', fontSize:14, fontWeight:500,
-            borderRadius:100, border:'1px solid rgba(0, 229, 255,0.15)', transition:'all 0.2s', textDecoration: 'none'
+            background:'rgba(247,246,243,0.04)', color:'#fff', fontSize:14, fontWeight:500,
+            borderRadius:100, border:'1px solid rgba(232, 181, 92,0.15)', transition:'all 0.2s', textDecoration: 'none'
           }}>See it run</a>
         </div>
 
@@ -159,15 +159,15 @@ export function Hero() {
               key={h}
               href={h}
               style={{
-                fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
+                fontSize: 11, fontFamily: 'IBM Plex Mono, monospace',
                 padding: '6px 12px',
-                color: 'rgba(254,254,254,0.55)',
-                border: '1px solid rgba(0, 229, 255,0.18)',
+                color: 'rgba(247,246,243,0.55)',
+                border: '1px solid rgba(232, 181, 92,0.18)',
                 textDecoration: 'none',
                 transition: 'all 0.2s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.4)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(254,254,254,0.55)'; e.currentTarget.style.borderColor = 'rgba(0, 229, 255,0.18)'; }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(232, 181, 92,0.4)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(247,246,243,0.55)'; e.currentTarget.style.borderColor = 'rgba(232, 181, 92,0.18)'; }}
             >
               {l}
             </a>
@@ -182,8 +182,8 @@ export function Hero() {
             [stats ? fmtN(Math.round(transactions))  : '—', 'Paid Transactions'],
           ] as const).map(([v, l]) => (
             <a key={l} href="/stats" style={{ textAlign:'center', textDecoration:'none' }}>
-              <div className="mono hero-stats-num" style={{ fontSize:28, fontWeight:600, color:'#00E5FF', fontVariantNumeric:'tabular-nums' }}>{v}</div>
-              <div style={{ fontSize:11, color:'rgba(254,254,254,0.4)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:4 }}>{l}</div>
+              <div className="mono hero-stats-num" style={{ fontSize:28, fontWeight:600, color:'#E8B55C', fontVariantNumeric:'tabular-nums' }}>{v}</div>
+              <div style={{ fontSize:11, color:'rgba(247,246,243,0.4)', textTransform:'uppercase', letterSpacing:'0.1em', marginTop:4 }}>{l}</div>
             </a>
           ))}
         </div>

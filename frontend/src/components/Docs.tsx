@@ -12,18 +12,18 @@ import { Footer } from './Footer';
 import { LogoLockup } from './Logo';
 
 // ─── Tokens (match Features.tsx vibe) ────────────────────────────────
-const LILAC = '#00E5FF';
-const TEXT = '#fefefe';
-const TEXT_DIM = 'rgba(254,254,254,0.7)';
-const TEXT_FAINT = 'rgba(254,254,254,0.5)';
-const TEXT_GHOST = 'rgba(254,254,254,0.35)';
-const BG_PAGE = '#050508';
-const BG_CARD = '#0c0c14';
+const LILAC = '#E8B55C';
+const TEXT = '#f7f6f3';
+const TEXT_DIM = 'rgba(247,246,243,0.7)';
+const TEXT_FAINT = 'rgba(247,246,243,0.5)';
+const TEXT_GHOST = 'rgba(247,246,243,0.35)';
+const BG_PAGE = '#070707';
+const BG_CARD = '#0e0e0f';
 const BG_CODE = 'rgba(0,0,0,0.55)';
-const BORDER = 'rgba(0,229,255,0.12)';
-const BORDER_HOVER = 'rgba(0,229,255,0.30)';
-const GREEN = '#7DEFB1';
-const AMBER = '#FFC97A';
+const BORDER = 'rgba(232,181,92,0.12)';
+const BORDER_HOVER = 'rgba(232,181,92,0.30)';
+const GREEN = '#6FE3A5';
+const AMBER = '#E8B55C';
 
 // ─── Sub-components ──────────────────────────────────────────────────
 
@@ -43,7 +43,7 @@ function Section({
   return (
     <section id={id} style={{ padding: '64px 0', borderTop: `1px solid ${BORDER}`, scrollMarginTop: 80 }}>
       {kicker && (
-        <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: LILAC, marginBottom: 14, fontFamily: 'JetBrains Mono, monospace' }}>
+        <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: LILAC, marginBottom: 14, fontFamily: 'IBM Plex Mono, monospace' }}>
           {kicker}
         </div>
       )}
@@ -69,7 +69,7 @@ function Code({ children, lang }: { children: string; lang?: string }) {
       fontSize: 12.5,
       lineHeight: 1.7,
       color: '#E6E1FF',
-      fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+      fontFamily: 'IBM Plex Mono, ui-monospace, monospace',
       overflow: 'auto',
       margin: '12px 0',
       whiteSpace: 'pre',
@@ -82,14 +82,14 @@ function Code({ children, lang }: { children: string; lang?: string }) {
 
 function Pill({ children, kind = 'live' }: { children: ReactNode; kind?: 'live' | 'dev' | 'free' | 'paid' }) {
   const styles: Record<string, CSSProperties> = {
-    live:  { color: GREEN,  border: '1px solid rgba(125,239,177,0.30)', background: 'rgba(125,239,177,0.06)' },
-    dev:   { color: AMBER,  border: '1px solid rgba(255,201,122,0.30)', background: 'rgba(255,201,122,0.05)' },
+    live:  { color: GREEN,  border: '1px solid rgba(111,227,165,0.30)', background: 'rgba(111,227,165,0.06)' },
+    dev:   { color: AMBER,  border: '1px solid rgba(232,181,92,0.30)', background: 'rgba(232,181,92,0.05)' },
     free:  { color: TEXT_FAINT, border: `1px solid ${BORDER}`,         background: 'transparent' },
-    paid:  { color: LILAC,  border: '1px solid rgba(0,229,255,0.30)', background: 'rgba(0,229,255,0.06)' },
+    paid:  { color: LILAC,  border: '1px solid rgba(232,181,92,0.30)', background: 'rgba(232,181,92,0.06)' },
   };
   return (
     <span style={{
-      display: 'inline-block', fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
+      display: 'inline-block', fontSize: 10, fontFamily: 'IBM Plex Mono, monospace',
       letterSpacing: '0.08em', textTransform: 'uppercase', padding: '3px 8px',
       ...(styles[kind] || styles.live),
     }}>
@@ -126,21 +126,21 @@ function Endpoint({
   body?: string;
   desc: ReactNode;
 }) {
-  const methodColor: Record<string, string> = { GET: GREEN, POST: LILAC, DELETE: '#f85149' };
+  const methodColor: Record<string, string> = { GET: GREEN, POST: LILAC, DELETE: '#E5484D' };
   return (
     <Card style={{ marginBottom: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
-        <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fontWeight: 700, color: methodColor[method] }}>
+        <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, fontWeight: 700, color: methodColor[method] }}>
           {method}
         </span>
-        <code style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 14, color: TEXT, flex: 1, wordBreak: 'break-all' }}>
+        <code style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 14, color: TEXT, flex: 1, wordBreak: 'break-all' }}>
           {path}
         </code>
         <Pill kind={cost === 'free' ? 'free' : 'paid'}>{cost}</Pill>
         <Pill kind={status}>{status === 'live' ? '● live' : '○ dev'}</Pill>
       </div>
       {body && (
-        <code style={{ display: 'block', fontSize: 11.5, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace', marginTop: 4, marginBottom: 8 }}>
+        <code style={{ display: 'block', fontSize: 11.5, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace', marginTop: 4, marginBottom: 8 }}>
           body: {body}
         </code>
       )}
@@ -207,7 +207,7 @@ export function Docs() {
           width: 200, flexShrink: 0, position: 'sticky', top: 100, alignSelf: 'flex-start',
           height: 'fit-content', display: 'flex', flexDirection: 'column', gap: 2,
         }}>
-          <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: TEXT_GHOST, marginBottom: 12, fontFamily: 'JetBrains Mono, monospace' }}>
+          <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: TEXT_GHOST, marginBottom: 12, fontFamily: 'IBM Plex Mono, monospace' }}>
             Documentation
           </div>
           {[
@@ -228,15 +228,15 @@ export function Docs() {
                 display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px',
                 fontSize: 13,
                 color: isActive ? LILAC : TEXT_DIM,
-                background: isActive ? 'rgba(0,229,255,0.08)' : 'transparent',
+                background: isActive ? 'rgba(232,181,92,0.08)' : 'transparent',
                 borderLeft: isActive ? `2px solid ${LILAC}` : '2px solid transparent',
                 textDecoration: 'none', borderRadius: '0 6px 6px 0',
                 transition: 'all 0.15s', fontFamily: 'Inter, system-ui, sans-serif',
               }}
-                onMouseEnter={e => { if (!isActive) { e.currentTarget.style.color = LILAC; e.currentTarget.style.background = 'rgba(0,229,255,0.06)'; } }}
+                onMouseEnter={e => { if (!isActive) { e.currentTarget.style.color = LILAC; e.currentTarget.style.background = 'rgba(232,181,92,0.06)'; } }}
                 onMouseLeave={e => { if (!isActive) { e.currentTarget.style.color = TEXT_DIM; e.currentTarget.style.background = 'transparent'; } }}
               >
-                <span style={{ fontSize: 10, color: isActive ? LILAC : TEXT_GHOST, fontFamily: 'JetBrains Mono, monospace', width: 18 }}>{num}</span>
+                <span style={{ fontSize: 10, color: isActive ? LILAC : TEXT_GHOST, fontFamily: 'IBM Plex Mono, monospace', width: 18 }}>{num}</span>
                 {label}
               </a>
             );
@@ -320,7 +320,7 @@ npm i -g @0gent/core
         >
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }}>
             <Card>
-              <div style={{ fontSize: 12, fontFamily: 'JetBrains Mono, monospace', color: LILAC, marginBottom: 10 }}>RULE 1</div>
+              <div style={{ fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', color: LILAC, marginBottom: 10 }}>RULE 1</div>
               <div style={{ fontSize: 17, fontWeight: 500, marginBottom: 10 }}>Wallet = identity</div>
               <div style={{ fontSize: 13, color: TEXT_DIM, lineHeight: 1.7 }}>
                 There are no user accounts. The wallet that signs each x402 payment becomes the owner of the resource it bought.
@@ -328,7 +328,7 @@ npm i -g @0gent/core
               </div>
             </Card>
             <Card>
-              <div style={{ fontSize: 12, fontFamily: 'JetBrains Mono, monospace', color: LILAC, marginBottom: 10 }}>RULE 2</div>
+              <div style={{ fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', color: LILAC, marginBottom: 10 }}>RULE 2</div>
               <div style={{ fontSize: 17, fontWeight: 500, marginBottom: 10 }}>Pay per call in 0G</div>
               <div style={{ fontSize: 13, color: TEXT_DIM, lineHeight: 1.7 }}>
                 Every paid endpoint settles a real on-chain transaction in native 0G via the{' '}
@@ -337,7 +337,7 @@ npm i -g @0gent/core
               </div>
             </Card>
             <Card>
-              <div style={{ fontSize: 12, fontFamily: 'JetBrains Mono, monospace', color: LILAC, marginBottom: 10 }}>RULE 3</div>
+              <div style={{ fontSize: 12, fontFamily: 'IBM Plex Mono, monospace', color: LILAC, marginBottom: 10 }}>RULE 3</div>
               <div style={{ fontSize: 17, fontWeight: 500, marginBottom: 10 }}>Keys never leave you</div>
               <div style={{ fontSize: 13, color: TEXT_DIM, lineHeight: 1.7 }}>
                 The seed is generated locally, encrypted at rest with AES-256-GCM, and the server only ever sees the public address.
@@ -378,13 +378,13 @@ npm i -g @0gent/core
             <table className="docs-services-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: BG_CARD }}>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Service</th>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Cost</th>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Status</th>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Backed by</th>
+                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Service</th>
+                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Cost</th>
+                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Status</th>
+                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Backed by</th>
                 </tr>
               </thead>
-              <tbody style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+              <tbody style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                 {([
                   ['Identity NFT mint',     prices.identity,       'live', '0G Chain · ZeroGentIdentity'],
                   ['Email inbox provision', prices.emailProvision,  'live', 'Cloudflare Email Workers'],
@@ -562,12 +562,12 @@ const resources = await z.listResources();`}</Code>
             <table className="docs-services-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
               <thead>
                 <tr style={{ background: BG_CARD }}>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Contract</th>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Address</th>
-                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Purpose</th>
+                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Contract</th>
+                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Address</th>
+                  <th style={{ textAlign: 'left', padding: '12px 16px', color: TEXT_FAINT, fontWeight: 500, fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Purpose</th>
                 </tr>
               </thead>
-              <tbody style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+              <tbody style={{ fontFamily: 'IBM Plex Mono, monospace' }}>
                 {([
                   ['ZeroGentPayment',  '0x124aF88c004e9df6D444a0Afc0Fe7Ef215dc02A2', 'x402 treasury, nonce-replay protected'],
                   ['AgentRegistry',    '0x49589C475BBB418B0E069010C923ed18D00E275b', 'Wallet → owned resources mapping'],
@@ -628,7 +628,7 @@ const resources = await z.listResources();`}</Code>
               <a key={h} href={h} target={h.startsWith('http') ? '_blank' : undefined} rel="noreferrer" style={{
                 display: 'block', padding: '14px 16px', background: BG_CARD, border: `1px solid ${BORDER}`,
                 color: TEXT, textDecoration: 'none', fontSize: 13, transition: 'all 0.2s',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'IBM Plex Mono, monospace',
               }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = BORDER_HOVER; e.currentTarget.style.color = LILAC; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.color = TEXT; }}

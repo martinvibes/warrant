@@ -3,16 +3,16 @@ import { Glyph0G as SharedGlyph0G } from './Logo';
 
 // ─── Color tokens ─────────────────────────────────────────────────────
 
-const PURPLE = '#00B8D4';
-const LILAC = '#00E5FF';
-const TEXT = '#fefefe';
-const TEXT_DIM = 'rgba(254,254,254,0.55)';
-const TEXT_FAINT = 'rgba(254,254,254,0.32)';
-const BG_PAGE = '#08080d';
-const BG_CARD = '#0a0a12';
-const BG_INVERT = '#fefefe';
-const BORDER = 'rgba(0,229,255,0.14)';
-const BORDER_HOVER = 'rgba(0,229,255,0.45)';
+const PURPLE = '#C98A2E';
+const LILAC = '#E8B55C';
+const TEXT = '#f7f6f3';
+const TEXT_DIM = 'rgba(247,246,243,0.55)';
+const TEXT_FAINT = 'rgba(247,246,243,0.32)';
+const BG_PAGE = '#0a0a0b';
+const BG_CARD = '#0c0c0d';
+const BG_INVERT = '#f7f6f3';
+const BORDER = 'rgba(232,181,92,0.14)';
+const BORDER_HOVER = 'rgba(232,181,92,0.45)';
 
 // ─────────────────────────────────────────────────────────────────────────
 //  Eight logo concepts. Each is a React component that takes `size` and
@@ -145,7 +145,7 @@ const LOGOS: LogoConcept[] = [
 function Wordmark({ size = 18, color = TEXT, weight = 600 }: { size?: number; color?: string; weight?: number }) {
   return (
     <span style={{
-      fontFamily: 'JetBrains Mono, monospace',
+      fontFamily: 'IBM Plex Mono, monospace',
       fontSize: size,
       fontWeight: weight,
       color,
@@ -188,7 +188,7 @@ function LogoCard({
       {/* Number + name + selected indicator */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
         <span style={{
-          fontFamily: 'JetBrains Mono, monospace',
+          fontFamily: 'IBM Plex Mono, monospace',
           fontSize: 11,
           color: TEXT_FAINT,
           letterSpacing: '0.06em',
@@ -204,10 +204,10 @@ function LogoCard({
             marginLeft: 'auto',
             fontSize: 10,
             color: LILAC,
-            background: 'rgba(0,229,255,0.14)',
+            background: 'rgba(232,181,92,0.14)',
             padding: '3px 9px',
             border: `1px solid ${LILAC}`,
-            fontFamily: 'JetBrains Mono, monospace',
+            fontFamily: 'IBM Plex Mono, monospace',
             letterSpacing: '0.06em',
             textTransform: 'uppercase',
             fontWeight: 600,
@@ -255,7 +255,7 @@ function LogoCard({
         marginBottom: 12,
       }}>
         <Mark size={24} color={PURPLE} />
-        <Wordmark color="#101015" />
+        <Wordmark color="#131314" />
       </div>
 
       {/* Tiny / favicon size preview — proves it works at small sizes */}
@@ -268,11 +268,11 @@ function LogoCard({
         border: `1px solid ${BORDER}`,
         marginBottom: 16,
       }}>
-        <span style={{ fontSize: 10, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace' }}>favicon</span>
+        <span style={{ fontSize: 10, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace' }}>favicon</span>
         <Mark size={16} />
-        <span style={{ fontSize: 10, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace' }}>nav</span>
+        <span style={{ fontSize: 10, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace' }}>nav</span>
         <Mark size={20} />
-        <span style={{ fontSize: 10, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace' }}>large</span>
+        <span style={{ fontSize: 10, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace' }}>large</span>
         <Mark size={36} />
       </div>
 
@@ -304,7 +304,7 @@ export function Logos() {
       {/* Subtle bg glow */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'radial-gradient(ellipse 50% 35% at 50% 20%, rgba(0,229,255,0.10), transparent 70%)',
+        background: 'radial-gradient(ellipse 50% 35% at 50% 20%, rgba(232,181,92,0.10), transparent 70%)',
       }} />
 
       <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative' }}>
@@ -312,7 +312,7 @@ export function Logos() {
         <div style={{ marginBottom: 56 }}>
           <a href="/" style={{
             display: 'inline-block',
-            fontFamily: 'JetBrains Mono, monospace',
+            fontFamily: 'IBM Plex Mono, monospace',
             fontSize: 11,
             color: TEXT_FAINT,
             marginBottom: 20,
@@ -355,7 +355,7 @@ export function Logos() {
         {/* Selected banner */}
         {chosen && (
           <div style={{
-            background: 'rgba(0,229,255,0.08)',
+            background: 'rgba(232,181,92,0.08)',
             border: `1px solid ${LILAC}`,
             padding: '14px 20px',
             marginBottom: 32,
@@ -367,7 +367,7 @@ export function Logos() {
             <span style={{
               fontSize: 11,
               color: LILAC,
-              fontFamily: 'JetBrains Mono, monospace',
+              fontFamily: 'IBM Plex Mono, monospace',
               fontWeight: 600,
               letterSpacing: '0.06em',
               textTransform: 'uppercase',
@@ -387,7 +387,7 @@ export function Logos() {
                 border: `1px solid ${BORDER_HOVER}`,
                 color: TEXT_DIM,
                 cursor: 'pointer',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'IBM Plex Mono, monospace',
               }}
             >clear</button>
           </div>

@@ -23,20 +23,20 @@ import {
 } from './Icons';
 
 // ─── Tokens ───────────────────────────────────────────────────────────
-const LILAC      = '#00E5FF';
-const PURPLE     = '#00B8D4';
-const TEXT       = '#fefefe';
-const TEXT_DIM   = 'rgba(254,254,254,0.7)';
-const TEXT_FAINT = 'rgba(254,254,254,0.5)';
-const TEXT_GHOST = 'rgba(254,254,254,0.30)';
-const BG_PAGE    = '#050508';
-const BG_CARD    = '#0c0c14';
+const LILAC      = '#E8B55C';
+const PURPLE     = '#C98A2E';
+const TEXT       = '#f7f6f3';
+const TEXT_DIM   = 'rgba(247,246,243,0.7)';
+const TEXT_FAINT = 'rgba(247,246,243,0.5)';
+const TEXT_GHOST = 'rgba(247,246,243,0.30)';
+const BG_PAGE    = '#070707';
+const BG_CARD    = '#0e0e0f';
 const BG_INPUT   = 'rgba(0,0,0,0.45)';
-const BORDER     = 'rgba(0,229,255,0.12)';
-const BORDER_HOVER = 'rgba(0,229,255,0.30)';
-const GREEN      = '#7DEFB1';
-const AMBER      = '#FFC97A';
-const RED        = '#f85149';
+const BORDER     = 'rgba(232,181,92,0.12)';
+const BORDER_HOVER = 'rgba(232,181,92,0.30)';
+const GREEN      = '#6FE3A5';
+const AMBER      = '#E8B55C';
+const RED        = '#E5484D';
 
 const CHAIN_EXPLORER_TX = 'https://chainscan.0g.ai/tx/';
 
@@ -49,7 +49,7 @@ const baseInput: CSSProperties = {
   border: `1px solid ${BORDER}`,
   color: TEXT,
   fontSize: 13,
-  fontFamily: 'JetBrains Mono, monospace',
+  fontFamily: 'IBM Plex Mono, monospace',
   outline: 'none',
 };
 const inputClass = 'dash-input';
@@ -88,13 +88,13 @@ const ghostBtn: CSSProperties = {
   border: `1px solid ${BORDER}`,
   cursor: 'pointer',
   transition: 'all 0.15s',
-  fontFamily: 'JetBrains Mono, monospace',
+  fontFamily: 'IBM Plex Mono, monospace',
 };
 
 function Label({ children, action }: { children: ReactNode; action?: ReactNode }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-      <span style={{ fontSize: 11, color: TEXT_FAINT, textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'JetBrains Mono, monospace' }}>{children}</span>
+      <span style={{ fontSize: 11, color: TEXT_FAINT, textTransform: 'uppercase', letterSpacing: '0.06em', fontFamily: 'IBM Plex Mono, monospace' }}>{children}</span>
       {action}
     </div>
   );
@@ -105,7 +105,7 @@ function Card({ kicker, title, sub, badge, children, style }: { kicker?: string;
     <div className="dash-card" style={{ background: BG_CARD, border: `1px solid ${BORDER}`, padding: 26, ...style }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
         {kicker && (
-          <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: LILAC, fontFamily: 'JetBrains Mono, monospace' }}>
+          <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: LILAC, fontFamily: 'IBM Plex Mono, monospace' }}>
             {kicker}
           </div>
         )}
@@ -123,7 +123,7 @@ function LiveBadge({ label = 'live' }: { label?: string }) {
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 6,
       fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: GREEN,
-      fontFamily: 'JetBrains Mono, monospace',
+      fontFamily: 'IBM Plex Mono, monospace',
     }}>
       <span className="dash-pulse-dot" style={{ width: 6, height: 6, background: GREEN, borderRadius: '50%', display: 'inline-block', boxShadow: `0 0 6px ${GREEN}` }} />
       {label}
@@ -139,9 +139,9 @@ function ProgressLine({ status }: { status: PaymentStatus }) {
   return (
     <div style={{
       marginTop: 12, padding: '8px 12px',
-      border: `1px solid ${isErr ? 'rgba(248,81,73,0.30)' : 'rgba(0,229,255,0.20)'}`,
-      background: isErr ? 'rgba(248,81,73,0.05)' : 'rgba(0,229,255,0.04)',
-      fontSize: 12, color, fontFamily: 'JetBrains Mono, monospace',
+      border: `1px solid ${isErr ? 'rgba(229,72,77,0.30)' : 'rgba(232,181,92,0.20)'}`,
+      background: isErr ? 'rgba(229,72,77,0.05)' : 'rgba(232,181,92,0.04)',
+      fontSize: 12, color, fontFamily: 'IBM Plex Mono, monospace',
       display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
     }}>
       <span className={isErr ? '' : 'pulse'}>{dot}</span>
@@ -178,7 +178,7 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
           padding: 20,
           background: BG_INPUT,
           border: `1px solid ${BORDER}`,
-          fontFamily: 'JetBrains Mono, monospace',
+          fontFamily: 'IBM Plex Mono, monospace',
           fontSize: 14,
           lineHeight: 1.95,
           color: TEXT,
@@ -189,7 +189,7 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
         }}>
           {justCreated.mnemonic}
         </div>
-        <div style={{ marginTop: 14, fontSize: 11, color: AMBER, fontFamily: 'JetBrains Mono, monospace', display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ marginTop: 14, fontSize: 11, color: AMBER, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', gap: 8, alignItems: 'center' }}>
           <span>⚠</span>
           <span>Don't share these. Anyone with these 12 words controls this wallet.</span>
         </div>
@@ -213,7 +213,7 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
             ...ghostBtn,
             color: mode === 'create' ? LILAC : TEXT_DIM,
             borderColor: mode === 'create' ? BORDER_HOVER : BORDER,
-            background: mode === 'create' ? 'rgba(0,229,255,0.06)' : 'transparent',
+            background: mode === 'create' ? 'rgba(232,181,92,0.06)' : 'transparent',
           }}
           className={ghostClass}
         >Create new</button>
@@ -224,7 +224,7 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
             ...ghostBtn,
             color: mode === 'unlock' ? LILAC : (state.kind !== 'locked' ? TEXT_GHOST : TEXT_DIM),
             borderColor: mode === 'unlock' ? BORDER_HOVER : BORDER,
-            background: mode === 'unlock' ? 'rgba(0,229,255,0.06)' : 'transparent',
+            background: mode === 'unlock' ? 'rgba(232,181,92,0.06)' : 'transparent',
           }}
           className={ghostClass}
         >Unlock existing</button>
@@ -256,16 +256,16 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
               this is, so spell it out before they need to type one. */}
           <div style={{
             marginBottom: 14, padding: '12px 14px',
-            border: `1px solid ${BORDER}`, background: 'rgba(0,229,255,0.04)',
+            border: `1px solid ${BORDER}`, background: 'rgba(232,181,92,0.04)',
             fontSize: 12.5, color: TEXT_DIM, lineHeight: 1.6,
           }}>
-            <div style={{ fontSize: 11, color: LILAC, fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+            <div style={{ fontSize: 11, color: LILAC, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
               What's a passphrase?
             </div>
             A password that locks your wallet on this device — only you'll know it. Pick something you can remember but no one can guess. Examples:{' '}
-            <code style={{ color: LILAC, fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>can run smile</code>,{' '}
-            <code style={{ color: LILAC, fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>blue sky bird</code>,{' '}
-            <code style={{ color: LILAC, fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>mydogjollof</code>.{' '}
+            <code style={{ color: LILAC, fontFamily: 'IBM Plex Mono, monospace', fontSize: 12 }}>can run smile</code>,{' '}
+            <code style={{ color: LILAC, fontFamily: 'IBM Plex Mono, monospace', fontSize: 12 }}>blue sky bird</code>,{' '}
+            <code style={{ color: LILAC, fontFamily: 'IBM Plex Mono, monospace', fontSize: 12 }}>mydogjollof</code>.{' '}
             <span style={{ color: TEXT_FAINT }}>Spaces, capitals, and punctuation all count — type it the same way every time.</span>
             <div style={{ marginTop: 8, fontSize: 11, color: AMBER }}>
               Different from your recovery phrase — that comes next, after the wallet is generated.
@@ -300,7 +300,7 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
               />
             </div>
           </div>
-          {err && <div style={{ color: RED, fontSize: 12, padding: '7px 10px', border: '1px solid rgba(248,81,73,0.25)', background: 'rgba(248,81,73,0.05)', marginBottom: 10 }}>{err}</div>}
+          {err && <div style={{ color: RED, fontSize: 12, padding: '7px 10px', border: '1px solid rgba(229,72,77,0.25)', background: 'rgba(229,72,77,0.05)', marginBottom: 10 }}>{err}</div>}
           <button type="submit" style={{ ...primaryBtn, width: '100%' }} className={primaryClass} disabled={busy}>
             {busy ? 'Generating…' : 'Generate wallet'}
           </button>
@@ -318,7 +318,7 @@ function WalletGate({ onUnlocked: _ }: { onUnlocked?: () => void }) {
             <Label>Passphrase</Label>
             <input type="password" style={baseInput} className={inputClass} value={pass} onChange={e => setPass(e.target.value)} autoFocus required />
           </div>
-          {err && <div style={{ color: RED, fontSize: 12, padding: '7px 10px', border: '1px solid rgba(248,81,73,0.25)', background: 'rgba(248,81,73,0.05)', marginBottom: 10 }}>{err}</div>}
+          {err && <div style={{ color: RED, fontSize: 12, padding: '7px 10px', border: '1px solid rgba(229,72,77,0.25)', background: 'rgba(229,72,77,0.05)', marginBottom: 10 }}>{err}</div>}
           <button type="submit" style={{ ...primaryBtn, width: '100%' }} className={primaryClass} disabled={busy}>
             {busy ? 'Unlocking…' : 'Unlock'}
           </button>
@@ -352,7 +352,7 @@ function AccountBar({ address, balance, onLock }: { address: string; balance: st
       {/* Connection indicator */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span className="dash-pulse-dot" style={{ width: 8, height: 8, background: GREEN, borderRadius: '50%', display: 'inline-block', boxShadow: `0 0 8px ${GREEN}` }} />
-        <span style={{ fontSize: 10, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase', letterSpacing: '0.10em' }}>connected</span>
+        <span style={{ fontSize: 10, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace', textTransform: 'uppercase', letterSpacing: '0.10em' }}>connected</span>
       </div>
 
       {/* Address with explicit copy button */}
@@ -360,7 +360,7 @@ function AccountBar({ address, balance, onLock }: { address: string; balance: st
         <code
           title={address}
           style={{
-            fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: TEXT,
+            fontFamily: 'IBM Plex Mono, monospace', fontSize: 13, color: TEXT,
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}
         >{shortAddress(address)}</code>
@@ -372,11 +372,11 @@ function AccountBar({ address, balance, onLock }: { address: string; balance: st
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             height: 28, padding: '0 10px',
-            background: copied ? 'rgba(125,239,177,0.08)' : 'transparent',
-            border: `1px solid ${copied ? 'rgba(125,239,177,0.35)' : BORDER}`,
+            background: copied ? 'rgba(111,227,165,0.08)' : 'transparent',
+            border: `1px solid ${copied ? 'rgba(111,227,165,0.35)' : BORDER}`,
             color: copied ? GREEN : TEXT_DIM,
             fontSize: 11,
-            fontFamily: 'JetBrains Mono, monospace',
+            fontFamily: 'IBM Plex Mono, monospace',
             cursor: 'pointer',
           }}
         >
@@ -387,7 +387,7 @@ function AccountBar({ address, balance, onLock }: { address: string; balance: st
 
       {/* Balance + actions on the right */}
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        <div style={{ fontFamily: 'JetBrains Mono, monospace', display: 'flex', alignItems: 'baseline', gap: 6 }}>
+        <div style={{ fontFamily: 'IBM Plex Mono, monospace', display: 'flex', alignItems: 'baseline', gap: 6 }}>
           <span style={{ fontSize: 10, color: TEXT_FAINT, textTransform: 'uppercase', letterSpacing: '0.08em' }}>balance</span>
           <span style={{ fontSize: 16, color: LILAC, fontWeight: 500 }}>{balance}</span>
           <span style={{ fontSize: 11, color: TEXT_FAINT }}>tokens</span>
@@ -399,7 +399,7 @@ function AccountBar({ address, balance, onLock }: { address: string; balance: st
           aria-label="View on explorer"
           title="View on chainscan"
           className={ghostClass}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 28, padding: '0 10px', fontSize: 11, textDecoration: 'none', color: TEXT_DIM, border: `1px solid ${BORDER}`, fontFamily: 'JetBrains Mono, monospace' }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 28, padding: '0 10px', fontSize: 11, textDecoration: 'none', color: TEXT_DIM, border: `1px solid ${BORDER}`, fontFamily: 'IBM Plex Mono, monospace' }}
         >
           <ExternalIcon size={11} />
           <span>view</span>
@@ -409,7 +409,7 @@ function AccountBar({ address, balance, onLock }: { address: string; balance: st
           aria-label="Lock wallet"
           title="Lock wallet"
           className={ghostClass}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 28, padding: '0 10px', fontSize: 11, color: TEXT_DIM, border: `1px solid ${BORDER}`, background: 'transparent', cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace' }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, height: 28, padding: '0 10px', fontSize: 11, color: TEXT_DIM, border: `1px solid ${BORDER}`, background: 'transparent', cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace' }}
         >
           <LockIcon size={11} />
           <span>lock</span>
@@ -458,13 +458,13 @@ function TabStrip({ active, onChange }: { active: TabId; onChange: (id: TabId) =
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               padding: '10px 16px',
-              fontFamily: 'JetBrains Mono, monospace',
+              fontFamily: 'IBM Plex Mono, monospace',
               fontSize: 12,
               fontWeight: 500,
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
               color: isActive ? TEXT : TEXT_FAINT,
-              background: isActive ? 'rgba(0,229,255,0.12)' : 'transparent',
+              background: isActive ? 'rgba(232,181,92,0.12)' : 'transparent',
               border: 'none',
               cursor: 'pointer',
               transition: 'background 0.18s ease, color 0.18s ease',
@@ -525,10 +525,10 @@ function IdentityCard({ client }: { client: AgentClient }) {
       }
     >
       {!loaded ? (
-        <div style={{ fontSize: 12, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace' }}>checking…</div>
+        <div style={{ fontSize: 12, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace' }}>checking…</div>
       ) : identity ? (
         <div className="dash-result-in">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontFamily: 'IBM Plex Mono, monospace', fontSize: 12 }}>
             <div>
               <div style={{ color: TEXT_FAINT, fontSize: 11, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Token ID</div>
               <div style={{ color: LILAC, fontSize: 28, fontWeight: 600 }}>#{identity.tokenId}</div>
@@ -599,7 +599,7 @@ function EmailCard({ client }: { client: AgentClient }) {
       sub={subText}
     >
       {!loaded ? (
-        <div style={{ fontSize: 12, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace' }}>checking…</div>
+        <div style={{ fontSize: 12, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace' }}>checking…</div>
       ) : (
         <>
           {/* Inbox list — click row to expand send form inline */}
@@ -615,8 +615,8 @@ function EmailCard({ client }: { client: AgentClient }) {
                       style={{
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                         padding: '10px 14px', border: `1px solid ${open ? BORDER_HOVER : BORDER}`,
-                        background: open ? 'rgba(0,229,255,0.05)' : BG_INPUT,
-                        fontFamily: 'JetBrains Mono, monospace', fontSize: 13,
+                        background: open ? 'rgba(232,181,92,0.05)' : BG_INPUT,
+                        fontFamily: 'IBM Plex Mono, monospace', fontSize: 13,
                         cursor: 'pointer',
                       }}
                     >
@@ -639,7 +639,7 @@ function EmailCard({ client }: { client: AgentClient }) {
               style={{
                 ...ghostBtn,
                 width: '100%',
-                fontFamily: 'JetBrains Mono, monospace',
+                fontFamily: 'IBM Plex Mono, monospace',
                 color: LILAC,
                 borderStyle: 'dashed',
               }}
@@ -648,12 +648,12 @@ function EmailCard({ client }: { client: AgentClient }) {
               + provision a new inbox · $2.00 USDC
             </button>
           ) : (
-            <div className="dash-result-in" style={{ padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(0,229,255,0.04)' }}>
+            <div className="dash-result-in" style={{ padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(232,181,92,0.04)' }}>
               <Label
                 action={
                   <button
                     onClick={() => { setShowProvisionForm(false); setName(''); setProvState({ kind: 'idle' }); }}
-                    style={{ background: 'transparent', border: 'none', color: TEXT_FAINT, cursor: 'pointer', fontSize: 10, fontFamily: 'JetBrains Mono, monospace' }}
+                    style={{ background: 'transparent', border: 'none', color: TEXT_FAINT, cursor: 'pointer', fontSize: 10, fontFamily: 'IBM Plex Mono, monospace' }}
                   >cancel ✕</button>
                 }
               >New inbox name</Label>
@@ -686,7 +686,7 @@ function InboxActions({ client, inboxId }: { client: AgentClient; inboxId: strin
   const [mode, setMode] = useState<'send' | 'read'>('send');
 
   return (
-    <div className="dash-result-in" style={{ marginTop: 8, padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(0,229,255,0.04)' }}>
+    <div className="dash-result-in" style={{ marginTop: 8, padding: 14, border: `1px solid ${BORDER_HOVER}`, background: 'rgba(232,181,92,0.04)' }}>
       {/* Sub-tabs: Send vs Read */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 14 }}>
         <button
@@ -697,7 +697,7 @@ function InboxActions({ client, inboxId }: { client: AgentClient; inboxId: strin
             height: 30, padding: '0 14px', fontSize: 11,
             color: mode === 'send' ? LILAC : TEXT_DIM,
             borderColor: mode === 'send' ? BORDER_HOVER : BORDER,
-            background: mode === 'send' ? 'rgba(0,229,255,0.08)' : 'transparent',
+            background: mode === 'send' ? 'rgba(232,181,92,0.08)' : 'transparent',
           }}
         >Send · $0.08 USDC</button>
         <button
@@ -708,7 +708,7 @@ function InboxActions({ client, inboxId }: { client: AgentClient; inboxId: strin
             height: 30, padding: '0 14px', fontSize: 11,
             color: mode === 'read' ? LILAC : TEXT_DIM,
             borderColor: mode === 'read' ? BORDER_HOVER : BORDER,
-            background: mode === 'read' ? 'rgba(0,229,255,0.08)' : 'transparent',
+            background: mode === 'read' ? 'rgba(232,181,92,0.08)' : 'transparent',
           }}
         >Inbox · $0.02 USDC</button>
       </div>
@@ -802,7 +802,7 @@ function ReadInbox({ client, inboxId }: { client: AgentClient; inboxId: string }
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <span style={{ fontSize: 11, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace' }}>
+        <span style={{ fontSize: 11, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace' }}>
           {messages.length} message{messages.length === 1 ? '' : 's'}
         </span>
         <button
@@ -826,7 +826,7 @@ function ReadInbox({ client, inboxId }: { client: AgentClient; inboxId: string }
                   border: `1px solid ${isOpen ? BORDER_HOVER : BORDER}`,
                   cursor: 'pointer',
                   fontSize: 12,
-                  fontFamily: 'JetBrains Mono, monospace',
+                  fontFamily: 'IBM Plex Mono, monospace',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -897,13 +897,13 @@ function PhoneCard() {
         position: 'relative', overflow: 'hidden',
       }}>
         <div className="dash-live-stripe" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2 }} />
-        <div style={{ fontSize: 10, color: TEXT_FAINT, textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'JetBrains Mono, monospace', marginBottom: 6 }}>
+        <div style={{ fontSize: 10, color: TEXT_FAINT, textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'IBM Plex Mono, monospace', marginBottom: 6 }}>
           Operator-side number
         </div>
-        <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 18, color: LILAC, fontWeight: 500 }}>
+        <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 18, color: LILAC, fontWeight: 500 }}>
           {operatorNumber}
         </div>
-        <div style={{ fontSize: 11, color: TEXT_FAINT, marginTop: 6, fontFamily: 'JetBrains Mono, monospace' }}>
+        <div style={{ fontSize: 11, color: TEXT_FAINT, marginTop: 6, fontFamily: 'IBM Plex Mono, monospace' }}>
           Kansas City, US · resource #11 on-chain
         </div>
       </div>
@@ -924,7 +924,7 @@ function PhoneCard() {
         style={{
           display: 'block', cursor: 'pointer',
           padding: '10px 12px', background: BG_INPUT, border: `1px solid ${BORDER}`,
-          fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: TEXT,
+          fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, color: TEXT,
           wordBreak: 'break-all',
         }}
         className="dash-row"
@@ -991,7 +991,7 @@ function ComputeCard({ client }: { client: AgentClient }) {
         }}>
           <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{reply.text}</div>
           {(reply.model || reply.tokens) && (
-            <div style={{ marginTop: 12, fontSize: 11, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace', display: 'flex', gap: 14 }}>
+            <div style={{ marginTop: 12, fontSize: 11, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace', display: 'flex', gap: 14 }}>
               {reply.model && <span>{reply.model}</span>}
               {reply.tokens && <span>{reply.tokens} tokens</span>}
             </div>
@@ -1054,7 +1054,7 @@ function MemoryCard({ client }: { client: AgentClient }) {
       sub={<>Persistent key/value storage. Free reads + writes.</>}
     >
       {!loaded ? (
-        <div style={{ fontSize: 12, color: TEXT_FAINT, fontFamily: 'JetBrains Mono, monospace' }}>checking…</div>
+        <div style={{ fontSize: 12, color: TEXT_FAINT, fontFamily: 'IBM Plex Mono, monospace' }}>checking…</div>
       ) : (
         <>
           {keys.length > 0 && (
@@ -1067,7 +1067,7 @@ function MemoryCard({ client }: { client: AgentClient }) {
                   style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8,
                     padding: '10px 14px', border: `1px solid ${BORDER}`, background: BG_INPUT,
-                    fontFamily: 'JetBrains Mono, monospace', fontSize: 12,
+                    fontFamily: 'IBM Plex Mono, monospace', fontSize: 12,
                     cursor: 'pointer',
                   }}
                 >
@@ -1080,8 +1080,8 @@ function MemoryCard({ client }: { client: AgentClient }) {
           {readResult && (
             <div className="dash-result-in" style={{
               marginBottom: 14, padding: 14,
-              border: `1px solid ${BORDER_HOVER}`, background: 'rgba(0,229,255,0.04)',
-              fontSize: 12, fontFamily: 'JetBrains Mono, monospace',
+              border: `1px solid ${BORDER_HOVER}`, background: 'rgba(232,181,92,0.04)',
+              fontSize: 12, fontFamily: 'IBM Plex Mono, monospace',
             }}>
               <div style={{ color: LILAC, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
                 {readResult.key}
@@ -1128,7 +1128,7 @@ export function Dashboard() {
 
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
-          <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: LILAC, marginBottom: 12, fontFamily: 'JetBrains Mono, monospace' }}>
+          <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: LILAC, marginBottom: 12, fontFamily: 'IBM Plex Mono, monospace' }}>
             Dashboard
           </div>
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1.05, marginBottom: 14 }}>
@@ -1161,7 +1161,7 @@ export function Dashboard() {
             {showFaucet && (
               <div className="dash-result-in" style={{
                 marginBottom: 18, padding: 14,
-                border: '1px solid rgba(255,201,122,0.30)', background: 'rgba(255,201,122,0.06)',
+                border: '1px solid rgba(232,181,92,0.30)', background: 'rgba(232,181,92,0.06)',
                 fontSize: 13, color: AMBER, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap',
               }}>
                 <span>Your wallet is empty. Fund it with USDC on Celo to start.</span>
@@ -1186,7 +1186,7 @@ export function Dashboard() {
         )}
 
         {/* Footnote */}
-        <div style={{ marginTop: 48, fontSize: 12, color: TEXT_GHOST, lineHeight: 1.7, fontFamily: 'JetBrains Mono, monospace', textAlign: 'center' }}>
+        <div style={{ marginTop: 48, fontSize: 12, color: TEXT_GHOST, lineHeight: 1.7, fontFamily: 'IBM Plex Mono, monospace', textAlign: 'center' }}>
           Live on-chain · all transactions visible at <a href="/stats" style={{ color: LILAC }}>0gent.xyz/stats</a>
         </div>
       </div>
