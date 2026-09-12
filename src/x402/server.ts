@@ -1,14 +1,16 @@
 /**
- * Payment plumbing, wired so that enforcement happens at three distinct
- * moments and each moment is the earliest one at which its check is possible.
+ * Payment plumbing.
  *
- *   onProtectedRequest  no money involved yet  — is this purchase authorised?
- *   onAfterVerify       payment signed, not settled — is the payer the agent
- *                       the warrant names?
- *   onAfterSettle       money has moved — write the receipt.
+ * Paying is the authorisation. There is no approval step in front of these
+ * routes and no human in the loop, because an agent that has to wait for a
+ * person is not an autonomous buyer, it is a form. What bounds the spending is
+ * the treasury contract, one layer down, where the money actually lives.
  *
- * The ordering is the whole point. A purchase the warrant does not cover never
- * becomes a payment, so there is nothing to refund and nothing to reconcile.
+ * Two things still happen here that are worth the code:
+ *
+ *   onAfterVerify   the payment is signed but not settled, so this is the last
+ *                   moment a mismatch can be refused for free.
+ *   onAfterSettle   the money moved, so the purchase is now a fact to record.
  */
 import {
   HTTPFacilitatorClient,
@@ -19,66 +21,47 @@ import {
   type HTTPAdapter,
 } from "@x402/core/server";
 import { ExactHederaScheme } from "@x402/hedera/exact/server";
-import { config, moneyFor, PRICES, type ResourceType } from "../config.js";
-import { decide } from "../warrant/gate.js";
-import { fromWire, warrantId, type SignedWarrant } from "../warrant/warrant.js";
-import {
-  isRevoked,
-  rememberWarrant,
-  spentUnder,
-  writeReceipt,
-  writeRefusal,
-} from "../store/db.js";
+import { config, LIVE_CATALOGUE, moneyFor, offerForRoute } from "../config.js";
+import { writePurchase } from "../store/db.js";
 
-export const WARRANT_HEADER = "x-warrant";
-
-/** Maps a protected path onto the resource type the warrant allowlist names. */
-const ROUTE_RESOURCE: Record<string, ResourceType> = {
-  "POST /v1/inference": "inference",
-  "POST /v1/email/send": "email.send",
-};
+/**
+ * The agent tells us which account it is; the settlement proves it. Claiming
+ * someone else's account is refused below, so a handler can read this header
+ * and treat it as established.
+ */
+export const AGENT_HEADER = "x-agent";
+/** The agent's EVM address, needed only by resources that touch a contract. */
+export const AGENT_ADDRESS_HEADER = "x-agent-address";
 
 export const routes: RoutesConfig = Object.fromEntries(
-  Object.entries(ROUTE_RESOURCE).map(([pattern, resource]) => [
-    pattern,
+  LIVE_CATALOGUE.map((offer) => [
+    `${offer.method} ${offer.path}`,
     {
       accepts: {
         scheme: "exact",
         network: config.network,
         payTo: config.payTo,
-        price: moneyFor(resource),
+        price: moneyFor(offer.price),
         maxTimeoutSeconds: 120,
       },
-      description: `Warrant-gated ${resource}`,
+      description: offer.blurb,
       serviceName: "Warrant",
       mimeType: "application/json",
       unpaidResponseBody: () => ({
         contentType: "application/json",
         body: {
-          resource,
-          price: moneyFor(resource),
-          warrantRequired: true,
-          hint: "Present a signed warrant in X-Warrant, then pay the challenge.",
+          kind: offer.kind,
+          title: offer.title,
+          price: moneyFor(offer.price),
+          priceAtomic: offer.price.toString(),
+          asset: config.asset,
+          poweredBy: offer.poweredBy,
+          hint: `Pay the challenge and send ${AGENT_HEADER} with the account you are paying from.`,
         },
       }),
     },
   ]),
 ) as RoutesConfig;
-
-/** Decodes the base64 JSON warrant an agent presents, or null if absent. */
-function readWarrant(adapter: HTTPAdapter): SignedWarrant | null {
-  const raw = adapter.getHeader(WARRANT_HEADER);
-  if (!raw) return null;
-  try {
-    return JSON.parse(Buffer.from(raw, "base64").toString("utf8")) as SignedWarrant;
-  } catch {
-    return null;
-  }
-}
-
-function resourceFor(method: string, path: string): ResourceType | undefined {
-  return ROUTE_RESOURCE[`${method.toUpperCase()} ${path}`];
-}
 
 function adapterOf(transportContext: unknown): HTTPAdapter | undefined {
   return (transportContext as HTTPTransportContext | undefined)?.request?.adapter;
@@ -91,123 +74,47 @@ export function buildResourceServer(): x402HTTPResourceServer {
     .register(config.network, new ExactHederaScheme())
 
     /**
-     * Payer binding. Verification tells us who actually signed the transfer; a
-     * warrant is a licence for one named agent, so a valid payment from anyone
-     * else is refused here, while the money is still recoverable.
+     * The claimed account has to be the paying one.
+     *
+     * Everything an agent owns here is keyed to its account: its inboxes, its
+     * numbers, its memory. Without this check an agent could pay from its own
+     * account while claiming another's, and buy things into someone else's
+     * name. Refusing at verify means the payment never settles.
      */
     .onAfterVerify(async (ctx) => {
       const adapter = adapterOf(ctx.transportContext);
-      if (!adapter) return;
-      const signed = readWarrant(adapter);
-      if (!signed) return;
+      const claimed = adapter?.getHeader(AGENT_HEADER);
       const payer = ctx.result.payer;
-      if (!payer) return;
-      const w = fromWire(signed.warrant);
-      if (payer !== w.agent) {
-        writeRefusal({
-          warrant_id: warrantId(w, config.network),
-          agent: w.agent,
-          resource: resourceFor(adapter.getMethod(), adapter.getPath()) ?? adapter.getPath(),
-          price: "0",
-          code: "payer_mismatch",
-          reason: `The warrant authorises ${w.agent} to spend, but the payment was signed by ${payer}.`,
-        });
+      if (!claimed || !payer) return;
+
+      if (claimed !== payer) {
         return {
           abort: true as const,
-          reason: "payer_not_authorised",
-          message: `This warrant authorises ${w.agent}. The payment came from ${payer}.`,
+          reason: "agent_mismatch",
+          message: `The payment was signed by ${payer}, but ${AGENT_HEADER} claims ${claimed}. Send the account you are paying from.`,
         };
       }
     })
 
-    /** Settlement happened, so the purchase is now a fact worth recording. */
+    /** Settlement happened, so the purchase is a fact worth recording. */
     .onAfterSettle(async (ctx) => {
       if (!ctx.result.success) return;
       const adapter = adapterOf(ctx.transportContext);
       if (!adapter) return;
-      const signed = readWarrant(adapter);
-      if (!signed) return;
-      const w = fromWire(signed.warrant);
-      const resource = resourceFor(adapter.getMethod(), adapter.getPath());
-      writeReceipt({
-        warrant_id: warrantId(w, config.network),
-        agent: w.agent,
-        payer: ctx.result.payer ?? w.agent,
-        resource: resource ?? adapter.getPath(),
-        purpose: w.purpose,
-        // Prefer what actually settled; fall back to what was agreed.
-        amount: ctx.result.amount ?? ctx.requirements.amount,
+
+      const offer = offerForRoute(adapter.getMethod(), adapter.getPath());
+      writePurchase({
+        agent: ctx.result.payer ?? adapter.getHeader(AGENT_HEADER) ?? "unknown",
+        kind: offer?.kind ?? adapter.getPath(),
+        // Prefer what actually settled over what was agreed.
+        amount: String(ctx.result.amount ?? ctx.requirements.amount),
         asset: ctx.requirements.asset,
         network: ctx.result.network,
-        tx_id: ctx.result.transaction,
+        tx_id: ctx.result.transaction ?? null,
       });
     });
 
-  const httpServer = new x402HTTPResourceServer(resourceServer, routes);
-
-  /**
-   * The gate. Runs before a payment challenge is issued, so a refusal costs
-   * the agent nothing but a 403 and an explanation it can act on.
-   */
-  httpServer.onProtectedRequest(async (ctx) => {
-    const resource = resourceFor(ctx.method, ctx.path);
-    if (!resource) return;
-
-    const signed = readWarrant(ctx.adapter);
-    const price = PRICES[resource];
-
-    let id: string | undefined;
-    let revoked = false;
-    if (signed) {
-      try {
-        const w = fromWire(signed.warrant);
-        id = warrantId(w, config.network);
-        revoked = isRevoked(id);
-        rememberWarrant({
-          id,
-          owner: w.owner,
-          agent: w.agent,
-          asset: w.asset,
-          cap: w.cap.toString(),
-          resources: w.resources.join(","),
-          purpose: w.purpose,
-          expiry: Number(w.expiry),
-          nonce: w.nonce.toString(),
-          signature: signed.signature,
-          payload: JSON.stringify(signed.warrant),
-        });
-      } catch {
-        /* decide() reports the malformed warrant with a usable message. */
-      }
-    }
-
-    const decision = await decide({
-      signed,
-      resource,
-      price,
-      asset: config.asset,
-      network: config.network,
-      spent: id ? spentUnder(id) : 0n,
-      revoked,
-      allowedOwners: [...config.allowedOwners],
-      now: Math.floor(Date.now() / 1000),
-    });
-
-    if (decision.allowed) return;
-
-    writeRefusal({
-      warrant_id: decision.warrantId ?? null,
-      agent: signed ? signed.warrant.agent : null,
-      resource,
-      price: price.toString(),
-      code: decision.code,
-      reason: decision.reason,
-    });
-
-    return { abort: true as const, reason: `${decision.code}: ${decision.reason}` };
-  });
-
-  return httpServer;
+  return new x402HTTPResourceServer(resourceServer, routes);
 }
 
 /**

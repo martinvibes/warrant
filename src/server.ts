@@ -2,10 +2,16 @@ import express from "express";
 import fs from "node:fs";
 import path from "node:path";
 import { paymentMiddlewareFromHTTPServer } from "@x402/express";
-import { assertServerConfig, config } from "./config.js";
-import { admin } from "./routes/admin.js";
+import { assertServerConfig, config, CATALOGUE, LIVE_CATALOGUE } from "./config.js";
+import { publicApi } from "./routes/public.js";
+import { inbound } from "./routes/inbound.js";
 import { paid } from "./routes/paid.js";
-import { buildResourceServer, initializeWithRetry } from "./x402/server.js";
+import {
+  AGENT_HEADER,
+  AGENT_ADDRESS_HEADER,
+  buildResourceServer,
+  initializeWithRetry,
+} from "./x402/server.js";
 
 async function main(): Promise<void> {
   assertServerConfig();
@@ -17,15 +23,25 @@ async function main(): Promise<void> {
   // the agent uses too.
   app.use((_req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "content-type, x-warrant, x-payment");
+    res.setHeader("Access-Control-Allow-Headers", `content-type, x-payment, ${AGENT_HEADER}, ${AGENT_ADDRESS_HEADER}`);
     res.setHeader("Access-Control-Expose-Headers", "payment-required, payment-response");
     next();
   });
   app.options("*", (_req, res) => void res.sendStatus(204));
 
-  // Unpaid surface first: health, pricing and the audit reads must stay
+  // Unpaid surface first: health, the catalogue and the audit reads must stay
   // reachable even when the facilitator is having a bad day.
-  app.use(admin);
+  app.get("/health", (_req, res) => {
+    res.json({
+      ok: true,
+      network: config.network,
+      asset: config.asset,
+      facilitator: config.facilitatorUrl,
+      selling: LIVE_CATALOGUE.length,
+    });
+  });
+  app.use(publicApi);
+  app.use(inbound);
 
   const httpServer = buildResourceServer();
   await initializeWithRetry(httpServer);
@@ -43,11 +59,11 @@ async function main(): Promise<void> {
     console.log(`  settles in  ${config.asset} (${config.assetDecimals} dp)`);
     console.log(`  facilitator ${config.facilitatorUrl}`);
     console.log(`  pays to     ${config.payTo}`);
-    console.log(
-      config.allowedOwners.length
-        ? `  warrants from ${config.allowedOwners.join(", ")}`
-        : `  warrants from any valid signer (set OWNER_ADDRESS to restrict)`,
-    );
+    console.log(`  selling     ${LIVE_CATALOGUE.map((o) => o.kind).join(", ")}`);
+    const dark = CATALOGUE.filter((o) => !o.live);
+    if (dark.length) {
+      console.log(`  not listed  ${dark.map((o) => o.kind).join(", ")} (provider not configured)`);
+    }
   });
 }
 
