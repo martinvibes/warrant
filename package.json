@@ -18,7 +18,8 @@
     "contracts:test": "cd contracts && forge test",
     "contracts:deploy": "cd contracts && forge script script/Deploy.s.sol --rpc-url hedera_testnet --broadcast --skip-simulation",
     "fund": "tsx scripts/fund.ts",
-    "demo:chain": "./scripts/local-chain.sh"
+    "demo:chain": "./scripts/local-chain.sh",
+    "associate": "tsx scripts/associate.ts"
   },
   "dependencies": {
     "@hiero-ledger/sdk": "2.85.0",
