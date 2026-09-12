@@ -19,9 +19,24 @@ import { Router } from "express";
 import type { Address } from "viem";
 import { config } from "../config.js";
 import { identityOf } from "../resources/identity.js";
+import { canProvision } from "../resources/phone.js";
 import { AGENT_ADDRESS_HEADER } from "../x402/server.js";
 
 export const precheck = Router();
+
+/**
+ * A number costs money upstream. A provider out of credit refuses the order
+ * after the buyer has paid us, which is the worst moment to find out.
+ */
+precheck.post("/v1/phone/provision", async (_req, res, next) => {
+  const { ok, reason } = await canProvision();
+  if (ok) return next();
+  res.status(409).json({
+    kind: "phone.provision",
+    error: `Numbers cannot be sold right now: ${reason}. You have not been charged.`,
+    charged: false,
+  });
+});
 
 precheck.post("/v1/identity/mint", async (req, res, next) => {
   if (!config.identityContract) return next();

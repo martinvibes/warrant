@@ -41,6 +41,33 @@ async function telnyx<T>(path: string, init?: RequestInit): Promise<T> {
   return JSON.parse(text) as T;
 }
 
+/**
+ * Whether the provider can actually fulfil an order right now.
+ *
+ * A number costs money upstream, and a provider with no credit refuses after
+ * the buyer has already paid us. Reading the balance first turns that into a
+ * refusal that costs nothing.
+ */
+export async function canProvision(): Promise<{ ok: boolean; reason?: string }> {
+  try {
+    const body = await telnyx<{ data?: { balance?: string; credit_limit?: string; currency?: string } }>(
+      "/balance",
+    );
+    const balance = Number(body.data?.balance ?? "0");
+    const credit = Number(body.data?.credit_limit ?? "0");
+    const spendable = balance + credit;
+    if (spendable > 0) return { ok: true };
+    return {
+      ok: false,
+      reason: `the number provider has ${balance.toFixed(2)} ${body.data?.currency ?? "USD"} available and will refuse the order`,
+    };
+  } catch {
+    // A provider we cannot reach might still be fine. Do not refuse a sale on
+    // the strength of one failed read.
+    return { ok: true };
+  }
+}
+
 export interface AvailableNumber {
   phoneNumber: string;
   country: string;
