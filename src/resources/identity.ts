@@ -149,6 +149,16 @@ export async function mintIdentity(req: MintRequest): Promise<MintResult> {
 }
 
 /** The key to seal mail to an agent, read straight from the chain. */
+/** The token an address already holds, or zero. Read before money moves. */
+export async function identityOf(agent: Address): Promise<bigint> {
+  return publicClient().readContract({
+    address: contract(),
+    abi: AGENT_IDENTITY_ABI,
+    functionName: "tokenIdOf",
+    args: [agent],
+  });
+}
+
 export async function encryptionKeyFor(agent: Address): Promise<Hex> {
   return publicClient().readContract({
     address: contract(),

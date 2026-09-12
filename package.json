@@ -20,7 +20,9 @@
     "fund": "tsx scripts/fund.ts",
     "demo:chain": "./scripts/local-chain.sh",
     "associate": "tsx scripts/associate.ts",
-    "new-account": "tsx scripts/new-account.ts"
+    "new-account": "tsx scripts/new-account.ts",
+    "smoke": "tsx scripts/smoke.ts",
+    "verify": "tsx scripts/verify-receipt.ts"
   },
   "dependencies": {
     "@hiero-ledger/sdk": "2.85.0",

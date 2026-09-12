@@ -61,6 +61,24 @@ CREATE TABLE IF NOT EXISTS phone_numbers (
 );
 `);
 
+/**
+ * Receipts were added after the first purchases were recorded, so the columns
+ * are added in place rather than by recreating the table. Dropping real
+ * settlement history to simplify a migration would be a poor trade.
+ */
+const columns = new Set(
+  (db.prepare("PRAGMA table_info(purchases)").all() as { name: string }[]).map((c) => c.name),
+);
+for (const [name, type] of [
+  ["resource", "TEXT"],
+  ["receipt_id", "TEXT"],
+  ["digest", "TEXT"],
+  ["signature", "TEXT"],
+] as const) {
+  if (!columns.has(name)) db.exec(`ALTER TABLE purchases ADD COLUMN ${name} ${type}`);
+}
+db.exec("CREATE UNIQUE INDEX IF NOT EXISTS purchases_by_receipt ON purchases(receipt_id)");
+
 /* --- purchases ------------------------------------------------------------ */
 
 export interface PurchaseRow {
@@ -74,17 +92,51 @@ export interface PurchaseRow {
   network: string;
   tx_id: string | null;
   created_at: number;
+  /** The route that was bought, so a receipt names the thing and not just its kind. */
+  resource?: string | null;
+  /** Set once the receipt is signed; see src/receipts.ts. */
+  receipt_id?: string | null;
+  digest?: string | null;
+  signature?: string | null;
 }
 
-export function writePurchase(r: Omit<PurchaseRow, "id" | "created_at">): PurchaseRow {
-  const created_at = Date.now();
+/**
+ * `created_at` is accepted rather than generated because the receipt is signed
+ * over its own issue time. Letting this row stamp its own clock puts the two a
+ * few milliseconds apart, and the digest then fails to rebuild from the stored
+ * fields, which is exactly the check a receipt exists to pass.
+ */
+export function writePurchase(
+  r: Omit<PurchaseRow, "id" | "created_at"> & { created_at?: number },
+): PurchaseRow {
+  const created_at = r.created_at ?? Date.now();
+  const row = {
+    resource: null,
+    receipt_id: null,
+    digest: null,
+    signature: null,
+    ...r,
+    created_at,
+  };
   const info = db
     .prepare(
-      `INSERT INTO purchases (agent, kind, amount, asset, network, tx_id, created_at)
-       VALUES (@agent, @kind, @amount, @asset, @network, @tx_id, @created_at)`,
+      `INSERT INTO purchases (agent, kind, amount, asset, network, tx_id, resource, receipt_id, digest, signature, created_at)
+       VALUES (@agent, @kind, @amount, @asset, @network, @tx_id, @resource, @receipt_id, @digest, @signature, @created_at)`,
     )
-    .run({ ...r, created_at });
-  return { ...r, id: Number(info.lastInsertRowid), created_at };
+    .run(row);
+  return { ...row, id: Number(info.lastInsertRowid) };
+}
+
+/** One purchase by the settlement it was paid with. */
+export function purchaseBySettlement(txId: string): PurchaseRow | undefined {
+  return db.prepare("SELECT * FROM purchases WHERE tx_id = ? ORDER BY id DESC LIMIT 1").get(txId) as
+    | PurchaseRow
+    | undefined;
+}
+
+/** One purchase by the receipt printed on it. */
+export function purchaseByReceipt(receiptId: string): PurchaseRow | undefined {
+  return db.prepare("SELECT * FROM purchases WHERE receipt_id = ?").get(receiptId) as PurchaseRow | undefined;
 }
 
 export function listPurchases(agent?: string, limit = 100): PurchaseRow[] {

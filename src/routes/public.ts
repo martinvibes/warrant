@@ -10,7 +10,8 @@ import { CATALOGUE, LIVE_CATALOGUE, config, moneyFor } from "../config.js";
 import { allInboxes, listPurchases, purchaseStats, spentBy } from "../store/db.js";
 import { messagesFor } from "../resources/mailbox.js";
 import { readMemory } from "../resources/memory.js";
-import { numbersFor } from "../resources/phone.js";
+import { numbersFor, searchNumbers } from "../resources/phone.js";
+import { bySettlement, fromRow, issuerAddress, lookup, RECEIPT_VERSION } from "../receipts.js";
 
 export const publicApi = Router();
 
@@ -50,6 +51,10 @@ publicApi.get("/v1/contracts", (_req, res) => {
     identity: { address: config.identityContract || null, explorer: explorer(config.identityContract) },
     market: { address: config.marketContract || null, explorer: explorer(config.marketContract) },
     treasury: { address: config.treasuryContract || null, explorer: explorer(config.treasuryContract) },
+    // The address a receipt's signature must recover to. Public by design:
+    // checking a receipt should not require asking us anything.
+    receiptIssuer: issuerAddress() ?? null,
+    receiptVersion: RECEIPT_VERSION,
   });
 });
 
@@ -67,9 +72,67 @@ publicApi.get("/v1/purchases", (req, res) => {
       network: p.network,
       transaction: p.tx_id,
       explorer: p.tx_id ? `https://hashscan.io/${config.hederaNetwork}/transaction/${p.tx_id}` : null,
+      receipt: p.receipt_id ?? null,
       at: new Date(p.created_at).toISOString(),
     })),
   });
+});
+
+/**
+ * One receipt, in the form it was signed in.
+ *
+ * Public because a receipt whose holder has to authenticate to show it is not
+ * proof of anything to a third party.
+ */
+publicApi.get("/v1/receipts", (req, res) => {
+  const settlement = typeof req.query.settlement === "string" ? req.query.settlement : undefined;
+  if (settlement) {
+    const receipt = bySettlement(settlement);
+    if (!receipt) {
+      res.status(404).json({ error: `No receipt here was issued against settlement ${settlement}.` });
+      return;
+    }
+    res.json({ receipt, verify: VERIFY_INSTRUCTIONS });
+    return;
+  }
+  const agent = typeof req.query.agent === "string" ? req.query.agent : undefined;
+  const limit = Math.min(Number(req.query.limit ?? 50) || 50, 200);
+  res.json({ receipts: listPurchases(agent, limit).map(fromRow), verify: VERIFY_INSTRUCTIONS });
+});
+
+publicApi.get("/v1/receipts/:id", (req, res) => {
+  const receipt = lookup(req.params.id);
+  if (!receipt) {
+    res.status(404).json({ error: `No receipt ${req.params.id} was issued here.` });
+    return;
+  }
+  res.json({ receipt, verify: VERIFY_INSTRUCTIONS });
+});
+
+/** How to check one without trusting this service. */
+const VERIFY_INSTRUCTIONS = {
+  digest: "sha256(version|id|agent|kind|resource|amount|asset|network|settlement|issuedAt)",
+  signature: "an EIP-191 personal_sign over that digest string",
+  signer: "must recover to receiptIssuer from /v1/contracts",
+};
+
+/**
+ * Numbers available to buy. Free, because a price list nobody can read is not
+ * a price list. Ordering one is the paid step, at POST /v1/phone/provision.
+ */
+publicApi.get("/v1/phone/search", async (req, res) => {
+  const str = (v: unknown) => (typeof v === "string" && v ? v : undefined);
+  try {
+    const numbers = await searchNumbers({
+      country: str(req.query.country),
+      areaCode: str(req.query.area),
+      contains: str(req.query.contains),
+      limit: Number(req.query.limit ?? 10) || 10,
+    });
+    res.json({ numbers, orderAt: "POST /v1/phone/provision" });
+  } catch (err) {
+    res.status(502).json({ error: (err as Error).message, numbers: [] });
+  }
 });
 
 publicApi.get("/v1/stats", (_req, res) => {

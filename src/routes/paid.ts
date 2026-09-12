@@ -138,8 +138,8 @@ paid.post(
 paid.post(
   "/v1/phone/provision",
   sold("phone.provision", async (req) => {
-    const { country } = (req.body ?? {}) as { country?: string };
-    return provisionNumber(agentOf(req), country ?? "US");
+    const { country, phoneNumber } = (req.body ?? {}) as { country?: string; phoneNumber?: string };
+    return provisionNumber(agentOf(req), country ?? "US", phoneNumber);
   }),
 );
 

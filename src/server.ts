@@ -6,6 +6,7 @@ import { assertServerConfig, config, CATALOGUE, LIVE_CATALOGUE } from "./config.
 import { publicApi } from "./routes/public.js";
 import { inbound } from "./routes/inbound.js";
 import { paid } from "./routes/paid.js";
+import { precheck } from "./routes/precheck.js";
 import {
   AGENT_HEADER,
   AGENT_ADDRESS_HEADER,
@@ -42,6 +43,10 @@ async function main(): Promise<void> {
   });
   app.use(publicApi);
   app.use(inbound);
+
+  // Ahead of the payment middleware, so a purchase that is already known to
+  // be impossible is refused in words rather than charged for.
+  app.use(precheck);
 
   const httpServer = buildResourceServer();
   await initializeWithRetry(httpServer);

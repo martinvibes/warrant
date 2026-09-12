@@ -61,6 +61,86 @@ export async function findNumber(countryCode = "US"): Promise<AvailableNumber> {
   return { phoneNumber: first.phone_number, country: first.country_code };
 }
 
+export interface NumberOption {
+  phoneNumber: string;
+  country: string;
+  /** Where the number is, as the provider describes it. */
+  region: string;
+  /** Monthly rental and the one-off, in the provider's currency. */
+  monthly: string | null;
+  upfront: string | null;
+  currency: string | null;
+  features: string[];
+}
+
+/**
+ * What is available to buy right now.
+ *
+ * Searching is free and unpriced. Charging to look at a catalogue would be a
+ * strange way to sell anything, and an agent that cannot see the prices before
+ * it commits is not really choosing.
+ */
+export async function searchNumbers(opts: {
+  country?: string;
+  areaCode?: string;
+  contains?: string;
+  limit?: number;
+} = {}): Promise<NumberOption[]> {
+  try {
+    return await search(opts, false);
+  } catch (err) {
+    // A narrow filter that matches nothing is the common case, and the
+    // provider says so by name. Widening once beats handing back an error
+    // that tells an agent to go and read the provider's documentation.
+    if (!/best_effort/i.test((err as Error).message)) throw err;
+    return search(opts, true);
+  }
+}
+
+async function search(
+  opts: { country?: string; areaCode?: string; contains?: string; limit?: number },
+  bestEffort: boolean,
+): Promise<NumberOption[]> {
+  const query = new URLSearchParams({
+    "filter[country_code]": (opts.country ?? "US").toUpperCase(),
+    "filter[limit]": String(Math.min(Math.max(opts.limit ?? 10, 1), 50)),
+    "filter[features][]": "sms",
+  });
+  if (opts.areaCode) query.set("filter[national_destination_code]", opts.areaCode);
+  if (opts.contains) query.set("filter[phone_number][contains]", opts.contains);
+  if (bestEffort) query.set("filter[best_effort]", "true");
+
+  const body = await telnyx<{ data?: RawNumber[] }>(`/available_phone_numbers?${query}`);
+  return (body.data ?? []).map(toOption);
+}
+
+interface RawNumber {
+  phone_number: string;
+  country_code?: string;
+  features?: { name: string }[];
+  region_information?: { region_name?: string; region_type?: string }[];
+  cost_information?: { monthly_cost?: string; upfront_cost?: string; currency?: string };
+}
+
+function toOption(n: RawNumber): NumberOption {
+  const regions = n.region_information ?? [];
+  const named =
+    regions.find((r) => r.region_type === "location") ??
+    regions.find((r) => r.region_type === "rate_center") ??
+    regions[0];
+  const state = regions.find((r) => r.region_type === "state")?.region_name;
+  const cost = n.cost_information ?? {};
+  return {
+    phoneNumber: n.phone_number,
+    country: n.country_code ?? "US",
+    region: [named?.region_name, state].filter(Boolean).join(", "),
+    monthly: cost.monthly_cost ?? null,
+    upfront: cost.upfront_cost ?? null,
+    currency: cost.currency ?? null,
+    features: (n.features ?? []).map((f) => f.name),
+  };
+}
+
 export interface ProvisionedNumber {
   phoneNumber: string;
   country: string;
@@ -68,8 +148,16 @@ export interface ProvisionedNumber {
   agent: string;
 }
 
-export async function provisionNumber(agent: string, countryCode = "US"): Promise<ProvisionedNumber> {
-  const found = await findNumber(countryCode);
+export async function provisionNumber(
+  agent: string,
+  countryCode = "US",
+  wanted?: string,
+): Promise<ProvisionedNumber> {
+  // Ordering the number the agent was quoted, rather than whatever a fresh
+  // search returns, is the difference between choosing and being assigned.
+  const found = wanted
+    ? { phoneNumber: wanted, country: countryCode.toUpperCase() }
+    : await findNumber(countryCode);
 
   const order = await telnyx<{ data?: { id: string; status: string } }>("/number_orders", {
     method: "POST",
