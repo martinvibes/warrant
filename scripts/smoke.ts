@@ -172,6 +172,13 @@ async function main(): Promise<void> {
     console.log(c.dim("  sms.send         skipped   needs a number first"));
   }
 
+  if (!flag("to")) {
+    console.log(
+      c.dim("\n  Mail was sent to the agent's own address, which needs inbound routing to land."),
+    );
+    console.log(c.dim("  Pass --to you@example.com to prove delivery to a real mailbox."));
+  }
+
   const failed = results.filter((r) => !r.ok);
   console.log(c.dim("\n  ─────────────────────────────────────────────"));
   console.log(`  ${results.length - failed.length}/${results.length} working, ${moneyFor(spent)} spent`);

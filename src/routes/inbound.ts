@@ -52,15 +52,34 @@ function signatureOk(raw: string, header: string | undefined, secret: string): b
   return given.length === mine.length && crypto.timingSafeEqual(given, mine);
 }
 
-inbound.post("/v1/email/inbound", (req, res) => {
+/**
+ * Two paths, one handler.
+ *
+ * `/v1/email/inbound` is this service's own. `/email/webhook` is where a
+ * Cloudflare Email Routing worker already posts, and honouring it means
+ * pointing existing mail at this service is one secret to change rather than a
+ * worker to rewrite and redeploy.
+ */
+function authorised(req: import("express").Request, secret: string): boolean {
+  // A shared secret sent whole, which is what the Cloudflare worker does. Compared
+  // in constant time so the comparison itself leaks nothing.
+  const shared = req.header("x-0gent-webhook-secret") ?? req.header("x-webhook-secret");
+  if (shared) {
+    const a = Buffer.from(shared, "utf8");
+    const b = Buffer.from(secret, "utf8");
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  }
+
+  // Or an HMAC over the body, which is what a provider with signing does.
+  const signature = req.header("svix-signature") ?? req.header("x-webhook-signature") ?? undefined;
+  return signatureOk(JSON.stringify(req.body ?? {}), signature, secret);
+}
+
+inbound.post(["/v1/email/inbound", "/email/webhook"], (req, res) => {
   const secret = process.env.EMAIL_WEBHOOK_SECRET ?? "";
-  if (secret) {
-    const raw = JSON.stringify(req.body ?? {});
-    const header = req.header("svix-signature") ?? req.header("x-webhook-signature") ?? undefined;
-    if (!signatureOk(raw, header, secret)) {
-      res.status(401).json({ error: "The webhook signature did not verify." });
-      return;
-    }
+  if (secret && !authorised(req, secret)) {
+    res.status(401).json({ error: "The webhook signature did not verify." });
+    return;
   }
 
   const payload = (req.body ?? {}) as InboundPayload;
