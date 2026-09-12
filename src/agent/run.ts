@@ -53,25 +53,29 @@ class Session {
   }
 
   /**
-   * Tops the float up from the treasury when the next purchase would outrun it.
+   * Draws the price of one call from the treasury before making it.
    *
-   * Returns a message when the chain refuses, because a refusal is information
-   * the agent should act on rather than an error to retry through.
+   * This is the whole point, so it is a transaction and not a question. The
+   * agent asks the chain for money at the listing's published price; the chain
+   * either sends it or reverts. Nobody is asked for permission, and no client
+   * side check is standing in for the limit, which would make the limit
+   * advisory.
+   *
+   * The revert reason is returned rather than thrown, because a refusal is
+   * information the agent should act on. An agent that knows it hit a daily
+   * cap can stop; one told only that something failed will retry forever.
    */
-  private async ensureFunds(kind: string): Promise<string | undefined> {
-    if (!this.treasury) return undefined;
+  private async drawFor(kind: string): Promise<{ drawId?: bigint; refused?: string }> {
+    if (!this.treasury) return {};
     try {
-      const budget = await this.treasury.budget();
-      const offer = this.offers.get(kind);
-      const need = offer?.price ?? 0n;
-      if (budget.window >= need) return undefined;
-
-      const when = budget.resetsAt ? new Date(budget.resetsAt * 1000).toISOString() : "the next window";
-      return `The daily limit is spent. ${usdc(budget.window)} left, ${usdc(need)} needed. It reopens at ${when}.`;
+      const { listingId } = await this.treasury.cheapest(kind);
+      const { drawId, amount } = await this.treasury.draw(listingId, 1);
+      console.log(`  ${c.dim("DRAW")}    ${kind.padEnd(16)} ${c.dim(`${usdc(amount)} from the treasury`)}`);
+      return { drawId };
     } catch (err) {
-      // No treasury configured is not a failure; it means the agent is running
-      // on a float somebody funded directly.
-      return (err as Error).message.includes("not set") ? undefined : (err as Error).message;
+      const message = (err as Error).message;
+      if (message.includes("not set")) return {};
+      return { refused: readable(message) };
     }
   }
 
@@ -79,10 +83,10 @@ class Session {
     const offer = this.offers.get(kind);
     if (!offer) return `There is nothing called ${kind} for sale here.`;
 
-    const blocked = await this.ensureFunds(kind);
-    if (blocked) {
-      console.log(`  ${c.red("REFUSED")} ${kind}  ${c.dim(blocked)}`);
-      return `Refused: ${blocked}`;
+    const { drawId, refused } = await this.drawFor(kind);
+    if (refused) {
+      console.log(`  ${c.red("REFUSED")} ${kind.padEnd(14)} ${c.dim(refused)}`);
+      return `Refused: ${refused}`;
     }
 
     process.stdout.write(`  ${c.gold("BUY")}     ${kind.padEnd(16)} ${c.dim(usdc(offer.price))} `);
@@ -118,7 +122,50 @@ class Session {
     this.spends.push({ kind, atomic: offer.price, transaction: settlement });
     console.log(`${c.green("PAID")} ${c.dim(`${took}ms`)}`);
 
+    // Ties the money drawn to the thing it bought, so the treasury's ledger
+    // can be read on its own without trusting this process's account of it.
+    if (drawId !== undefined && this.treasury && settlement) {
+      try {
+        await this.treasury.recordSettlement(drawId, settlement.slice(0, 120), offer.price);
+      } catch {
+        // The purchase already happened. Failing to annotate it is not a
+        // reason to tell the agent its purchase failed.
+      }
+    }
+
     return text.slice(0, 4000);
+  }
+}
+
+/**
+ * Turns a viem revert into the sentence the contract meant.
+ *
+ * The custom errors carry the numbers that explain the refusal, and losing
+ * them to a stack trace wastes the only useful thing about a failed draw.
+ */
+function readable(message: string): string {
+  const named = /Error: ([A-Za-z]+)\((.*?)\)/s.exec(message);
+  if (!named) return message.split("\n")[0].slice(0, 200);
+  const [, name, args] = named;
+  const parts = args.split(",").map((a) => a.trim()).filter(Boolean);
+  switch (name) {
+    case "WindowCapExceeded": {
+      const [wanted, left, reopens] = parts;
+      const when = reopens ? new Date(Number(reopens) * 1000).toISOString() : "the next window";
+      return `daily cap: wanted ${usdc(BigInt(wanted))}, ${usdc(BigInt(left))} left, reopens ${when}`;
+    }
+    case "TotalCapExceeded": {
+      const [wanted, left] = parts;
+      return `lifetime cap: wanted ${usdc(BigInt(wanted))}, ${usdc(BigInt(left))} left`;
+    }
+    case "KindNotAllowed":
+      return "this kind is not in the policy";
+    case "PolicyExpired":
+      return "the policy has expired";
+    case "NoPolicy":
+      return "this agent has no policy";
+    default:
+      return name;
   }
 }
 
