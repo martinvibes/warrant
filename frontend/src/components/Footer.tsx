@@ -21,22 +21,22 @@ export function Footer() {
           Authorise the purchase, not the wallet
         </h2>
         <p style={{ fontSize: 17, color: 'rgba(247,246,243,0.5)', maxWidth: 520, margin: '0 auto 36px', lineHeight: 1.75, padding: '0 24px' }}>
-          Sign one warrant, hand it to an agent, and watch what it bought and what it was
+          Give an agent a budget, walk away, and read back exactly what it bought and what it was
           stopped from buying. Signing costs nothing and revoking costs nothing.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', padding: '0 24px' }}>
           <a
-            href="/console"
+            href="/#resources"
             style={{
               display: 'inline-flex', alignItems: 'center', height: 48, padding: '0 28px',
               background: '#C98A2E', color: '#0b0b0b', fontSize: 14, fontWeight: 600, borderRadius: 100,
               border: 'none', transition: 'filter 0.2s', textDecoration: 'none',
             }}
           >
-            Sign a warrant →
+            See the catalogue →
           </a>
           <a
-            href="/audit"
+            href="/ledger"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8, height: 48, padding: '0 24px',
               background: 'transparent', color: '#fff', fontSize: 14, fontWeight: 500,
@@ -63,8 +63,8 @@ export function Footer() {
           </a>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
             {[
-              ['Console', '/console', false],
-              ['Audit', '/audit', false],
+              ['Ledger', '/ledger', false],
+              ['Docs', '/docs', false],
               ['Docs', '/docs', false],
               ['GitHub', REPO_URL, true],
               ['x402', 'https://x402.org', true],

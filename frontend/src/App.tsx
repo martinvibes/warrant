@@ -2,14 +2,14 @@ import { useEffect } from 'react';
 import { Nav } from './components/Nav';
 import { Hero } from './components/Hero';
 import { Terminal } from './components/Terminal';
-import { Features } from './components/Features';
+import { Limits } from './components/Limits';
 import { HowItWorks } from './components/HowItWorks';
 import { Settlement } from './components/Settlement';
 import { Footer } from './components/Footer';
 import { AgentProfile } from './components/AgentProfile';
 import { Docs } from './components/Docs';
-import { Audit } from './components/Audit';
-import { Console } from './components/Console';
+import { Ledger } from './components/Ledger';
+import { Resources } from './components/Resources';
 import { NotFound } from './components/NotFound';
 
 function App() {
@@ -25,11 +25,8 @@ function App() {
     return () => observer.disconnect();
   }, [path]);
 
-  // /console — where a human issues and withdraws spending authority.
-  if (path === '/console' || path === '/console/') return <Console />;
-
-  // /audit — the same reads the console uses, with nothing hidden and no signer.
-  if (path === '/audit' || path === '/audit/') return <Audit />;
+  // /ledger — what this service sold, readable by anyone with no credentials.
+  if (path === '/ledger' || path === '/ledger/') return <Ledger />;
 
   if (path === '/docs' || path === '/docs/') return <Docs />;
 
@@ -41,8 +38,9 @@ function App() {
       <>
         <Nav />
         <Hero />
+        <div className="reveal"><Resources /></div>
         <div className="reveal"><Terminal /></div>
-        <div className="reveal"><Features /></div>
+        <div className="reveal"><Limits /></div>
         <div className="reveal"><HowItWorks /></div>
         <div className="reveal"><Settlement /></div>
         <Footer />

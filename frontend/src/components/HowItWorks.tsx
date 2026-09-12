@@ -5,27 +5,27 @@ const STEP_DURATION_MS = 4500;
 const steps = [
   {
     n: '01',
-    title: 'A human signs',
-    body: 'The owner signs a warrant naming one agent, the resources it may buy, a ceiling, a purpose and an expiry. No transaction, no gas, no funded account. The signature is the authorisation.',
-    code: 'EIP-712 Warrant\n\n  agent      0.0.4242\n  resources  ["inference"]\n  cap        1000000   ($1.00)\n  purpose    "support triage"\n  expiry     +24h\n\n→ 0x07d266582acb47f6…7fe7edf0',
+    title: 'Fund it once',
+    body: 'You put USDC in the treasury contract and set the limit in the same command: a lifetime ceiling, a daily ceiling, and which kinds the agent may buy. Then you leave.',
+    code: 'npm run fund -- --cap 5 --per day\n\n  totalCap      5000000   ($5.00)\n  windowCap     1000000   ($1.00)\n  windowSeconds 86400\n  kinds         inference, email.send\n\n→ policy set for 0x9aE1…c3',
   },
   {
     n: '02',
-    title: 'The gate reads it first',
-    body: 'The agent presents the warrant on every request. Before the service quotes a price, it recovers the signature, checks the resource against the allowlist, sums what has already settled and compares it to the cap.',
-    code: 'POST /v1/inference\nX-Warrant: eyJ3YXJyYW50Ijp7…\n\n  signature   recovers to owner ✓\n  inference   in allowlist   ✓\n  $0.05       under cap      ✓\n  expiry      21h remaining  ✓',
+    title: 'The agent decides',
+    body: 'You give it a goal in plain English. It reads the catalogue, works out what it needs, and starts buying. There is no approval step and nobody to wait for.',
+    code: 'npm run agent -- "email me a summary"\n\n  reads   /v1/catalogue\n  plans   inbox → inference → send\n  budget  $1.00 this window',
   },
   {
     n: '03',
-    title: 'Only then, money',
-    body: 'An authorised request gets an HTTP 402 with terms. The agent signs a USDC transfer on Hedera. After the signature and before settlement, the payer is checked against the agent the warrant names.',
-    code: '← 402 Payment Required\n{\n  "scheme":  "exact",\n  "network": "hedera:testnet",\n  "amount":  "50000",\n  "asset":   "0.0.429274"\n}\n\n  payer 0.0.4242 = named agent ✓',
+    title: 'It pays per call',
+    body: 'Each endpoint answers 402 with terms. The agent signs a USDC transfer on Hedera and the facilitator sponsors the network fee, so the agent needs stablecoin and no HBAR at all.',
+    code: '← 402 Payment Required\n{\n  "scheme":  "exact",\n  "network": "hedera:testnet",\n  "amount":  "20000",\n  "asset":   "0.0.429274",\n  "feePayer": "0.0.7162784"\n}\n\n✓ settled in 1104ms',
   },
   {
     n: '04',
-    title: 'A receipt, or a reason',
-    body: 'Settled purchases write a receipt binding agent, warrant, purpose, amount and transaction. Refused ones write the code and the reason. Both are readable without credentials.',
-    code: '✓ settled  0.0.4242@1789189611.402118000\n✓ receipt  inference $0.05\n           purpose "support triage"\n\n✗ refused  resource_not_authorised\n           covers inference,\n           not email.send',
+    title: 'The chain says when to stop',
+    body: 'When the float runs low the agent draws from the treasury. The contract checks the ceilings and either hands over the money or refuses. That refusal is the only thing in the system that can stop it.',
+    code: '✗ WindowCapExceeded\n    wanted     20000\n    remaining  0\n    resetsAt   2026-09-13T00:00:00Z\n\n  the agent waits; it does not retry',
   },
 ];
 

@@ -27,7 +27,7 @@ export function Nav() {
             ['How it works', '#how-it-works'],
             ['Refusals',     '#refusals'],
             ['Settlement',   '#settlement'],
-            ['Audit',        '/audit'],
+            ['Ledger',       '/ledger'],
             ['Docs',         '/docs'],
           ].map(([label, href]) => (
             <a
@@ -43,7 +43,7 @@ export function Nav() {
         </div>
 
         <a
-          href="/console"
+          href="/ledger"
           className="nav-cta"
           style={{
             display: 'inline-flex', alignItems: 'center', height: 32, padding: '0 16px',
@@ -52,7 +52,7 @@ export function Nav() {
             transition: 'filter 0.2s', whiteSpace: 'nowrap', textDecoration: 'none',
           }}
         >
-          Console
+          Ledger
         </a>
       </div>
     </nav>

@@ -95,7 +95,7 @@ export function NotFound() {
         }}>
           {([
             ['Home',       '/',          'Landing page'],
-            ['Console',    '/console',   'Issue and revoke warrants'],
+            ['Ledger',     '/ledger',    'What this service sold'],
             ['Audit',      '/audit',     'Every receipt and every refusal'],
             ['Docs',       '/docs',      'Full developer reference'],
           ] as const).map(([label, href, sub]) => (

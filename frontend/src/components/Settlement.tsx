@@ -64,7 +64,7 @@ const items: Item[] = [
   },
   {
     title: 'Receipts, not log lines',
-    desc: 'Settlement writes a row binding the agent, the warrant, the purpose, the amount and the transaction id. That row is what turns a balance that went down into a purchase somebody can explain.',
+    desc: 'Settlement writes a row binding the agent, what it bought, the amount and the transaction id. That row is what turns a balance that went down into a purchase somebody can explain.',
     detail: 'GET /v1/receipts',
     icon: ReceiptIcon,
   },
@@ -97,7 +97,7 @@ export function Settlement() {
           Small enough payments to be worth refusing
         </h2>
         <p className="reveal-up" style={{ fontSize: 16, color: 'rgba(247,246,243,0.5)', maxWidth: 540, margin: '0 auto 56px', lineHeight: 1.7 }}>
-          A warrant is only interesting where the purchases are small and frequent. That needs a
+          Per-call buying is only interesting where the purchases are small and frequent. That needs a
           rail where five cents is a sensible amount to move, and a protocol where the price
           travels with the request rather than through a billing relationship.
         </p>

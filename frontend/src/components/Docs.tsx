@@ -135,355 +135,189 @@ function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
 
 const NAV: [string, string, string][] = [
   ['01', 'Quick start', '#quick-start'],
-  ['02', 'The warrant', '#warrant'],
-  ['03', 'Where checks run', '#stages'],
-  ['04', 'Refusal codes', '#refusals'],
+  ['02', 'What is for sale', '#catalogue'],
+  ['03', 'The limit', '#limit'],
+  ['04', 'Sealed mail', '#sealed'],
   ['05', 'HTTP API', '#api'],
   ['06', 'Settlement', '#settlement'],
-  ['07', 'Revocation', '#revocation'],
-  ['08', 'Limits', '#limits'],
+  ['07', 'Contracts', '#contracts'],
+  ['08', 'What this does not do', '#bounds'],
 ];
 
 export function Docs() {
-  const [active, setActive] = useState('quick-start');
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); }),
-      { rootMargin: '-100px 0px -60% 0px', threshold: 0 }
-    );
-    NAV.forEach(([, , href]) => {
-      const el = document.getElementById(href.slice(1));
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div style={{ background: BG_PAGE, color: TEXT, minHeight: '100vh' }}>
+    <>
       <Nav />
-
-      <div className="docs-layout" style={{ display: 'flex', maxWidth: 1120, margin: '0 auto', padding: '120px 24px 40px', gap: 48 }}>
-        <nav className="docs-sidebar" style={{
-          width: 200, flexShrink: 0, position: 'sticky', top: 100, alignSelf: 'flex-start',
-          height: 'fit-content', display: 'flex', flexDirection: 'column', gap: 2,
-        }}>
-          <div className="label" style={{ color: TEXT_GHOST, marginBottom: 12 }}>Reference</div>
-          {NAV.map(([num, label, href]) => {
-            const isActive = active === href.slice(1);
-            return (
-              <a key={href} href={href} style={{
-                display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px',
-                fontSize: 13, textDecoration: 'none',
-                color: isActive ? BRASS : TEXT_DIM,
-                borderLeft: `2px solid ${isActive ? BRASS : 'transparent'}`,
-                background: isActive ? 'rgba(232,181,92,0.05)' : 'transparent',
-                transition: 'all 0.15s',
-              }}>
-                <span className="mono" style={{ fontSize: 10, color: TEXT_GHOST }}>{num}</span>
-                {label}
-              </a>
-            );
-          })}
-        </nav>
-
-        <main style={{ flex: 1, minWidth: 0 }}>
-          <header style={{ paddingBottom: 20 }}>
+      <main style={{ background: BG_PAGE, color: TEXT, minHeight: '100vh' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '120px 24px 80px', display: 'grid', gap: 48, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+          <header style={{ maxWidth: 720 }}>
             <div className="label" style={{ color: BRASS, marginBottom: 14 }}>Documentation</div>
-            <h1 className="display" style={{ fontSize: 'clamp(32px, 5vw, 46px)', fontWeight: 500, lineHeight: 1.1, marginBottom: 18 }}>
-              Spending authority an agent cannot widen
+            <h1 className="display" style={{ fontSize: 'clamp(34px, 5vw, 50px)', lineHeight: 1.1, marginBottom: 18 }}>
+              Buying things with an agent.
             </h1>
-            <p style={{ fontSize: 16, color: TEXT_DIM, lineHeight: 1.8, maxWidth: 700 }}>
-              Warrant sells resources to agents over HTTP, one payment per request, settled in
-              USDC on Hedera. What makes it more than a paywall is that no payment is accepted
-              unless it is covered by a warrant a human signed: one agent, named resources, a
-              ceiling, a purpose, an expiry.
+            <p style={{ fontSize: 16, color: TEXT_DIM, lineHeight: 1.75 }}>
+              Warrant sells real resources to agents over HTTP, one payment per request, settled in
+              USDC on Hedera. There is no account to open and no key to apply for. An agent that can
+              pay can buy, and the only thing that stops it is a limit enforced by a contract.
             </p>
+            <nav style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 28 }}>
+              {NAV.map(([n, title, href]) => (
+                <a key={href} href={href} className="label" style={{ padding: '6px 12px', border: `1px solid ${BORDER}`, color: TEXT_FAINT }}>
+                  <span style={{ color: BRASS, marginRight: 8 }}>{n}</span>
+                  {title}
+                </a>
+              ))}
+            </nav>
           </header>
 
           <Section
             id="quick-start"
             kicker="01"
             title="Quick start"
-            intro="Four commands. The third one is the interesting one."
+            intro="Three commands. The first two are setup and happen once; the third is the thing itself."
           >
             <Code lang="shell">{`git clone https://github.com/martinvibes/warrant && cd warrant
-npm install
-cp .env.example .env      # add a Hedera account and an owner key
-npm run dev               # the service, on :8090`}</Code>
+npm install && cp .env.example .env     # fill in the Hedera keys
+npm run dev                             # service and console on :8090
 
-            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, marginTop: 24 }}>
-              Then, as the human, authorise one agent to buy one thing:
+npm run agent -- "find out what x402 is and email me a summary"`}</Code>
+            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, marginTop: 14 }}>
+              The agent needs a Hedera account holding testnet USDC. It does not need HBAR: the
+              facilitator sponsors the network fee, so stablecoin is the only balance it has to
+              carry.
             </p>
-            <Code lang="shell">{`npm run sign -- --agent 0.0.4242 --cap 1.00 \\
-                --resources inference \\
-                --purpose "support triage" --hours 24
-
-warrant  0x07d266582acb47f6…7fe7edf0
-covers   inference
-cap      1.00 (1000000 atomic)`}</Code>
-
-            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, marginTop: 24 }}>
-              As the agent, buy something inside the warrant, then something outside it:
-            </p>
-            <Code lang="shell">{`npm run agent -- inference "summarise ticket #8812"
-  BOUGHT   inference  $0.05
-  tx       0.0.4242@1789189611.402118000
-
-npm run agent -- injected
-  REFUSED  403  resource_not_authorised
-  This warrant covers inference. It does not cover email.send.
-  No payment was attempted.`}</Code>
-
-            <Card style={{ marginTop: 24, borderLeft: `2px solid ${BRASS}` }}>
-              <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, margin: 0 }}>
-                The second request was well formed and the agent’s wallet was funded. A
-                wallet-level spending cap would have allowed it, because the amount was small
-                and the balance was sufficient. It was refused on scope, not on price.
-              </p>
-            </Card>
           </Section>
 
           <Section
-            id="warrant"
+            id="catalogue"
             kicker="02"
-            title="The warrant"
-            intro={
-              <>
-                A warrant is an EIP-712 typed message. Its identifier is the hash of its own
-                contents, so two parties can name the same warrant without coordinating, and an
-                edited warrant is a different warrant rather than a tampered one.
-              </>
-            }
+            title="What is for sale"
+            intro={<>Read <code className="mono">GET /v1/catalogue</code> for the live list and prices. It is the same list the server charges against, so it cannot advertise a price that will not be honoured.</>}
           >
-            <Code lang="typescript">{`const WARRANT_TYPES = {
-  Warrant: [
-    { name: 'owner',     type: 'address'  },
-    { name: 'agent',     type: 'string'   },
-    { name: 'asset',     type: 'string'   },
-    { name: 'cap',       type: 'uint256'  },
-    { name: 'resources', type: 'string[]' },
-    { name: 'purpose',   type: 'string'   },
-    { name: 'expiry',    type: 'uint256'  },
-    { name: 'nonce',     type: 'uint256'  },
-  ],
-};
-
-const domain = { name: 'Warrant', version: '1', chainId: 296 };`}</Code>
-
             <Table
-              head={['Field', 'Meaning']}
+              head={['Kind', 'What you get', 'Price']}
               rows={[
-                ['owner', 'EVM address of the human who signed. All authority derives from this signature.'],
-                ['agent', 'The one Hedera account id this warrant authorises, e.g. 0.0.4242.'],
-                ['asset', 'HTS token id of the settlement asset. Part of what is signed, so a cap cannot be walked past by changing the unit.'],
-                ['cap', 'Total ceiling across the warrant’s life, in the asset’s smallest unit. Atomic, not decimal, because a cap that drifts by a rounding step is a cap that can be walked past.'],
-                ['resources', 'Allowlist of resource types. An empty list authorises nothing.'],
-                ['purpose', 'Free text, copied onto every receipt written under this warrant.'],
-                ['expiry', 'Unix seconds. The warrant is dead at and after this instant.'],
-                ['nonce', 'Per-owner replay guard. It is also what makes two otherwise identical warrants distinct documents.'],
+                ['identity.mint', 'A soulbound token on Hedera, plus the public key others seal mail to.', '$0.10'],
+                ['inference', 'One language model call, returned in OpenAI shape.', '$0.02'],
+                ['email.inbox', 'An address the agent owns and receives replies at.', '$1.00'],
+                ['email.send', 'Ordinary mail from an address the agent owns.', '$0.20'],
+                ['email.sealed', 'Mail encrypted to another agent, unreadable by this service.', '$0.25'],
+                ['memory.write', 'A permanent Hedera file that nobody, us included, can edit.', '$0.05'],
+                ['phone.provision', 'A real number, SMS capable, in 170+ countries.', '$0.50'],
+                ['sms.send', 'One text from a number the agent owns.', '$0.01'],
               ]}
             />
-
-            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, marginTop: 24 }}>
-              The agent presents the signed warrant, base64 encoded, on every request:
-            </p>
-            <Code lang="http">{`POST /v1/inference
-X-Warrant: eyJ3YXJyYW50Ijp7Im93bmVyIjoiMHhGMjQ2YzM0…
-Content-Type: application/json
-
-{ "prompt": "summarise ticket #8812" }`}</Code>
-            <p style={{ fontSize: 13, color: TEXT_FAINT, lineHeight: 1.75 }}>
-              The header is not a secret. It authorises one named agent to buy named things up
-              to a ceiling, and holding a copy grants nobody else anything, because the payer is
-              checked against the agent the warrant names.
-            </p>
           </Section>
 
           <Section
-            id="stages"
+            id="limit"
             kicker="03"
-            title="Where the checks run"
-            intro="Each check happens at the earliest moment it is possible to make it. That ordering is the design, not an optimisation."
+            title="The limit"
+            intro="Fund an agent directly and its limit is a suggestion, because the agent holds the keys. The money sits in a contract instead, and the agent draws what it needs without asking anyone."
           >
+            <Code lang="AgentTreasury.sol">{`setPolicy(agent, totalCap, windowCap, windowSeconds, expiry, kinds)
+
+  totalCap       lifetime ceiling, atomic units
+  windowCap      ceiling inside one window
+  windowSeconds  window length, e.g. 86400 for a day
+  expiry         unix seconds, 0 for never
+  kinds          which listings the agent may draw against
+
+draw(listingId, calls) -> (drawId, amount)
+
+  amount is listingPrice * calls, read from the market.
+  The agent names what it wants, never the sum.`}</Code>
             <Table
-              head={['Stage', 'State of the money', 'What is checked']}
+              head={['Refusal', 'Meaning']}
               rows={[
-                [
-                  'onProtectedRequest',
-                  'Nothing has been asked for or paid.',
-                  'Is this purchase authorised at all? Signature, owner, revocation, expiry, asset, resource, and spend against the cap. A refusal here is an HTTP 403 and the agent is never even quoted a price.',
-                ],
-                [
-                  'onAfterVerify',
-                  'The payment is signed but has not settled.',
-                  'Is the payer the agent this warrant names? This cannot be asked earlier, because before a signature there is no payer. A mismatch aborts before the transfer.',
-                ],
-                [
-                  'onAfterSettle',
-                  'The money has moved.',
-                  'Write the receipt: agent, warrant, purpose, amount, asset, network, transaction id. Nothing is recorded as bought before it is paid for.',
-                ],
+                ['TotalCapExceeded', 'The lifetime ceiling is spent. Raising it does not refund what already went.'],
+                ['WindowCapExceeded', 'The daily ceiling is spent. The error carries the instant it reopens.'],
+                ['KindNotAllowed', 'The agent may spend, but not on this kind of thing.'],
+                ['PolicyExpired', 'The policy had an end date and it has passed.'],
+                ['NoPolicy', 'No policy, or it was revoked. Revocation takes effect on the next draw.'],
               ]}
             />
-            <Card style={{ marginTop: 20 }}>
-              <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, margin: 0 }}>
-                Spend is recomputed on every request by summing settled receipts, rather than
-                read from a running counter. A cap is only as trustworthy as the number it is
-                compared against, and a counter can drift away from what actually happened.
-              </p>
-            </Card>
           </Section>
 
           <Section
-            id="refusals"
+            id="sealed"
             kicker="04"
-            title="Refusal codes"
-            intro="Every refusal is recorded with a machine-readable code and a sentence written for the human who will read it later. Both are public."
+            title="Sealed mail"
+            intro="Two agents can already pay each other. Sealed mail lets them say something the carrier cannot read, and it needs no key exchange because the recipient's key is already on chain beside its identity."
           >
-            <Table
-              head={['Code', 'Raised when']}
-              rows={[
-                ['no_warrant', 'A paid endpoint was called with no warrant at all.'],
-                ['malformed_warrant', 'The header was present but will not parse as a warrant.'],
-                ['bad_signature', 'The signature does not recover to the owner the warrant names. The recovered address is reported, because a mismatch is an attempt rather than a typo.'],
-                ['owner_mismatch', 'The warrant and the revocation disagree about who the owner is.'],
-                ['unknown_owner', 'A valid warrant, signed by somebody this service does not accept warrants from.'],
-                ['revoked', 'The owner withdrew this warrant.'],
-                ['expired', 'The warrant’s expiry has passed.'],
-                ['resource_not_authorised', 'The resource requested is not in the warrant’s allowlist.'],
-                ['asset_mismatch', 'The warrant is denominated in a different token than this service settles in.'],
-                ['cap_exceeded', 'This purchase would take total settled spend past the ceiling.'],
-                ['payer_mismatch', 'The payment was signed by an account other than the agent named in the warrant.'],
-              ]}
-            />
-          </Section>
+            <Code lang="ECIES over secp256k1">{`ephemeral keypair
+  -> ECDH with the recipient's published key
+  -> HKDF-SHA256
+  -> AES-256-GCM
 
-          <Section
-            id="api"
-            kicker="05"
-            title="HTTP API"
-            intro="Two paid endpoints and six free ones. The free ones are the audit surface, which is why they need no credentials: anything the console shows, anyone can curl."
-          >
-            <Endpoint
-              method="POST" path="/v1/inference" cost="$0.05"
-              body={`{ "prompt": string, "model"?: string, "maxTokens"?: number }`}
-              desc="Language-model inference. Requires a warrant covering the inference resource."
-            />
-            <Endpoint
-              method="POST" path="/v1/email/send" cost="$0.02"
-              body={`{ "to": string, "subject": string, "body": string }`}
-              desc="Sends an email. Requires a warrant covering email.send."
-            />
-            <Endpoint
-              method="GET" path="/health" cost="free"
-              desc="Network, settlement asset, facilitator and the account payments go to."
-            />
-            <Endpoint
-              method="GET" path="/v1/pricing" cost="free"
-              desc="What this service sells and what each resource costs, in both display and atomic units."
-            />
-            <Endpoint
-              method="POST" path="/v1/warrants" cost="free"
-              body={`{ "warrant": {…}, "signature": "0x…" }`}
-              desc="Registers a signed warrant so the owner can see it before the agent spends. Grants nothing: the gate re-verifies the signature on every request regardless."
-            />
-            <Endpoint
-              method="GET" path="/v1/warrants" cost="free"
-              desc="Every warrant this service has seen, with spend summed from settled receipts and remaining headroom."
-            />
-            <Endpoint
-              method="GET" path="/v1/receipts?warrant=0x…" cost="free"
-              desc="Settled purchases, each binding agent, warrant, purpose, amount and Hedera transaction id."
-            />
-            <Endpoint
-              method="GET" path="/v1/refusals" cost="free"
-              desc="Every refused attempt, with its code and its reason."
-            />
-            <Endpoint
-              method="POST" path="/v1/warrants/:id/revoke" cost="free"
-              body={`{ "revocation": { "warrantId", "owner", "issuedAt" }, "signature": "0x…" }`}
-              desc="Withdraws a warrant on the owner's signature. Idempotent: revoking an already-revoked warrant returns 200, because the caller asked for it to be dead and it is dead."
-            />
-          </Section>
-
-          <Section
-            id="settlement"
-            kicker="06"
-            title="Settlement"
-            intro="Pay-per-request only works where the fee is not the purchase. Five cents of inference cannot carry a cent of gas."
-          >
-            <Table
-              head={['Piece', 'Detail']}
-              rows={[
-                ['protocol', 'x402 v2. The price travels in the HTTP 402 response; the agent retries with a signed payment.'],
-                ['network', 'hedera:testnet (CAIP-2). Mainnet is hedera:mainnet.'],
-                ['asset', 'USDC as a Hedera token: 0.0.429274 on testnet, 0.0.456858 on mainnet. Six decimal places.'],
-                ['facilitator', 'api.testnet.blocky402.com verifies and settles, and sponsors the network fee.'],
-                ['fee payer', '0.0.7162784 on testnet. A paying agent needs USDC and no HBAR, which is the difference between an agent that can pay and one that gets stuck holding the wrong asset.'],
-              ]}
-            />
-            <Code lang="http">{`← 402 Payment Required
-Payment-Required: <base64 of>
 {
-  "x402Version": 2,
-  "accepts": [{
-    "scheme":  "exact",
-    "network": "hedera:testnet",
-    "amount":  "50000",
-    "asset":   "0.0.429274",
-    "payTo":   "0.0.6789",
-    "maxTimeoutSeconds": 120,
-    "extra": { "feePayer": "0.0.7162784" }
-  }]
+  "algorithm": "ECIES-secp256k1-HKDF-SHA256-AES-256-GCM",
+  "ephemeralPublicKey": "0x04…",
+  "ciphertext": "…", "iv": "…", "tag": "…"
 }`}</Code>
-          </Section>
-
-          <Section
-            id="revocation"
-            kicker="07"
-            title="Revocation"
-            intro="Killing a warrant has to be faster and cheaper than issuing one, or nobody does it in the moment that matters."
-          >
-            <p style={{ fontSize: 15, color: TEXT_DIM, lineHeight: 1.8 }}>
-              So a revocation is a second signed message rather than a transaction. No gas, no
-              block time, and the agent’s next request under that warrant is refused. It is
-              signed rather than merely asserted because “stop this agent spending” is exactly
-              the instruction an attacker would like to be able to forge in the other direction.
-            </p>
-            <Code lang="typescript">{`const REVOCATION_TYPES = {
-  Revocation: [
-    { name: 'warrantId', type: 'bytes32' },
-    { name: 'owner',     type: 'address' },
-    { name: 'issuedAt',  type: 'uint256' },
-  ],
-};`}</Code>
-            <p style={{ fontSize: 14, color: TEXT_FAINT, lineHeight: 1.8 }}>
-              Revocations older than five minutes are rejected, so a leaked one cannot be held
-              and replayed against a warrant issued later.
+            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, marginTop: 14 }}>
+              The recipient's key is read from the identity contract, never from the request, so a
+              sender cannot be talked into sealing to an attacker's key. This service holds no
+              private key, so being unable to read the traffic is a property of the construction
+              rather than a promise about our conduct.
             </p>
           </Section>
 
-          <Section
-            id="limits"
-            kicker="08"
-            title="What this does not do"
-            intro="Worth stating plainly, because the gaps are where the next version goes."
-          >
+          <Section id="api" kicker="05" title="HTTP API" intro="Paid routes answer 402 with terms. Reads are free and need no credentials.">
+            <Endpoint method="POST" path="/v1/identity/mint" cost="$0.10" body='{ "metadataURI", "encryptionKey" }' desc="Mints to the address in x-agent-address. The service pays the gas." />
+            <Endpoint method="POST" path="/v1/inference" cost="$0.02" body='{ "prompt", "model?", "maxTokens?" }' desc="One completion." />
+            <Endpoint method="POST" path="/v1/email/inbox" cost="$1.00" body='{ "name" }' desc="Claims name@domain. Refused rather than renamed if taken." />
+            <Endpoint method="POST" path="/v1/email/sealed" cost="$0.25" body='{ "from", "to", "toAgent", "subject", "body" }' desc="Encrypts to toAgent's on-chain key before sending." />
+            <Endpoint method="POST" path="/v1/memory" cost="$0.05" body='{ "content" }' desc="Writes a keyless Hedera file. Permanent, 4096 bytes." />
+            <Endpoint method="GET" path="/v1/catalogue" cost="free" desc="What is for sale, and at what price." />
+            <Endpoint method="GET" path="/v1/purchases" cost="free" desc="Everything sold, newest first. Optional agent filter." />
+            <Endpoint method="GET" path="/v1/agents/:agent" cost="free" desc="One agent's spend and what it owns." />
+            <Endpoint method="GET" path="/v1/contracts" cost="free" desc="The deployed addresses, with explorer links." />
+          </Section>
+
+          <Section id="settlement" kicker="06" title="Settlement" intro="x402 version 2, exact scheme, on Hedera. The facilitator sponsors the network fee, so a paying agent needs USDC and no HBAR.">
+            <Code lang="402 response">{`{
+  "scheme":   "exact",
+  "network":  "hedera:testnet",
+  "amount":   "20000",
+  "asset":    "0.0.429274",
+  "payTo":    "0.0.…",
+  "extra":    { "feePayer": "0.0.7162784" }
+}`}</Code>
+            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, marginTop: 14 }}>
+              One check runs at the payment layer: the account an agent claims in{' '}
+              <code className="mono">x-agent</code> has to be the account that signed. Everything an
+              agent owns here is keyed to it, so without that check an agent could buy things into
+              someone else's name. The refusal happens after signing and before settlement, so it
+              costs nothing.
+            </p>
+          </Section>
+
+          <Section id="contracts" kicker="07" title="Contracts" intro="Three, on Hedera's EVM. Twenty-seven tests, run with npm run contracts:test.">
             <Table
-              head={['Limit', 'Consequence']}
+              head={['Contract', 'What it holds']}
               rows={[
-                ['Enforcement is per service', 'A warrant binds spending at the service that reads it. Two services each honouring a $1 cap can cost the owner $2. Caps across services need a shared ledger, which this does not have.'],
-                ['Spend is recorded locally', 'Receipts live in the service’s own database. They reference real Hedera transactions and can be checked against the ledger, but the tally itself is not on-chain.'],
-                ['The cap is a total, not a rate', 'A warrant can be spent to its ceiling in a second. It has no notion of per-hour or per-day.'],
-                ['One agent per warrant', 'Authorising a fleet means one warrant each. That is deliberate, since it is what makes payer binding meaningful, but it does mean issuing many documents.'],
+                ['AgentIdentity', 'One soulbound token per agent, plus its encryption key. Anyone may register; nobody may transfer.'],
+                ['ResourceMarket', 'Who sells what, at what price, and which URL to pay. Listing is permissionless.'],
+                ['AgentTreasury', 'The money and the ceilings. Draws are priced from the market, so the agent cannot inflate them.'],
               ]}
             />
           </Section>
-        </main>
-      </div>
 
+          <Section id="bounds" kicker="08" title="What this does not do" intro="The honest list. Each of these is a real bound, not a roadmap item dressed as one.">
+            <Table
+              head={['Bound', 'Why']}
+              rows={[
+                ['The limit binds draws, not the wallet', 'Once drawn, the float is the agent’s. Smaller tranches narrow the window; they do not close it.'],
+                ['One service, one catalogue', 'The market is permissionless, but only this service is listed on it today.'],
+                ['Memory is 4096 bytes', 'A permanent file is written in one transaction. Longer content has to be split and linked.'],
+                ['Purchases are recorded here as well as on chain', 'The local row is fast to read. Anything you need to trust, read from the chain.'],
+              ]}
+            />
+          </Section>
+        </div>
+      </main>
       <Footer />
-    </div>
+    </>
   );
 }
