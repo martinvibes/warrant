@@ -13,6 +13,7 @@
  */
 import "dotenv/config";
 import OpenAI from "openai";
+import { BaseError, ContractFunctionRevertedError } from "viem";
 import { config, moneyFor, type Offer } from "../config.js";
 import { keysFromEnv, payingFetch, Treasury, type AgentKeys } from "./wallet.js";
 import { kindForToolName, toolsFor, toolNameFor } from "./tools.js";
@@ -73,9 +74,8 @@ class Session {
       console.log(`  ${c.dim("DRAW")}    ${kind.padEnd(16)} ${c.dim(`${usdc(amount)} from the treasury`)}`);
       return { drawId };
     } catch (err) {
-      const message = (err as Error).message;
-      if (message.includes("not set")) return {};
-      return { refused: readable(message) };
+      if ((err as Error).message.includes("not set")) return {};
+      return { refused: readable(err) };
     }
   }
 
@@ -138,32 +138,46 @@ class Session {
 }
 
 /**
- * Turns a viem revert into the sentence the contract meant.
+ * Turns a revert into the sentence the contract meant.
  *
- * The custom errors carry the numbers that explain the refusal, and losing
- * them to a stack trace wastes the only useful thing about a failed draw.
+ * viem hands back the decoded name and arguments once the errors are in the
+ * ABI, so this reads those rather than scraping the exception's prose. The
+ * numbers are the whole value of a refusal: an agent told it hit a daily cap
+ * and when that cap reopens can stop and come back, where one told only that
+ * a transaction failed will retry forever.
  */
-function readable(message: string): string {
-  const named = /Error: ([A-Za-z]+)\((.*?)\)/s.exec(message);
-  if (!named) return message.split("\n")[0].slice(0, 200);
-  const [, name, args] = named;
-  const parts = args.split(",").map((a) => a.trim()).filter(Boolean);
+function readable(err: unknown): string {
+  const revert =
+    err instanceof BaseError
+      ? (err.walk((e) => e instanceof ContractFunctionRevertedError) as ContractFunctionRevertedError | null)
+      : null;
+  const name = revert?.data?.errorName;
+  const args = (revert?.data?.args ?? []) as readonly unknown[];
+
   switch (name) {
     case "WindowCapExceeded": {
-      const [wanted, left, reopens] = parts;
-      const when = reopens ? new Date(Number(reopens) * 1000).toISOString() : "the next window";
-      return `daily cap: wanted ${usdc(BigInt(wanted))}, ${usdc(BigInt(left))} left, reopens ${when}`;
+      const [wanted, left, reopens] = args as [bigint, bigint, bigint];
+      const when = new Date(Number(reopens) * 1000).toISOString().replace("T", " ").slice(0, 16);
+      return `daily cap reached. ${usdc(wanted)} wanted, ${usdc(left)} left, reopens ${when} UTC`;
     }
     case "TotalCapExceeded": {
-      const [wanted, left] = parts;
-      return `lifetime cap: wanted ${usdc(BigInt(wanted))}, ${usdc(BigInt(left))} left`;
+      const [wanted, left] = args as [bigint, bigint];
+      return `lifetime cap reached. ${usdc(wanted)} wanted, ${usdc(left)} left`;
     }
     case "KindNotAllowed":
-      return "this kind is not in the policy";
-    case "PolicyExpired":
-      return "the policy has expired";
+      return "this kind of purchase is not in the policy";
+    case "PolicyExpired": {
+      const [expiry] = args as [bigint];
+      return `the policy expired at ${new Date(Number(expiry) * 1000).toISOString().slice(0, 16)} UTC`;
+    }
     case "NoPolicy":
-      return "this agent has no policy";
+      return "this agent has no policy, so it may not spend at all";
+    case "InsufficientBalance": {
+      const [wanted, held] = args as [bigint, bigint];
+      return `the treasury holds ${usdc(held)} and ${usdc(wanted)} was asked for`;
+    }
+    case undefined:
+      return (err as Error).message.split("\n")[0].slice(0, 160);
     default:
       return name;
   }

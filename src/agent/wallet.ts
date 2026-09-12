@@ -26,6 +26,39 @@ import { privateKeyToAccount } from "viem/accounts";
 import { config } from "../config.js";
 
 export const TREASURY_ABI = [
+  // The custom errors matter as much as the functions here. Without them viem
+  // reports a bare four-byte selector, and the agent is told "something
+  // reverted" when the chain took the trouble to say which ceiling it hit and
+  // when that ceiling reopens.
+  {
+    type: "error",
+    name: "WindowCapExceeded",
+    inputs: [
+      { name: "wanted", type: "uint256" },
+      { name: "remaining", type: "uint256" },
+      { name: "resetsAt", type: "uint64" },
+    ],
+  },
+  {
+    type: "error",
+    name: "TotalCapExceeded",
+    inputs: [
+      { name: "wanted", type: "uint256" },
+      { name: "remaining", type: "uint256" },
+    ],
+  },
+  { type: "error", name: "KindNotAllowed", inputs: [{ name: "kind", type: "bytes32" }] },
+  { type: "error", name: "PolicyExpired", inputs: [{ name: "expiry", type: "uint64" }] },
+  { type: "error", name: "NoPolicy", inputs: [{ name: "agent", type: "address" }] },
+  { type: "error", name: "ListingInactive", inputs: [{ name: "listingId", type: "uint256" }] },
+  {
+    type: "error",
+    name: "InsufficientBalance",
+    inputs: [
+      { name: "wanted", type: "uint256" },
+      { name: "held", type: "uint256" },
+    ],
+  },
   {
     type: "function",
     name: "draw",

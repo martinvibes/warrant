@@ -222,7 +222,7 @@ contract AgentTreasury is ReentrancyGuard {
 
         Usage memory u = usageOf[msg.sender];
 
-        uint256 remainingTotal = uint256(p.totalCap) - u.drawnTotal;
+        uint256 remainingTotal = _headroom(p.totalCap, u.drawnTotal);
         if (amount > remainingTotal) revert TotalCapExceeded(amount, remainingTotal);
 
         if (p.windowCap != 0 && p.windowSeconds != 0) {
@@ -232,7 +232,7 @@ contract AgentTreasury is ReentrancyGuard {
                 u.windowStart = uint64(block.timestamp);
                 u.drawnWindow = 0;
             }
-            uint256 remainingWindow = uint256(p.windowCap) - u.drawnWindow;
+            uint256 remainingWindow = _headroom(p.windowCap, u.drawnWindow);
             if (amount > remainingWindow) {
                 revert WindowCapExceeded(amount, remainingWindow, u.windowStart + p.windowSeconds);
             }
@@ -265,6 +265,20 @@ contract AgentTreasury is ReentrancyGuard {
         emit Settled(drawId, msg.sender, settlementRef, amount);
     }
 
+
+    /**
+     * @dev What is left of a ceiling, floored at zero.
+     *
+     * An owner may lower a cap below what the agent has already drawn, which
+     * is the natural way to say "stop". Plain subtraction turns that into an
+     * arithmetic panic, which would take `remaining` down with it and leave
+     * the agent unable to read its own budget or receive an honest refusal.
+     * Nothing owes anyone money here, so the floor is zero.
+     */
+    function _headroom(uint128 cap, uint128 drawn) private pure returns (uint256) {
+        return drawn >= cap ? 0 : uint256(cap) - drawn;
+    }
+
     // --- reading -----------------------------------------------------------
 
     /**
@@ -280,7 +294,7 @@ contract AgentTreasury is ReentrancyGuard {
         if (!p.active) return (0, 0, 0);
 
         Usage memory u = usageOf[agent];
-        total_ = uint256(p.totalCap) - u.drawnTotal;
+        total_ = _headroom(p.totalCap, u.drawnTotal);
 
         if (p.windowCap == 0 || p.windowSeconds == 0) return (total_, total_, 0);
 
@@ -288,7 +302,7 @@ contract AgentTreasury is ReentrancyGuard {
             window_ = p.windowCap;
             windowResetsAt = uint64(block.timestamp) + p.windowSeconds;
         } else {
-            window_ = uint256(p.windowCap) - u.drawnWindow;
+            window_ = _headroom(p.windowCap, u.drawnWindow);
             windowResetsAt = u.windowStart + p.windowSeconds;
         }
         if (window_ > total_) window_ = total_;

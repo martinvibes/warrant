@@ -86,6 +86,40 @@ function usage(message: string): never {
   process.exit(1);
 }
 
+/**
+ * Sends a write and insists the chain actually accepted it.
+ *
+ * Two Hedera details make the naive version wrong. Its gas estimate is a floor
+ * rather than a forecast, and a rewrite that clears a previous allowlist costs
+ * more than the estimate allows, so the transaction lands as INSUFFICIENT_GAS.
+ * And a reverted transaction still produces a receipt, so waiting for one and
+ * reading no further reports success on a limit the chain refused to store.
+ * For a tool whose whole job is setting a ceiling, that is the worst possible
+ * way to be wrong.
+ */
+async function send(
+  pub: ReturnType<typeof createPublicClient>,
+  wallet: ReturnType<typeof createWalletClient>,
+  request: Parameters<typeof wallet.writeContract>[0],
+  what: string,
+): Promise<Hex> {
+  let gas: bigint | undefined;
+  try {
+    gas = (await pub.estimateContractGas(request as never)) * 2n;
+  } catch {
+    // Let the node pick if it will not estimate; the receipt check below is
+    // what actually protects us.
+  }
+  const hash = await wallet.writeContract({ ...request, gas } as never);
+  const receipt = await pub.waitForTransactionReceipt({ hash });
+  if (receipt.status !== "success") {
+    throw new Error(
+      `${what} was rejected by the chain. https://hashscan.io/${config.hederaNetwork}/transaction/${hash}`,
+    );
+  }
+  return hash;
+}
+
 async function main(): Promise<void> {
   const ownerKey = process.env.OWNER_PRIVATE_KEY as Hex | undefined;
   if (!ownerKey) usage("OWNER_PRIVATE_KEY is not set, so there is nobody to fund from.");
@@ -136,31 +170,35 @@ async function main(): Promise<void> {
     // Approve exactly what is about to move. An unlimited approval would let
     // the treasury pull the owner's whole balance later, which is a strange
     // thing to hand a contract whose job is to limit spending.
-    const approve = await wallet.writeContract({
-      address: asset,
-      abi: erc20Abi,
-      functionName: "approve",
-      args: [treasury, amount],
-    });
-    await pub.waitForTransactionReceipt({ hash: approve });
+    await send(
+      pub,
+      wallet,
+      { account, chain, address: asset, abi: erc20Abi, functionName: "approve", args: [treasury, amount] },
+      "The approval",
+    );
 
-    const funded = await wallet.writeContract({
-      address: treasury,
-      abi: TREASURY_ABI,
-      functionName: "fund",
-      args: [amount],
-    });
-    await pub.waitForTransactionReceipt({ hash: funded });
+    const funded = await send(
+      pub,
+      wallet,
+      { account, chain, address: treasury, abi: TREASURY_ABI, functionName: "fund", args: [amount] },
+      "The transfer into the treasury",
+    );
     console.log(`  funded    ${flag("amount")} USDC  ${funded}`);
   }
 
-  const policy = await wallet.writeContract({
-    address: treasury,
-    abi: TREASURY_ABI,
-    functionName: "setPolicy",
-    args: [agent, totalCap, windowCap, windowSeconds, expiry, kinds],
-  });
-  await pub.waitForTransactionReceipt({ hash: policy });
+  const policy = await send(
+    pub,
+    wallet,
+    {
+      account,
+      chain,
+      address: treasury,
+      abi: TREASURY_ABI,
+      functionName: "setPolicy",
+      args: [agent, totalCap, windowCap, windowSeconds, expiry, kinds],
+    },
+    "The policy",
+  );
 
   console.log(`  cap       ${capUsdc} USDC lifetime`);
   console.log(per ? `  window    ${flag("window") ?? capUsdc} USDC per ${per}` : "  window    none");

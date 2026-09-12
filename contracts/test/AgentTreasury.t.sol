@@ -223,4 +223,28 @@ contract AgentTreasuryTest is Test {
         );
         treasury.draw(emailId, 1);
     }
+
+    /**
+     * Lowering a cap under what is already spent is how an owner says stop.
+     * It has to read as a refusal, not as a panic that also takes `remaining`
+     * down and leaves the agent unable to learn why it was refused.
+     */
+    function test_lowering_a_cap_below_what_is_spent_refuses_rather_than_panics() public {
+        _allowInferenceOnly(uint128(5 * DOLLAR), uint128(DOLLAR), 1 days);
+
+        vm.prank(agent);
+        treasury.draw(inferenceId, 10); // twenty cents gone
+
+        _allowInferenceOnly(uint128(5 * DOLLAR), uint128(10 * CENT), 1 days);
+
+        (uint256 total_, uint256 window_,) = treasury.remaining(agent);
+        assertEq(window_, 0, "no headroom left inside the window");
+        assertGt(total_, 0, "the lifetime cap is untouched");
+
+        vm.prank(agent);
+        vm.expectRevert(
+            abi.encodeWithSelector(AgentTreasury.WindowCapExceeded.selector, 2 * CENT, 0, block.timestamp + 1 days)
+        );
+        treasury.draw(inferenceId, 1);
+    }
 }
