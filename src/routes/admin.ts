@@ -10,11 +10,18 @@ import {
   listReceipts,
   listRefusals,
   listWarrants,
+  rememberWarrant,
   revokeWarrant,
   spentUnder,
   type WarrantRow,
 } from "../store/db.js";
 import { verifyRevocation, type SignedRevocation } from "../warrant/revocation.js";
+import {
+  fromWire,
+  verifyWarrantSignature,
+  warrantId,
+  type SignedWarrant,
+} from "../warrant/warrant.js";
 
 export const admin = Router();
 
@@ -76,6 +83,68 @@ admin.get("/v1/warrants/:id", (req, res) => {
     return;
   }
   res.json({ warrant: present(row), receipts: listReceipts(row.id) });
+});
+
+/**
+ * Registers a warrant the owner has just signed.
+ *
+ * The gate already records any warrant an agent presents, so this endpoint
+ * grants nothing: it only lets the owner see a warrant in the console before
+ * the agent has spent against it. The gate re-checks the signature on every
+ * request regardless of what is stored here, so a warrant being present in
+ * this table is never itself an authorisation.
+ */
+admin.post("/v1/warrants", async (req, res) => {
+  const signed = req.body as SignedWarrant | undefined;
+  if (!signed?.signature || !signed.warrant) {
+    res.status(400).json({ error: "Post { warrant, signature } — a warrant is only a warrant once it is signed." });
+    return;
+  }
+
+  let w;
+  try {
+    w = fromWire(signed.warrant);
+  } catch (err) {
+    res.status(400).json({ error: `That warrant will not parse: ${(err as Error).message}` });
+    return;
+  }
+
+  const check = await verifyWarrantSignature(signed, config.network);
+  if (!check.ok) {
+    res.status(403).json({
+      error: `That signature does not belong to ${w.owner}. It recovers to ${check.recovered}.`,
+      code: "bad_signature",
+    });
+    return;
+  }
+
+  if (config.allowedOwners.length && !config.allowedOwners.some((o) => o.toLowerCase() === w.owner.toLowerCase())) {
+    res.status(403).json({
+      error: `This service does not accept warrants from ${w.owner}.`,
+      code: "unknown_owner",
+    });
+    return;
+  }
+
+  const id = warrantId(w, config.network);
+  rememberWarrant({
+    id,
+    owner: w.owner,
+    agent: w.agent,
+    asset: w.asset,
+    cap: w.cap.toString(),
+    resources: w.resources.join(","),
+    purpose: w.purpose,
+    expiry: Number(w.expiry),
+    nonce: w.nonce.toString(),
+    signature: signed.signature,
+    payload: JSON.stringify(signed.warrant),
+  });
+
+  res.status(201).json({
+    warrant: present(getWarrant(id)!),
+    header: Buffer.from(JSON.stringify(signed)).toString("base64"),
+  });
 });
 
 /**
