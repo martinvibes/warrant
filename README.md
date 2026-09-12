@@ -107,6 +107,24 @@ npm run dev                              # service and console on :8090
 cd contracts && ./setup.sh && forge test # 27 tests
 ```
 
+To see the limit work without spending anything, one command deploys the
+contracts to a local chain, funds an agent, lets it draw, and shows the chain
+refusing the next draw:
+
+```bash
+npm run demo:chain
+```
+
+```
+the agent draws for 50 inference calls, asking nobody
+  agent now holds 1000000 atomic USDC
+  remaining (lifetime, window): 4000000  0
+
+it tries once more, and the chain says no
+  WindowCapExceeded
+    wanted 20000 atomic, remaining 0, reopens at 2026-09-13T13:51:27+00:00
+```
+
 The agent needs a Hedera account holding testnet USDC. It does not need HBAR:
 the facilitator sponsors the network fee, so stablecoin is the only balance it
 carries.

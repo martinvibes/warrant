@@ -167,7 +167,14 @@ async function main(): Promise<void> {
   console.log(`  kinds     ${kinds.join(", ")}`);
   console.log(expiry > 0n ? `  expires   in ${expiryHours}h` : "  expires   never");
   console.log(`  policy    ${policy}`);
-  console.log(`\n  https://hashscan.io/${config.hederaNetwork}/transaction/${policy}\n`);
+  // A local chain has no explorer, and printing a HashScan link for a
+  // transaction that is not on Hedera would be a lie in the demo output.
+  const onHedera = config.chainId === 295 || config.chainId === 296;
+  console.log(
+    onHedera
+      ? `\n  https://hashscan.io/${config.hederaNetwork}/transaction/${policy}\n`
+      : `\n  chain ${config.chainId}, no explorer\n`,
+  );
 }
 
 main().catch((err) => {

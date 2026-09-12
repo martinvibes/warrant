@@ -164,8 +164,12 @@ export const config = {
   network,
   /** Short form the Hedera SDK and the mirror node want. */
   hederaNetwork: network === "hedera:mainnet" ? "mainnet" : "testnet",
-  /** EVM chain id of the same network, for the contracts. */
-  chainId: network === "hedera:mainnet" ? 295 : 296,
+  /**
+   * EVM chain id for the contracts. Overridable so the same code can be run
+   * against a local chain, which is how the on-chain flow is tested without
+   * spending testnet funds.
+   */
+  chainId: Number(process.env.EVM_CHAIN_ID ?? (network === "hedera:mainnet" ? 295 : 296)),
   jsonRpcUrl:
     process.env.HEDERA_JSON_RPC_URL ??
     (network === "hedera:mainnet" ? "https://mainnet.hashio.io/api" : "https://testnet.hashio.io/api"),
