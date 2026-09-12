@@ -29,3 +29,16 @@ generates and encrypts locally for machines that have no wallet installed.
 Nothing here touches a chain: signing a warrant costs no gas and creates no
 transaction, which is what lets an owner scope one tightly and withdraw it
 without thinking about cost.
+
+## Checks
+
+```
+npm run check:renders     # every page renders without throwing
+npm run check:signing     # needs the service running on :8090
+```
+
+`check:signing` is the one worth having. It signs a warrant and a revocation
+with the console's own code and posts both to a running service, which is the
+only way to catch a drift between the browser's typed-data definition and the
+server's. Field order, domain and the string-versus-bigint encoding all have to
+match exactly, and neither type system enforces that they do.

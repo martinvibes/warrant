@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:renders": "vite build --config scripts/vite.config.ts && node scripts/.out/renders.js",
+    "check:signing": "CHECK_ENTRY=scripts/signing.ts vite build --config scripts/vite.config.ts && node scripts/.out/signing.js"
   },
   "dependencies": {
     "ethers": "^6.16.0",
