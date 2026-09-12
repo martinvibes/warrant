@@ -16,6 +16,8 @@
  * without the extra step the service account needs.
  */
 import "dotenv/config";
+import fs from "node:fs";
+import path from "node:path";
 import {
   AccountCreateTransaction,
   AccountId,
@@ -71,14 +73,35 @@ async function main(): Promise<void> {
 
   console.log(`\n  created  ${accountId.toString()}`);
   console.log(`  evm      ${evmAddress}`);
-  console.log(`\n  Put these in .env:\n`);
-  console.log(`AGENT_HEDERA_ACCOUNT_ID=${accountId.toString()}`);
-  console.log(`AGENT_HEDERA_PRIVATE_KEY=${key.toStringRaw()}`);
-  console.log(`AGENT_EVM_PRIVATE_KEY=0x${key.toStringRaw()}`);
-  console.log(`\n  Then fund it with USDC at https://faucet.circle.com`);
+
+  // Written straight into .env rather than printed. A private key in terminal
+  // scrollback is a private key in every screen recording made afterwards, and
+  // this one is about to be in a demo.
+  const env = path.join(process.cwd(), ".env");
+  if (!fs.existsSync(env)) {
+    console.error(`\n  No .env to write to. Copy .env.example first.\n`);
+    process.exit(1);
+  }
+  const current = fs.readFileSync(env, "utf8");
+  const written = [
+    `AGENT_HEDERA_ACCOUNT_ID=${accountId.toString()}`,
+    `AGENT_HEDERA_PRIVATE_KEY=${key.toStringRaw()}`,
+    `AGENT_EVM_PRIVATE_KEY=0x${key.toStringRaw()}`,
+  ];
+  const names = written.map((l) => l.split("=")[0]);
+  const kept = current
+    .split("\n")
+    .filter((l) => !names.some((n) => l.startsWith(`${n}=`)));
+  fs.writeFileSync(
+    env,
+    `${kept.join("\n").trimEnd()}\n\n# --- The agent, created by \`npm run new-account\` ---------------------------\n${written.join("\n")}\n`,
+  );
+
+  console.log(`\n  wrote ${names.join(", ")} to .env`);
+  console.log(`  The key was not printed. It exists in .env and nowhere else.`);
+  console.log(`\n  Next: fund it with USDC at https://faucet.circle.com`);
   console.log(`  Pick Hedera testnet and paste ${accountId.toString()}.`);
   console.log(`\n  https://hashscan.io/${config.hederaNetwork}/account/${accountId.toString()}\n`);
-  console.log(`  This key is printed once and not stored. Save it now.\n`);
 
   client.close();
 }
