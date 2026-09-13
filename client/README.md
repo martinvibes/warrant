@@ -43,37 +43,45 @@ a memory that outlives the process. Every paid step is a real settlement on
 Hedera, and every resource is owned by the account that paid for it.
 
 ```bash
-# 0. The account that pays. It needs testnet USDC and nothing else —
+# 0. Install the CLI, and set the account that pays. It needs testnet USDC and
+#    nothing else —
 #    the facilitator sponsors the network fee, so no HBAR is required.
+npm i -g warrant-client
+
 export WARRANT_ACCOUNT_ID=0.0.10514332
 export WARRANT_PRIVATE_KEY=302e…            # DER or hex
 export WARRANT_AGENT_ADDRESS=0x7d14…33cC    # only identity.mint needs this
 
 # 1. See what is for sale, and what it costs. Free, and needs no key.
-npx warrant catalogue
+warrant catalogue
 
 # 2. Mint the agent's identity — soulbound ERC-721 on Hedera ($0.10)
-npx warrant buy identity.mint
+warrant buy identity.mint
 
 # 3. Claim an inbox it owns and receives replies at ($1.00)
-npx warrant buy email.inbox --name scout
+warrant buy email.inbox --name scout
 
 # 4. Send a real email from it ($0.20)
-npx warrant buy email.send --from scout@0gent.xyz --to you@example.com \
+warrant buy email.send --from scout@0gent.xyz --to you@example.com \
   --subject "Hello" --body "from the agent, paid for by the agent"
 
 # 5. Ask a model, paid per call ($0.02)
-npx warrant buy inference --prompt "What is Hedera in one sentence?"
+warrant buy inference --prompt "What is Hedera in one sentence?"
 
 # 6. Write something it will still know tomorrow ($0.05)
-npx warrant buy memory.write --content "the peer at 0x7510 answers on scout@0gent.xyz"
+warrant buy memory.write --content "the peer at 0x7510 answers on scout@0gent.xyz"
 
 # 7. Search real phone inventory (free — an agent that cannot see the price
 #    before it commits is not choosing)
-npx warrant read '/v1/phone/search?country=US&area=415'
+warrant read '/v1/phone/search?country=US&area=415'
 ```
 
-Install it globally for a shorter line: `npm i -g warrant-client && warrant catalogue`.
+Without installing, put the package name in front, because the command is
+`warrant` and the package is `warrant-client`:
+
+```bash
+npx --package warrant-client warrant catalogue
+```
 
 ## In code
 
