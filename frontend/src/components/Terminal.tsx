@@ -141,7 +141,7 @@ export function Terminal() {
   }, []);
 
   return (
-    <section style={{ padding: '110px 24px', borderTop: '1px solid var(--color-line)' }}>
+    <section style={{ padding: '112px 24px', borderTop: '1px solid var(--color-line)' }}>
       <div style={{ maxWidth: 980, margin: '0 auto' }} ref={host}>
         <header style={{ marginBottom: 36, maxWidth: 620 }}>
           <span className="label" style={{ color: 'var(--color-accent)' }}>

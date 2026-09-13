@@ -29,7 +29,11 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  /* An anchor should land below the floating pill, not under it. */
+  scroll-padding-top: 104px;
+}
 
 body {
   background: #070707;
@@ -580,4 +584,61 @@ body::after {
 
   /* Buttons span the row at very small sizes */
   .hero-buttons a, .final-cta a { width: 100%; justify-content: center; }
+}
+
+/* ─── Docs sidebar ─────────────────────────────────────────────────────────
+   The reference is one long page on purpose, which makes a standing index the
+   difference between reading it and searching it. */
+.docs-split {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: 52px;
+  align-items: start;
+}
+
+.docs-side {
+  position: sticky;
+  top: 104px;
+  display: grid;
+  gap: 2px;
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
+  padding-bottom: 8px;
+}
+
+.docs-side a {
+  display: flex;
+  gap: 11px;
+  align-items: baseline;
+  padding: 7px 12px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--color-muted);
+  border-left: 2px solid transparent;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+.docs-side a:hover { color: var(--color-text); background: var(--color-surface); }
+.docs-side a[data-active='true'] {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border-left-color: var(--color-accent);
+}
+.docs-side-n { font-size: 11px; color: var(--color-accent); flex-shrink: 0; }
+.docs-side a[data-active='true'] .docs-side-n { color: var(--color-accent-light); }
+
+/* Under the split the index becomes a rail above the text, still usable. */
+@media (max-width: 940px) {
+  .docs-split { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .docs-side {
+    position: static;
+    max-height: none;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .docs-side > .label { display: none; }
+  .docs-side a { border-left: none; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .docs-side a[data-active='true'] { border-bottom-color: var(--color-accent); background: transparent; }
 }

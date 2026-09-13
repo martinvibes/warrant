@@ -63,7 +63,7 @@ export function HowItWorks() {
       id="how-it-works"
       ref={sectionRef as any}
       className="section-pad"
-      style={{ padding: '120px 0', position: 'relative', overflow: 'hidden' }}
+      style={{ padding: '112px 0', position: 'relative', overflow: 'hidden' }}
     >
       {/* CSS keyframes scoped to this component */}
       <style>{`
@@ -112,9 +112,8 @@ export function HowItWorks() {
           transitionDelay: '120ms',
         }}>
           <span>
-            The order is the design. Asking whether a purchase is authorised costs nothing, so
-            it happens before the agent is asked to pay. Checking who paid needs a signature,
-            so it happens after one and before the money moves.
+            Asking whether a purchase is authorised costs nothing, so it happens first. Checking who
+            paid needs a signature, so it happens last.
           </span>
           <button
             type="button"

@@ -134,23 +134,65 @@ function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
 // ─── page ────────────────────────────────────────────────────────────
 
 const NAV: [string, string, string][] = [
-  ['01', 'Quick start', '#quick-start'],
-  ['02', 'What is for sale', '#catalogue'],
-  ['03', 'The limit', '#limit'],
-  ['04', 'Sealed mail', '#sealed'],
-  ['05', 'HTTP API', '#api'],
-  ['06', 'Settlement', '#settlement'],
-  ['07', 'Contracts', '#contracts'],
-  ['08', 'What this does not do', '#bounds'],
+  ['01', 'Quick start', 'quick-start'],
+  ['02', 'What is for sale', 'catalogue'],
+  ['03', 'The limit', 'limit'],
+  ['04', 'Sealed mail', 'sealed'],
+  ['05', 'HTTP API', 'api'],
+  ['06', 'Receipts', 'receipts'],
+  ['07', 'Settlement', 'settlement'],
+  ['08', 'Contracts', 'contracts'],
+  ['09', 'What this does not do', 'bounds'],
 ];
 
+/**
+ * Which section the reader is in.
+ *
+ * Reported from the section nearest the top of the viewport rather than from
+ * whatever is merely intersecting, because several sections are on screen at
+ * once and only one of them is the one being read.
+ */
+function useActiveSection(ids: string[]): string {
+  const [active, setActive] = useState(ids[0]);
+
+  useEffect(() => {
+    let frame = 0;
+    const measure = () => {
+      frame = 0;
+      let current = ids[0];
+      for (const id of ids) {
+        const node = document.getElementById(id);
+        if (node && node.getBoundingClientRect().top <= 140) current = id;
+      }
+      setActive(current);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [ids]);
+
+  return active;
+}
+
+const SECTION_IDS = NAV.map(([, , id]) => id);
+
 export function Docs() {
+  const active = useActiveSection(SECTION_IDS);
+
   return (
     <>
       <Nav />
       <main style={{ background: BG_PAGE, color: TEXT, minHeight: '100vh' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '120px 24px 80px', display: 'grid', gap: 48, gridTemplateColumns: 'minmax(0, 1fr)' }}>
-          <header style={{ maxWidth: 720 }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto', padding: '120px 24px 80px' }}>
+          <header style={{ maxWidth: 720, marginBottom: 8 }}>
             <div className="label" style={{ color: BRASS, marginBottom: 14 }}>Documentation</div>
             <h1 className="display" style={{ fontSize: 'clamp(34px, 5vw, 50px)', lineHeight: 1.1, marginBottom: 18 }}>
               Buying things with an agent.
@@ -160,16 +202,22 @@ export function Docs() {
               USDC on Hedera. There is no account to open and no key to apply for. An agent that can
               pay can buy, and the only thing that stops it is a limit enforced by a contract.
             </p>
-            <nav style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 28 }}>
-              {NAV.map(([n, title, href]) => (
-                <a key={href} href={href} className="label" style={{ padding: '6px 12px', border: `1px solid ${BORDER}`, color: TEXT_FAINT }}>
-                  <span style={{ color: BRASS, marginRight: 8 }}>{n}</span>
+          </header>
+
+          <div className="docs-split">
+            <aside className="docs-side" aria-label="Sections">
+              <div className="label" style={{ color: TEXT_GHOST, padding: '0 12px 10px' }}>
+                On this page
+              </div>
+              {NAV.map(([n, title, id]) => (
+                <a key={id} href={`#${id}`} data-active={active === id}>
+                  <span className="mono docs-side-n">{n}</span>
                   {title}
                 </a>
               ))}
-            </nav>
-          </header>
+            </aside>
 
+            <div className="docs-body">
           <Section
             id="quick-start"
             kicker="01"
@@ -347,6 +395,8 @@ draw(listingId, calls) -> (drawId, amount)
               ]}
             />
           </Section>
+            </div>
+          </div>
         </div>
       </main>
       <Footer />

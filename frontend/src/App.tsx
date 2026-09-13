@@ -11,7 +11,6 @@ import { Docs } from './components/Docs';
 import { Ledger } from './components/Ledger';
 import { Resources } from './components/Resources';
 import { NumberSearch } from './components/NumberSearch';
-import { Upcoming } from './components/Upcoming';
 import { NotFound } from './components/NotFound';
 
 function App() {
@@ -46,7 +45,6 @@ function App() {
         <div className="reveal"><Limits /></div>
         <div className="reveal"><HowItWorks /></div>
         <div className="reveal"><Settlement /></div>
-        <div className="reveal"><Upcoming /></div>
         <Footer />
       </>
     );

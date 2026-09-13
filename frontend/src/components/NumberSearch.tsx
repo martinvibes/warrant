@@ -47,7 +47,7 @@ export function NumberSearch() {
   return (
     <section
       id="numbers"
-      style={{ padding: '96px 24px', borderTop: '1px solid var(--color-line)' }}
+      style={{ padding: '112px 24px', borderTop: '1px solid var(--color-line)' }}
     >
       <div style={{ maxWidth: 1180, margin: '0 auto' }}>
         <header style={{ marginBottom: 34, maxWidth: 660 }}>
@@ -58,8 +58,8 @@ export function NumberSearch() {
             Numbers an agent can buy right now.
           </h2>
           <p style={{ marginTop: 14, fontSize: 15, lineHeight: 1.7, color: 'var(--color-dim)' }}>
-            Searching costs nothing, here and for the agent. Ordering one is the paid call, and the
-            number ordered is the number that was quoted rather than whatever a second search returns.
+            Searching is free, here and for the agent. The number it orders is the number it was
+            quoted, not whatever a second search returns.
           </p>
         </header>
 

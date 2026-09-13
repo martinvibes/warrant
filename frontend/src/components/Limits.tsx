@@ -59,7 +59,7 @@ function Cell({ children, tone }: { children: React.ReactNode; tone: 'usual' | '
 
 export function Limits() {
   return (
-    <section id="limits" style={{ padding: '110px 24px', borderTop: '1px solid var(--color-line)' }}>
+    <section id="limits" style={{ padding: '112px 24px', borderTop: '1px solid var(--color-line)' }}>
       <div style={{ maxWidth: 1080, margin: '0 auto' }}>
         <header style={{ marginBottom: 44, maxWidth: 660 }}>
           <span className="label" style={{ color: 'var(--color-accent)' }}>
@@ -70,8 +70,7 @@ export function Limits() {
           </h2>
           <p style={{ marginTop: 16, fontSize: 15.5, lineHeight: 1.7, color: 'var(--color-dim)' }}>
             Fund an agent directly and its limit becomes a suggestion, because the agent holds the
-            keys. Keeping the balance one step away makes the limit real without putting a person in
-            the loop.
+            keys. Keeping the balance one step away makes it real.
           </p>
         </header>
 

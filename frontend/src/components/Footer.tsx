@@ -21,8 +21,8 @@ export function Footer() {
           Authorise the purchase, not the wallet
         </h2>
         <p style={{ fontSize: 17, color: 'rgba(247,246,243,0.5)', maxWidth: 520, margin: '0 auto 36px', lineHeight: 1.75, padding: '0 24px' }}>
-          Give an agent a budget, walk away, and read back exactly what it bought and what it was
-          stopped from buying. Signing costs nothing and revoking costs nothing.
+          Give an agent a budget, walk away, and read back what it bought and what it was stopped
+          from buying.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', padding: '0 24px' }}>
           <a
@@ -64,7 +64,6 @@ export function Footer() {
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
             {[
               ['Ledger', '/ledger', false],
-              ['Docs', '/docs', false],
               ['Docs', '/docs', false],
               ['GitHub', REPO_URL, true],
               ['x402', 'https://x402.org', true],

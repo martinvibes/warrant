@@ -32,7 +32,14 @@ function Figure({ value, label }: { value: number; label: string }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <span
         className="mono"
-        style={{ fontSize: 26, color: 'var(--color-accent-light)', fontVariantNumeric: 'tabular-nums' }}
+        style={{
+          fontSize: 36,
+          fontWeight: 600,
+          lineHeight: 1,
+          letterSpacing: '-0.03em',
+          color: 'var(--color-accent-light)',
+          fontVariantNumeric: 'tabular-nums',
+        }}
       >
         {Math.round(shown)}
       </span>

@@ -46,25 +46,25 @@ interface Item {
 const items: Item[] = [
   {
     title: 'x402, pay per request',
-    desc: 'An HTTP 402 carries the terms, the agent signs a transfer, the request is retried with proof. No API key, no account, no invoice at the end of the month.',
+    desc: 'A 402 carries the terms, the agent signs a transfer, the request is retried with proof. No API key, no account, no invoice.',
     detail: '@x402/express · @x402/hedera',
     icon: ProtocolIcon,
   },
   {
     title: 'Hedera, final in seconds',
-    desc: 'USDC as a native token with fixed, fractions-of-a-cent fees and consensus finality in seconds. A $0.05 purchase is only worth making where the fee is not the purchase.',
+    desc: 'Native USDC, fees in fractions of a cent, finality in seconds. A five-cent purchase only makes sense where the fee is not the purchase.',
     detail: 'hedera:testnet · USDC 0.0.429274',
     icon: LedgerIcon,
   },
   {
     title: 'The fee is sponsored',
-    desc: 'The facilitator pays the network fee, so a paying agent needs stablecoin and nothing else. One funded asset instead of two is the difference between an agent that can pay and one that gets stuck.',
+    desc: 'The facilitator pays the network fee, so a paying agent holds stablecoin and nothing else. One funded asset instead of two.',
     detail: 'Blocky402 facilitator · feePayer 0.0.7162784',
     icon: SponsorIcon,
   },
   {
     title: 'Receipts, not log lines',
-    desc: 'Settlement writes a row binding the agent, what it bought, the amount and the transaction id. That row is what turns a balance that went down into a purchase somebody can explain.',
+    desc: 'Settlement signs a row binding the buyer, the resource, the amount and the transaction. Anyone can check one.',
     detail: 'GET /v1/receipts',
     icon: ReceiptIcon,
   },
@@ -72,7 +72,7 @@ const items: Item[] = [
 
 export function Settlement() {
   return (
-    <section id="settlement" className="section-pad" style={{ padding: '120px 0', borderTop: '1px solid rgba(232,181,92,0.1)', position: 'relative', overflow: 'hidden' }}>
+    <section id="settlement" className="section-pad" style={{ padding: '112px 0', borderTop: '1px solid rgba(232,181,92,0.1)', position: 'relative', overflow: 'hidden' }}>
       {/* subtle decorative grid in the background */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
@@ -97,9 +97,8 @@ export function Settlement() {
           Small enough payments to be worth refusing
         </h2>
         <p className="reveal-up" style={{ fontSize: 16, color: 'rgba(247,246,243,0.5)', maxWidth: 540, margin: '0 auto 56px', lineHeight: 1.7 }}>
-          Per-call buying is only interesting where the purchases are small and frequent. That needs a
-          rail where five cents is a sensible amount to move, and a protocol where the price
-          travels with the request rather than through a billing relationship.
+          Per-call buying needs a rail where five cents is a sensible amount to move, and a protocol
+          where the price travels with the request.
         </p>
 
         <div className="settle-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, textAlign: 'left' }}>
@@ -137,13 +136,6 @@ export function Settlement() {
                 color: '#E8B55C',
                 borderRadius: 10,
               }}>{it.icon}</div>
-
-              <div style={{
-                fontSize: 10, letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'rgba(247,246,243,0.3)',
-                marginBottom: 10, fontWeight: 500,
-              }}>Layer</div>
 
               <h3 style={{
                 fontSize: 18, fontWeight: 600,
