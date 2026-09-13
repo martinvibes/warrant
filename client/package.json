@@ -1,6 +1,6 @@
 {
   "name": "warrant-client",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Buy resources for an AI agent over x402 on Hedera: a name, an inbox, a phone number, inference and permanent memory, one call at a time.",
   "keywords": [
     "x402",

@@ -156,6 +156,8 @@ async function fund(): Promise<void> {
   if (!known.accountId) {
     heading("Funding", "an address becomes an account on its first transfer");
     field("address", text(address!));
+    field("explorer", link(wallet.explorer(address!)));
+    note("               (empty until the first transfer lands)");
     out();
     out(await qr(address!));
     step("01", `Send testnet HBAR to that address: ${link(wallet.HBAR_FAUCET)}`);
