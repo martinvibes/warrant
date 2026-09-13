@@ -18,6 +18,11 @@ async function main(): Promise<void> {
   assertServerConfig();
 
   const app = express();
+
+  // Behind Railway's proxy, so the payment challenge names the https URL a
+  // caller actually reached rather than the http one the proxy used inside.
+  app.set("trust proxy", true);
+
   app.use(express.json({ limit: "256kb" }));
 
   // The console is a browser client of this same API, so it needs the header
