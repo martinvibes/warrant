@@ -14,7 +14,7 @@
  */
 import { Warrant, WarrantError, DEFAULT_BASE_URL, type Offer } from "./index.js";
 import * as wallet from "./wallet.js";
-import { bad, bold, brass, dim, field, green, heading, light, link, note, ok, out, red, step, table, text } from "./ui.js";
+import { bad, bold, brass, dim, field, green, heading, light, link, note, ok, out, qr, red, step, table, text } from "./ui.js";
 
 function usage(): void {
   heading("warrant", "resources an agent buys, under a limit it cannot exceed");
@@ -133,9 +133,11 @@ function createAgent(): void {
   field("address", text(agent.address));
   field("public key", dim(agent.publicKey));
   field("private key", dim(`kept in ${path}, readable only by you`));
+  field("explorer", link(wallet.explorer(agent.address)));
   out();
-  out(`  ${dim("The account does not exist on Hedera yet. Funding the address is what")}`);
-  out(`  ${dim("creates it, so the next step is the only step:")}`);
+  out(`  ${dim("The account does not exist on Hedera yet: an address becomes an account")}`);
+  out(`  ${dim("the moment the first transfer reaches it. That is the next step, and the")}`);
+  out(`  ${dim("only one.")}`);
   out();
   out(`  ${light("warrant fund")}`);
   out();
@@ -146,45 +148,87 @@ async function fund(): Promise<void> {
   const address = process.env.WARRANT_AGENT_ADDRESS ?? agent?.address;
   if (!address) fail(`No agent yet. Run ${light("warrant create")} first.`);
 
-  heading("Funding", "testnet USDC is the only balance an agent needs");
-  field("address", text(address!));
-  out();
-  step("01", `Get testnet USDC on Hedera: ${link(wallet.USDC_FAUCET)}`);
-  note(`     Choose Hedera Testnet, and paste the address above.`);
-  step("02", `HBAR, only if you want to deploy or transact yourself: ${link(wallet.HBAR_FAUCET)}`);
-  note(`     Buying through Warrant needs none — the facilitator sponsors the fee.`);
-  out();
+  const known = await wallet.lookup(address!);
 
-  const watch = !process.argv.includes("--once");
-  process.stdout.write(`  ${dim(watch ? "Watching for the first transfer" : "Checking")}`);
-  const deadline = Date.now() + (watch ? 10 * 60_000 : 0);
-
-  for (;;) {
-    const { accountId, usdc, hbar } = await wallet.lookup(address!);
-    if (accountId) {
-      out("\n");
-      ok(`Account ${bold(text(accountId))} exists on Hedera.`);
-      field("USDC", `${light(`$${usdc}`)}`);
-      if (hbar) field("HBAR", dim(hbar));
-      if (agent && agent.accountId !== accountId) wallet.save({ ...agent, accountId });
-      out();
-      if (usdc === "0.00") {
-        note(`The account is live but holds no USDC yet. Top it up at ${link(wallet.USDC_FAUCET)}.`);
-      } else {
-        note(`Ready. Try ${light("warrant buy inference --prompt \"hello\"")}.`);
-      }
+  // Two different problems, so two different screens. Before the account
+  // exists there is no account id to give Circle, and HBAR is what brings it
+  // into being. After it exists, the id is the thing every faucet asks for.
+  if (!known.accountId) {
+    heading("Funding", "an address becomes an account on its first transfer");
+    field("address", text(address!));
+    out();
+    out(await qr(address!));
+    step("01", `Send testnet HBAR to that address: ${link(wallet.HBAR_FAUCET)}`);
+    note("     It accepts an EVM address, and the transfer is what creates the");
+    note("     account. Hedera then gives you the 0.0.x id every faucet asks for.");
+    out();
+    note("Scan the code above to paste the address on a phone.");
+  } else {
+    heading("Funding", `account ${known.accountId}`);
+    field("account", bold(text(known.accountId)));
+    field("address", dim(address!));
+    field("USDC", light(`$${known.usdc}`));
+    if (known.hbar) field("HBAR", dim(known.hbar));
+    field("explorer", link(wallet.explorer(known.accountId)));
+    out();
+    out(await qr(known.accountId));
+    step("01", `Get testnet USDC: ${link(wallet.USDC_FAUCET)}`);
+    note(`     Choose ${bold("Hedera Testnet")} and paste ${bold(known.accountId)} — Circle asks for`);
+    note("     the account id, not the 0x address.");
+    step("02", `More HBAR, if you want to deploy or transact yourself: ${link(wallet.HBAR_FAUCET)}`);
+    note("     Buying through Warrant needs none: the facilitator sponsors the fee.");
+    out();
+    if (known.usdc !== "0.00") {
+      ok(`Funded. Try ${light('warrant buy inference --prompt "hello"')}.`);
       out();
       return;
     }
+  }
+
+  out();
+  const watch = !process.argv.includes("--once");
+  if (!watch) {
+    note("Run warrant fund again once the transfer has landed.");
+    out();
+    return;
+  }
+
+  process.stdout.write(`  ${dim(known.accountId ? "Watching for USDC" : "Watching for the first transfer")}`);
+  const deadline = Date.now() + 10 * 60_000;
+
+  for (;;) {
+    await new Promise((r) => setTimeout(r, 5000));
+    const now = await wallet.lookup(address!);
+
+    if (now.accountId && !known.accountId) {
+      out("\n");
+      ok(`Account ${bold(text(now.accountId))} now exists.`);
+      if (agent) wallet.save({ ...agent, accountId: now.accountId });
+      field("explorer", link(wallet.explorer(now.accountId)));
+      out();
+      note(`Now get USDC for it: ${link(wallet.USDC_FAUCET)} — paste ${bold(now.accountId)}.`);
+      out();
+      out(await qr(now.accountId));
+      return;
+    }
+
+    if (now.accountId && now.usdc !== "0.00") {
+      out("\n");
+      ok(`${bold(light(`$${now.usdc} USDC`))} arrived in ${text(now.accountId)}.`);
+      if (agent && agent.accountId !== now.accountId) wallet.save({ ...agent, accountId: now.accountId });
+      out();
+      note(`Ready. Try ${light('warrant buy inference --prompt "hello"')}.`);
+      out();
+      return;
+    }
+
     if (Date.now() >= deadline) {
       out("\n");
-      note("Nothing has arrived yet. The account appears the moment the first transfer lands.");
-      note(`Run ${light("warrant fund")} again to keep watching.`);
+      note("Nothing yet. Run warrant fund again to keep watching.");
       out();
       return;
     }
     process.stdout.write(dim("."));
-    await new Promise((r) => setTimeout(r, 5000));
   }
 }
 
@@ -207,6 +251,8 @@ async function status(): Promise<void> {
   field("spent", `${light(money(agent.spent ?? 0))} ${dim(`over ${agent.purchases} purchases`)}`);
   if (agent.inboxes?.length) field("inbox", text(agent.inboxes.map((i) => i.address).join(", ")));
   if (agent.numbers?.length) field("number", text(agent.numbers.map((n) => n.phoneNumber).join(", ")));
+  out();
+  field("explorer", link(wallet.explorer(accountId!)));
   out();
   note(`The whole ledger is public: ${link(`${base()}/v1/receipts`)}`);
   out();

@@ -80,3 +80,18 @@ export function table(rows: string[][], align: ("left" | "right")[] = []): void 
     );
   }
 }
+
+/**
+ * A QR of one string, for funding from a phone.
+ *
+ * A faucet is usually open on a laptop and a wallet is usually on a phone, and
+ * retyping a 42-character address between the two is where mistakes live.
+ */
+export function qr(value: string): Promise<string> {
+  return import("qrcode-terminal").then(
+    (mod) =>
+      new Promise<string>((resolve) => {
+        mod.default.generate(value, { small: true }, (out) => resolve(out));
+      }),
+  );
+}

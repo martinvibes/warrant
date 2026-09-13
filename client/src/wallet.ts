@@ -18,6 +18,12 @@ export const MIRROR = "https://testnet.mirrornode.hedera.com";
 export const USDC = "0.0.429274";
 export const HBAR_FAUCET = "https://portal.hedera.com/faucet";
 export const USDC_FAUCET = "https://faucet.circle.com";
+export const HASHSCAN = "https://hashscan.io/testnet";
+
+/** Where to look one of these up, by account id or by EVM address. */
+export function explorer(idOrAddress: string): string {
+  return idOrAddress.startsWith("0x") ? `${HASHSCAN}/account/${idOrAddress}` : `${HASHSCAN}/account/${idOrAddress}`;
+}
 
 export interface Agent {
   privateKey: string;

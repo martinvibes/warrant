@@ -153,14 +153,20 @@ be honoured.
 
 ### Where the faucets are
 
-| | |
-|---|---|
-| USDC on Hedera testnet | [faucet.circle.com](https://faucet.circle.com) — choose **Hedera Testnet** and paste the address from `warrant create` |
-| HBAR | [portal.hedera.com/faucet](https://portal.hedera.com/faucet) — only if you want to deploy or transact yourself; buying through Warrant needs none |
+An address becomes an *account* on Hedera the moment the first transfer reaches
+it, and only then does it have the `0.0.x` id that faucets ask for. So funding a
+brand-new agent is two steps, and `warrant fund` walks you through both — with a
+QR code, because the faucet is usually on a laptop and the wallet on a phone.
 
-An account on Hedera comes into existence when the first transfer reaches its
-EVM address, so funding the address is what creates the account. `warrant fund`
-watches the mirror node and tells you the moment it exists.
+| Step | Where | What you paste |
+|---|---|---|
+| **1. Create the account** | [portal.hedera.com/faucet](https://portal.hedera.com/faucet) | The `0x…` address from `warrant create`. The HBAR transfer is what brings the account into existence and gives it its `0.0.x` id. |
+| **2. Get USDC** | [faucet.circle.com](https://faucet.circle.com) | The `0.0.x` **account id**, not the `0x` address — choose **Hedera Testnet**. |
+
+Run `warrant fund` again after step 1 and it picks up the new account id, shows
+it with a HashScan link and a fresh QR, and then watches for the USDC to land.
+Buying through Warrant needs no HBAR at all after that: the facilitator sponsors
+the network fee.
 
 ## How payment works
 
