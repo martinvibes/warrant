@@ -49,9 +49,10 @@ npm i -g warrant-client
 #    it lands in ~/.warrant/agent.json, readable only by you.
 warrant create
 
-# 2. Fund it. Testnet USDC is the only balance an agent needs — the
-#    facilitator sponsors the network fee, so no HBAR is required.
-#    Prints the faucet links and then watches for the first transfer.
+# 2. Fund it. Prints a QR and walks both steps: HBAR at the Hedera faucet,
+#    whose transfer creates the account and gives it its 0.0.x id, then USDC
+#    at Circle's, which asks for that id. Watches until the money lands.
+#    After this, buying needs no HBAR: the facilitator sponsors the fee.
 warrant fund
 
 # 3. See what is for sale, and what it costs. Free, and needs no key.
