@@ -43,36 +43,41 @@ a memory that outlives the process. Every paid step is a real settlement on
 Hedera, and every resource is owned by the account that paid for it.
 
 ```bash
-# 0. Install the CLI, and set the account that pays. It needs testnet USDC and
-#    nothing else —
-#    the facilitator sponsors the network fee, so no HBAR is required.
 npm i -g warrant-client
 
-export WARRANT_ACCOUNT_ID=0.0.10514332
-export WARRANT_PRIVATE_KEY=302e…            # DER or hex
-export WARRANT_AGENT_ADDRESS=0x7d14…33cC    # only identity.mint needs this
+# 1. Make an agent. The key is generated on your machine and sent nowhere;
+#    it lands in ~/.warrant/agent.json, readable only by you.
+warrant create
 
-# 1. See what is for sale, and what it costs. Free, and needs no key.
+# 2. Fund it. Testnet USDC is the only balance an agent needs — the
+#    facilitator sponsors the network fee, so no HBAR is required.
+#    Prints the faucet links and then watches for the first transfer.
+warrant fund
+
+# 3. See what is for sale, and what it costs. Free, and needs no key.
 warrant catalogue
 
-# 2. Mint the agent's identity — soulbound ERC-721 on Hedera ($0.10)
+# 4. Mint the agent's identity — soulbound ERC-721 on Hedera ($0.10)
 warrant buy identity.mint
 
-# 3. Claim an inbox it owns and receives replies at ($1.00)
+# 5. Claim an inbox it owns and receives replies at ($1.00)
 warrant buy email.inbox --name scout
 
-# 4. Send a real email from it ($0.20)
+# 6. Send a real email from it ($0.20)
 warrant buy email.send --from scout@0gent.xyz --to you@example.com \
   --subject "Hello" --body "from the agent, paid for by the agent"
 
-# 5. Ask a model, paid per call ($0.02)
+# 7. Ask a model, paid per call ($0.02)
 warrant buy inference --prompt "What is Hedera in one sentence?"
 
-# 6. Write something it will still know tomorrow ($0.05)
+# 8. Write something it will still know tomorrow ($0.05)
 warrant buy memory.write --content "the peer at 0x7510 answers on scout@0gent.xyz"
 
-# 7. Search real phone inventory (free — an agent that cannot see the price
-#    before it commits is not choosing)
+# 9. Check what it owns and what it has spent
+warrant status
+
+# 10. Search real phone inventory (free — an agent that cannot see the price
+#     before it commits is not choosing)
 warrant read '/v1/phone/search?country=US&area=415'
 ```
 
@@ -116,6 +121,9 @@ subscriptions, no minimum. Flags become the JSON body: `--prompt hello` is
 
 | Command | Cost | Notes |
 |---|---|---|
+| `warrant create` | free | Generates a secp256k1 key locally and saves it to `~/.warrant/agent.json` (mode 600). Nothing is sent anywhere. `--force` makes another. |
+| `warrant fund` | free | Prints the faucet links, then watches the mirror node until the first transfer lands and the account exists. `--once` to check and exit. |
+| `warrant status` | free | Balance, spend, and what this agent owns. |
 | `warrant catalogue` | free | What is for sale and the live price. The same table the server charges against. |
 | `warrant read /v1/receipts` | free | Every settled purchase, signed. Add `?limit=3`. |
 | `warrant read /v1/purchases` | free | The public ledger, including what was refused. |
@@ -142,6 +150,17 @@ subscriptions, no minimum. Flags become the JSON body: `--prompt hello` is
 Nothing is listed as coming soon. An offer whose provider is not configured is
 not shown and not sold, so the catalogue never advertises a price that will not
 be honoured.
+
+### Where the faucets are
+
+| | |
+|---|---|
+| USDC on Hedera testnet | [faucet.circle.com](https://faucet.circle.com) — choose **Hedera Testnet** and paste the address from `warrant create` |
+| HBAR | [portal.hedera.com/faucet](https://portal.hedera.com/faucet) — only if you want to deploy or transact yourself; buying through Warrant needs none |
+
+An account on Hedera comes into existence when the first transfer reaches its
+EVM address, so funding the address is what creates the account. `warrant fund`
+watches the mirror node and tells you the moment it exists.
 
 ## How payment works
 
@@ -235,8 +254,11 @@ repeat.
 
 ### Environment
 
+`warrant create` saves these for you, so set them only to override it.
+
 | Variable | What it is |
 |---|---|
+| `WARRANT_WALLET` | Where the key lives. Defaults to `~/.warrant/agent.json`. |
 | `WARRANT_ACCOUNT_ID` | The Hedera account paying, e.g. `0.0.10514332`. |
 | `WARRANT_PRIVATE_KEY` | Its private key, DER or hex. Read it from the environment; never commit it. |
 | `WARRANT_AGENT_ADDRESS` | The agent's EVM address. Only `identity.mint` needs it. |

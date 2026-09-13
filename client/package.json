@@ -1,25 +1,51 @@
 {
   "name": "warrant-client",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Buy resources for an AI agent over x402 on Hedera: a name, an inbox, a phone number, inference and permanent memory, one call at a time.",
-  "keywords": ["x402", "agent", "hedera", "usdc", "pay-per-call", "ai-agent", "402"],
+  "keywords": [
+    "x402",
+    "agent",
+    "hedera",
+    "usdc",
+    "pay-per-call",
+    "ai-agent",
+    "402"
+  ],
   "license": "MIT",
   "author": "martinvibes",
   "homepage": "https://github.com/martinvibes/warrant#readme",
-  "repository": { "type": "git", "url": "git+https://github.com/martinvibes/warrant.git", "directory": "client" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martinvibes/warrant.git",
+    "directory": "client"
+  },
   "bugs": "https://github.com/martinvibes/warrant/issues",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
-  "bin": { "warrant": "dist/cli.js" },
-  "files": ["dist", "README.md"],
-  "engines": { "node": ">=20" },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "warrant": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
+    "@noble/curves": "^1.9.7",
+    "@noble/hashes": "^1.8.0",
     "@x402/core": "2.25.0",
     "@x402/fetch": "2.25.0",
     "@x402/hedera": "2.25.0"
