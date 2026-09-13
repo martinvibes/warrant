@@ -20,10 +20,13 @@ whoever is selling.
 - **Ledger:** `GET /v1/receipts` — everything sold and everything refused, no credentials
 - **Spec:** `GET /openapi.json`
 - **MCP:** `https://qmt6sdhe5ffmva3zl2iagc6hkm.bazgateway.com/mcp` — the same catalogue as MCP tools, listed on Bazantic
+- **Package:** `npm i warrant-client` — https://www.npmjs.com/package/warrant-client
 - **Source:** https://github.com/martinvibes/warrant
 
-There is no SDK to install and no key to obtain. Every call below is plain HTTP
-against that base URL.
+There is no key to obtain. Every call below is plain HTTP against that base URL,
+and works with `curl` and a signer. `warrant-client` is a convenience, not a
+requirement: it wraps the 402 challenge, the payment and the retry into one call
+so buying something is a single line rather than three.
 
 ## When to use this skill
 
