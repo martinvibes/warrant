@@ -11,13 +11,14 @@
 import { renderToString } from 'react-dom/server';
 import { Hero } from '../src/components/Hero';
 import { Terminal } from '../src/components/Terminal';
-import { Features } from '../src/components/Features';
+import { Resources } from '../src/components/Resources';
 import { HowItWorks } from '../src/components/HowItWorks';
 import { Settlement } from '../src/components/Settlement';
 import { Footer } from '../src/components/Footer';
 import { Nav } from '../src/components/Nav';
-import { Console } from '../src/components/Console';
-import { Audit } from '../src/components/Audit';
+import { Limits } from '../src/components/Limits';
+import { NumberSearch } from '../src/components/NumberSearch';
+import { Ledger } from '../src/components/Ledger';
 import { Docs } from '../src/components/Docs';
 import { AgentProfile } from '../src/components/AgentProfile';
 import { NotFound } from '../src/components/NotFound';
@@ -26,12 +27,13 @@ const cases: [string, () => JSX.Element][] = [
   ['Nav', () => <Nav />],
   ['Hero', () => <Hero />],
   ['Terminal', () => <Terminal />],
-  ['Features', () => <Features />],
+  ['Resources', () => <Resources />],
+  ['NumberSearch', () => <NumberSearch />],
   ['HowItWorks', () => <HowItWorks />],
   ['Settlement', () => <Settlement />],
   ['Footer', () => <Footer />],
-  ['Console', () => <Console />],
-  ['Audit', () => <Audit />],
+  ['Limits', () => <Limits />],
+  ['Ledger', () => <Ledger />],
   ['Docs', () => <Docs />],
   ['AgentProfile', () => <AgentProfile agent="0.0.4242" />],
   ['NotFound', () => <NotFound />],

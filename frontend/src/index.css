@@ -717,7 +717,10 @@ body::after {
   border-color: var(--color-accent);
 }
 .resource-card:hover .resource-glyph path { stroke: #0b0b0b; }
-.resource-glyph path { transition: stroke 0.35s ease; }
+/* A provider's logo is a filled shape, so it inverts on fill where a drawn
+   outline inverts on stroke. Both land on the same brass tile. */
+.resource-card:hover .resource-glyph svg[data-brand] path { fill: #0b0b0b; }
+.resource-glyph path { transition: stroke 0.35s ease, fill 0.35s ease; }
 
 .resource-card[data-dim='true'] .resource-glyph {
   background: var(--color-surface);

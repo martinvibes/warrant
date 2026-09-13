@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getCatalogue, type Offer } from '../lib/api';
+import { Mark } from './marks';
 
 /**
  * What an agent can buy here, and what it cannot buy yet.
@@ -23,36 +24,6 @@ const RETURNS: Record<string, string[]> = {
   'phone.provision': ['+1 (816) 496-1100, SMS capable'],
   'sms.send': ['message id, delivered'],
 };
-
-const GLYPHS: Record<string, string> = {
-  'identity.mint': 'M8 2l5 3v6l-5 3-5-3V5z',
-  inference: 'M8 1v14M1 8h14M3.5 3.5l9 9M12.5 3.5l-9 9',
-  'email.inbox': 'M1 4h14v8H1zM1 4l7 5 7-5',
-  'email.send': 'M1 8l14-6-5 14-3-5z',
-  'email.sealed': 'M3 7V5a5 5 0 0110 0v2M2 7h12v8H2z',
-  'memory.write': 'M2 3h12v4H2zM2 9h12v4H2z',
-  'phone.provision': 'M4 1h8v14H4zM7 13h2',
-  'sms.send': 'M1 3h14v9H5l-4 3z',
-  domains: 'M8 1a7 7 0 100 14A7 7 0 008 1zM1 8h14M8 1c2 2 2 12 0 14M8 1C6 3 6 13 8 15',
-  compute: 'M2 2h12v5H2zM2 9h12v5H2zM4.5 4.5h1M4.5 11.5h1',
-  social: 'M11 5.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM2 14c0-2.8 2.7-4.5 5.5-4.5S13 11.2 13 14',
-  refill: 'M8 2v5l3 2M14 8A6 6 0 112 8M12 3.5V6h-2.5',
-  delegation: 'M8 2v4M4 14v-3M12 14v-3M4 11h8M8 6v5',
-};
-
-function Glyph({ kind, dim }: { kind: string; dim?: boolean }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d={GLYPHS[kind] ?? GLYPHS.inference}
-        stroke={dim ? 'var(--color-muted)' : 'var(--color-accent-light)'}
-        strokeWidth="1.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 function LiveBadge() {
   return (
@@ -105,7 +76,7 @@ function Card({ offer }: { offer: Offer }) {
     <article className="resource-card">
       <header style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <span className="resource-glyph">
-          <Glyph kind={offer.kind} />
+          <Mark kind={offer.kind} />
         </span>
         <h3 className="display" style={{ fontSize: 19, flex: 1 }}>
           {offer.title}
@@ -146,7 +117,7 @@ function PhoneCard({ number, sms }: { number: Offer; sms: Offer }) {
     <article className="resource-card">
       <header style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <span className="resource-glyph">
-          <Glyph kind="phone.provision" />
+          <Mark kind="phone.provision" />
         </span>
         <h3 className="display" style={{ fontSize: 19, flex: 1 }}>
           Phone &amp; SMS
@@ -240,7 +211,7 @@ function PlannedCard({ item }: { item: Planned }) {
     <article className="resource-card" data-dim="true">
       <header style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <span className="resource-glyph">
-          <Glyph kind={item.kind} dim />
+          <Mark kind={item.kind} dim />
         </span>
         <h3 className="display" style={{ fontSize: 19, flex: 1, color: 'var(--color-dim)' }}>
           {item.title}
