@@ -12,6 +12,7 @@ import { messagesFor } from "../resources/mailbox.js";
 import { readMemory } from "../resources/memory.js";
 import { numbersFor, searchNumbers } from "../resources/phone.js";
 import { bySettlement, fromRow, issuerAddress, lookup, RECEIPT_VERSION } from "../receipts.js";
+import { openapi } from "../openapi.js";
 
 export const publicApi = Router();
 
@@ -28,6 +29,17 @@ function present(offer: (typeof CATALOGUE)[number]) {
     live: offer.live,
   };
 }
+
+/**
+ * The machine-readable version of this file.
+ *
+ * Served rather than committed as a static artefact so it cannot describe a
+ * price the service is no longer charging. A gateway that indexes this is
+ * reading the running system, not a snapshot of it.
+ */
+publicApi.get("/openapi.json", (_req, res) => {
+  res.json(openapi());
+});
 
 /** What is for sale and at what price. The same list the middleware charges. */
 publicApi.get("/v1/catalogue", (_req, res) => {
