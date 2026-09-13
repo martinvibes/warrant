@@ -797,3 +797,62 @@ body::after {
   .resource-card::after { transition: none; }
   .resource-card::before { display: none; }
 }
+
+/* ---- Built on -------------------------------------------------------------
+   A quiet strip above the footer. Four names, each with one sentence and a
+   link to the thing itself, so a reader can go and check it rather than take
+   a logo's word for it. Ruled rather than carded: these are credits, not
+   products on offer. */
+.built-on {
+  border-top: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-surface);
+}
+.built-on-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 46px 24px 52px;
+}
+.built-on-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 26px;
+}
+.built-on-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  list-style: none;
+  background: var(--color-line);
+}
+.built-on-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 22px 22px 24px;
+  background: var(--color-surface);
+  color: var(--color-dim);
+  text-decoration: none;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+.built-on-item:hover { background: var(--color-surface-2); color: var(--color-text); }
+.built-on-mark { color: var(--color-accent-light); line-height: 0; }
+.built-on-item:hover .built-on-mark { color: var(--color-accent-pale); }
+.built-on-name {
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+.built-on-role { font-size: 12.5px; line-height: 1.6; color: inherit; }
+
+@media (max-width: 900px) {
+  .built-on-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .built-on-grid { grid-template-columns: 1fr; }
+  .built-on-inner { padding: 38px 16px 42px; }
+}

@@ -102,3 +102,69 @@ export function Mark({ kind, dim }: { kind: string; dim?: boolean }) {
     </svg>
   );
 }
+
+/**
+ * The marks for the "Built on" strip.
+ *
+ * The same rule applies here as on the cards: Hedera has published a mark, so
+ * Hedera's own mark is the one drawn. x402 is a protocol named after an HTTP
+ * status code, and the code itself is the only honest mark it has. Privy and
+ * Bazantic publish wordmarks that are illegible at this size, so each gets a
+ * drawn glyph naming what it does in the system — a key held behind a shield,
+ * a listing on a shelf — and the strip prints the company's name in words
+ * beside it. Nothing here wears a logo that was invented for it.
+ */
+const built = {
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.4,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+};
+
+export function HederaMark() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" role="img" aria-label="Hedera">
+      <path d={BRANDS.hedera!.path} fill="currentColor" />
+    </svg>
+  );
+}
+
+export function X402Mark() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" role="img" aria-label="x402">
+      <rect x="1.5" y="4.5" width="21" height="15" rx="1.5" {...built} />
+      <text
+        x="12"
+        y="15.1"
+        textAnchor="middle"
+        fontFamily="'IBM Plex Mono', monospace"
+        fontSize="8.5"
+        letterSpacing="0.6"
+        fill="currentColor"
+      >
+        402
+      </text>
+    </svg>
+  );
+}
+
+export function PrivyMark() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" role="img" aria-label="Privy">
+      <path d="M12 2.5 4.5 5.5v6.2c0 4.6 3.1 8.3 7.5 9.8 4.4-1.5 7.5-5.2 7.5-9.8V5.5Z" {...built} />
+      <circle cx="12" cy="10.5" r="2.2" {...built} />
+      <path d="M12 12.7v3.6M12 14.9h1.8" {...built} />
+    </svg>
+  );
+}
+
+export function BazanticMark() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" role="img" aria-label="Bazantic">
+      <path d="M3 7h18M3 12h18M3 17h18" {...built} />
+      <rect x="5.2" y="4.9" width="5.6" height="4.2" rx="0.6" fill="currentColor" stroke="none" />
+      <rect x="13.2" y="14.9" width="5.6" height="4.2" rx="0.6" {...built} />
+    </svg>
+  );
+}

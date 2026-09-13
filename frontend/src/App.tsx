@@ -5,6 +5,7 @@ import { Terminal } from './components/Terminal';
 import { Limits } from './components/Limits';
 import { HowItWorks } from './components/HowItWorks';
 import { Settlement } from './components/Settlement';
+import { BuiltOn } from './components/BuiltOn';
 import { Footer } from './components/Footer';
 import { AgentProfile } from './components/AgentProfile';
 import { Docs } from './components/Docs';
@@ -45,6 +46,7 @@ function App() {
         <div className="reveal"><Limits /></div>
         <div className="reveal"><HowItWorks /></div>
         <div className="reveal"><Settlement /></div>
+        <BuiltOn />
         <Footer />
       </>
     );
