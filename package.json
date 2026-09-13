@@ -22,7 +22,10 @@
     "associate": "tsx scripts/associate.ts",
     "new-account": "tsx scripts/new-account.ts",
     "smoke": "tsx scripts/smoke.ts",
-    "verify": "tsx scripts/verify-receipt.ts"
+    "verify": "tsx scripts/verify-receipt.ts",
+    "privy:setup": "tsx scripts/privy-setup.ts",
+    "privy:policy": "tsx scripts/privy-policy.ts",
+    "privy:check": "tsx scripts/privy-check.ts"
   },
   "dependencies": {
     "@hiero-ledger/sdk": "2.85.0",

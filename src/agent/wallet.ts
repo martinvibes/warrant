@@ -23,7 +23,10 @@ import {
   type Hex,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import type { Account } from "viem";
 import { config } from "../config.js";
+import { privyAccount } from "../privy/account.js";
+import { privyHederaSigner } from "../privy/hedera.js";
 
 export const TREASURY_ABI = [
   // The custom errors matter as much as the functions here. Without them viem
@@ -135,31 +138,68 @@ export function parseKey(raw: string): PrivateKey {
 export interface AgentKeys {
   /** Hedera account the agent pays from, e.g. "0.0.12345". */
   accountId: string;
-  hederaKey: string;
+  /** Absent when the key lives in Privy and this process cannot read it. */
+  hederaKey?: string;
   /** EVM key, for the treasury and for resources that write to a contract. */
   evmKey?: Hex;
+  /** Set when the agent's spending key is a Privy server wallet. */
+  privy?: { walletId: string; publicKey: string; address: Address };
+  /**
+   * The key others seal mail to.
+   *
+   * Deliberately not the spending key. A signing key and an encryption key do
+   * different jobs, and a custodial signer will sign for you but will never
+   * hand over the scalar an ECIES decrypt needs — so conflating them only
+   * works until the key stops being local, which is the point of all this.
+   */
+  messagingKey?: Hex;
 }
 
 export function keysFromEnv(): AgentKeys {
+  const messagingKey = (process.env.AGENT_MESSAGING_KEY ?? process.env.AGENT_EVM_PRIVATE_KEY) as
+    | Hex
+    | undefined;
+
+  // Privy first: when the agent has a server wallet, that is the agent.
+  const privyAccountId = process.env.AGENT_PRIVY_ACCOUNT_ID;
+  if (privyAccountId && config.privyWalletId && config.privyWalletPublicKey && config.privyWalletAddress) {
+    return {
+      accountId: privyAccountId,
+      privy: {
+        walletId: config.privyWalletId,
+        publicKey: config.privyWalletPublicKey,
+        address: config.privyWalletAddress as Address,
+      },
+      messagingKey,
+    };
+  }
+
   const accountId = process.env.AGENT_HEDERA_ACCOUNT_ID;
   const hederaKey = process.env.AGENT_HEDERA_PRIVATE_KEY;
   if (!accountId || !hederaKey) {
     throw new Error(
-      "Set AGENT_HEDERA_ACCOUNT_ID and AGENT_HEDERA_PRIVATE_KEY so the agent has a wallet to pay from.",
+      "Set AGENT_HEDERA_ACCOUNT_ID and AGENT_HEDERA_PRIVATE_KEY so the agent has a wallet to pay from, " +
+        "or run npm run privy:setup to give it one it does not hold.",
     );
   }
   return {
     accountId,
     hederaKey,
     evmKey: (process.env.AGENT_EVM_PRIVATE_KEY as Hex | undefined) ?? undefined,
+    messagingKey,
   };
 }
 
 /** A fetch that answers a 402 by paying and retrying, transparently. */
 export function payingFetch(keys: AgentKeys): typeof fetch {
-  const signer = createClientHederaSigner(keys.accountId, parseKey(keys.hederaKey), {
-    network: config.network,
-  });
+  const signer = keys.privy
+    ? privyHederaSigner({
+        accountId: keys.accountId,
+        walletId: keys.privy.walletId,
+        publicKey: keys.privy.publicKey,
+        network: config.network,
+      })
+    : createClientHederaSigner(keys.accountId, parseKey(keys.hederaKey!), { network: config.network });
   const client = new x402Client().register(config.network, new ExactHederaScheme(signer));
   return wrapFetchWithPayment(fetch, client);
 }
@@ -180,11 +220,23 @@ export interface Budget {
   resetsAt: number;
 }
 
-export class Treasury {
-  private readonly account;
+/**
+ * Builds the agent's treasury client, wherever its key happens to live.
+ *
+ * Everything below this line is written against viem and does not know or care
+ * whether the signature came from a local key or from Privy.
+ */
+export function treasuryFor(keys: AgentKeys): Treasury | undefined {
+  if (keys.privy) return new Treasury(privyAccount(keys.privy.walletId, keys.privy.address));
+  if (keys.evmKey) return new Treasury(privateKeyToAccount(keys.evmKey));
+  return undefined;
+}
 
-  constructor(evmKey: Hex) {
-    this.account = privateKeyToAccount(evmKey);
+export class Treasury {
+  private readonly account: Account;
+
+  constructor(account: Account) {
+    this.account = account;
   }
 
   get address(): Address {

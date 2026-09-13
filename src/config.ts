@@ -201,8 +201,19 @@ export const config = {
   telnyxProfileId: process.env.TELNYX_MESSAGING_PROFILE_ID ?? "",
 
   ownerAddress: ownerAddress(),
+  /**
+   * Privy holds the agent's signing key. The authorization key below is the
+   * private half of a keypair generated on this machine; Privy only ever saw
+   * the public half, registered as a quorum that owns the wallet.
+   */
   privyAppId: process.env.PRIVY_APP_ID ?? "",
   privyAppSecret: process.env.PRIVY_APP_SECRET ?? "",
+  privyAuthKeyId: process.env.PRIVY_AUTH_KEY_ID ?? "",
+  privyAuthPrivateKey: process.env.PRIVY_AUTH_PRIVATE_KEY ?? "",
+  privyWalletId: process.env.PRIVY_WALLET_ID ?? "",
+  privyWalletAddress: (process.env.PRIVY_WALLET_ADDRESS ?? "") as Address | "",
+  privyWalletPublicKey: process.env.PRIVY_WALLET_PUBLIC_KEY ?? "",
+  privyPolicyId: process.env.PRIVY_POLICY_ID ?? "",
 } as const;
 
 export function assertServerConfig(): void {

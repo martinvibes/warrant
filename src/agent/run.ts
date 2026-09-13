@@ -15,7 +15,7 @@ import "dotenv/config";
 import OpenAI from "openai";
 import { BaseError, ContractFunctionRevertedError } from "viem";
 import { config, moneyFor, type Offer } from "../config.js";
-import { keysFromEnv, payingFetch, Treasury, type AgentKeys } from "./wallet.js";
+import { keysFromEnv, payingFetch, treasuryFor, Treasury, type AgentKeys } from "./wallet.js";
 import { kindForToolName, toolsFor, toolNameFor } from "./tools.js";
 import { publicKeyFor } from "../resources/seal.js";
 
@@ -97,10 +97,11 @@ class Session {
       "x-agent": this.keys.accountId,
     };
     if (this.treasury) headers["x-agent-address"] = this.treasury.address;
-    if (kind === "identity.mint" && this.treasury && this.keys.evmKey) {
-      // The key others seal mail to is derived from the agent's own EVM key,
-      // so minting and sealing stay consistent without a second keypair.
-      body.encryptionKey = publicKeyFor(this.keys.evmKey);
+    if (kind === "identity.mint" && this.treasury && this.keys.messagingKey) {
+      // Published alongside the identity so other agents can seal mail to it.
+      // This is the messaging key, not the spending key: the agent signs with
+      // a key it does not hold and decrypts with one it does.
+      body.encryptionKey = publicKeyFor(this.keys.messagingKey);
     }
 
     const started = Date.now();
@@ -192,7 +193,7 @@ async function main(): Promise<void> {
   if (!config.openaiKey) throw new Error("OPENAI_API_KEY is not set, so the agent cannot decide anything.");
 
   const keys = keysFromEnv();
-  const treasury = keys.evmKey ? new Treasury(keys.evmKey) : undefined;
+  const treasury = treasuryFor(keys);
   const fetcher = payingFetch(keys);
 
   const catalogue = (await (await fetch(`${API}/v1/catalogue`)).json()) as {
