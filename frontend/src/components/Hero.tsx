@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Orb from './Orb';
+import { HeroField } from './HeroField';
 import { getCatalogue, getStats, type Stats } from '../lib/api';
 
 /**
@@ -83,6 +84,8 @@ export function Hero() {
         overflow: 'hidden',
       }}
     >
+      <HeroField />
+
       <div style={{ position: 'absolute', inset: 0, opacity: 0.5, pointerEvents: 'none' }}>
         <Orb hoverIntensity={2} rotateOnHover hue={0} forceHoverState={false} backgroundColor="#000000" />
       </div>

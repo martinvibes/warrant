@@ -54,91 +54,131 @@ function Glyph({ kind, dim }: { kind: string; dim?: boolean }) {
   );
 }
 
-function Card({ offer }: { offer: Offer }) {
-  const returns = RETURNS[offer.kind] ?? [];
-
+function LiveBadge() {
   return (
-    <article
+    <span
+      className="label"
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 18,
-        padding: '28px 26px',
-        borderTop: '1px solid var(--color-line)',
-        borderLeft: '1px solid var(--color-line)',
-        background: 'var(--color-surface)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        padding: '3px 9px',
+        color: 'var(--color-settled)',
+        border: '1px solid rgba(111,227,165,0.3)',
       }}
     >
+      <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--color-settled)' }} />
+      LIVE
+    </span>
+  );
+}
+
+/**
+ * The call, written out.
+ *
+ * The lines brighten one after another on hover, in the order the call
+ * actually happens: the request, the challenge, then what comes back. Hovering
+ * a card replays what buying from it does.
+ */
+function Trace({ offer, animate }: { offer: Offer; animate?: boolean }) {
+  return (
+    <div className={`mono resource-trace${animate ? ' fade-in' : ''}`}>
+      <div className="trace-line" style={{ color: 'var(--color-accent-light)', whiteSpace: 'nowrap' }}>
+        {offer.method} {offer.path}
+      </div>
+      <div className="trace-line" style={{ whiteSpace: 'nowrap' }}>
+        <span className="trace-arrow">→ </span>
+        402: pay {offer.price} USDC
+      </div>
+      {(RETURNS[offer.kind] ?? []).map(line => (
+        <div key={line} className="trace-line" style={{ whiteSpace: 'nowrap' }}>
+          <span className="trace-arrow">→ </span>
+          {line}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Card({ offer }: { offer: Offer }) {
+  return (
+    <article className="resource-card">
       <header style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <span
-          style={{
-            display: 'grid',
-            placeItems: 'center',
-            width: 34,
-            height: 34,
-            background: 'var(--color-accent-glow)',
-            border: '1px solid var(--color-line)',
-          }}
-        >
+        <span className="resource-glyph">
           <Glyph kind={offer.kind} />
         </span>
         <h3 className="display" style={{ fontSize: 19, flex: 1 }}>
           {offer.title}
         </h3>
-        <span
-          className="label"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '3px 9px',
-            color: 'var(--color-settled)',
-            border: '1px solid rgba(111,227,165,0.3)',
-          }}
-        >
-          <span
-            style={{
-              width: 5,
-              height: 5,
-              borderRadius: '50%',
-              background: 'var(--color-settled)',
-            }}
-          />
-          LIVE
-        </span>
+        <LiveBadge />
       </header>
 
       <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--color-dim)' }}>{offer.blurb}</p>
 
-      <div
-        className="mono"
-        style={{
-          marginTop: 'auto',
-          padding: '14px 16px',
-          fontSize: 12.5,
-          lineHeight: 1.85,
-          background: 'var(--color-bg)',
-          border: '1px solid var(--color-faint)',
-          overflowX: 'auto',
-        }}
-      >
-        <div style={{ color: 'var(--color-accent-light)', whiteSpace: 'nowrap' }}>
-          {offer.method} {offer.path}
-        </div>
-        <div style={{ color: 'var(--color-dim)', whiteSpace: 'nowrap' }}>
-          <span style={{ color: 'var(--color-muted)' }}>→ </span>
-          402: pay {offer.price} USDC
-        </div>
-        {returns.map(line => (
-          <div key={line} style={{ color: 'var(--color-dim)', whiteSpace: 'nowrap' }}>
-            <span style={{ color: 'var(--color-muted)' }}>→ </span>
-            {line}
-          </div>
-        ))}
-      </div>
+      <Trace offer={offer} />
 
       <span className="label" style={{ color: 'var(--color-muted)' }}>
         {offer.poweredBy}
+      </span>
+    </article>
+  );
+}
+
+/**
+ * The phone line, which is two purchases.
+ *
+ * A number and the texts sent from it are one thing an agent owns and two
+ * things it pays for, so they share a card and the card carries both prices.
+ * The switch is what keeps it from being crowded: one call is shown at a time,
+ * and the prices sit on the switch itself, where they are the label rather
+ * than an extra line of text.
+ */
+function PhoneCard({ number, sms }: { number: Offer; sms: Offer }) {
+  const [showing, setShowing] = useState<'number' | 'message'>('number');
+  const active = showing === 'number' ? number : sms;
+
+  const tabs: [typeof showing, string, string][] = [
+    ['number', 'Number', number.price],
+    ['message', 'Message', sms.price],
+  ];
+
+  return (
+    <article className="resource-card">
+      <header style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <span className="resource-glyph">
+          <Glyph kind="phone.provision" />
+        </span>
+        <h3 className="display" style={{ fontSize: 19, flex: 1 }}>
+          Phone &amp; SMS
+        </h3>
+        <LiveBadge />
+      </header>
+
+      <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--color-dim)' }}>
+        A real number the agent owns, in any of 170+ countries, and the texts it sends from it.
+      </p>
+
+      <div className="resource-switch" role="tablist" aria-label="Phone and SMS">
+        {tabs.map(([key, label, price]) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={showing === key}
+            data-active={showing === key}
+            onClick={() => setShowing(key)}
+            onMouseEnter={() => setShowing(key)}
+          >
+            <span>{label}</span>
+            <span className="mono">{price}</span>
+          </button>
+        ))}
+      </div>
+
+      <Trace key={active.kind} offer={active} animate />
+
+      <span className="label" style={{ color: 'var(--color-muted)' }}>
+        {number.poweredBy}
       </span>
     </article>
   );
@@ -197,28 +237,9 @@ const PLANNED: Planned[] = [
 
 function PlannedCard({ item }: { item: Planned }) {
   return (
-    <article
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 18,
-        padding: '28px 26px',
-        borderTop: '1px solid var(--color-line)',
-        borderLeft: '1px solid var(--color-line)',
-        background: 'transparent',
-      }}
-    >
+    <article className="resource-card" data-dim="true">
       <header style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <span
-          style={{
-            display: 'grid',
-            placeItems: 'center',
-            width: 34,
-            height: 34,
-            background: 'var(--color-surface)',
-            border: '1px solid var(--color-faint)',
-          }}
-        >
+        <span className="resource-glyph">
           <Glyph kind={item.kind} dim />
         </span>
         <h3 className="display" style={{ fontSize: 19, flex: 1, color: 'var(--color-dim)' }}>
@@ -238,17 +259,7 @@ function PlannedCard({ item }: { item: Planned }) {
 
       <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--color-dim)' }}>{item.blurb}</p>
 
-      <div
-        className="mono"
-        style={{
-          marginTop: 'auto',
-          padding: '14px 16px',
-          fontSize: 12.5,
-          lineHeight: 1.75,
-          border: '1px dashed var(--color-line)',
-          color: 'var(--color-dim)',
-        }}
-      >
+      <div className="mono resource-trace resource-trace-dev">
         <div className="label" style={{ color: 'var(--color-muted)', marginBottom: 6 }}>
           Blocked on
         </div>
@@ -262,6 +273,19 @@ function PlannedCard({ item }: { item: Planned }) {
   );
 }
 
+/**
+ * Follows the pointer across the grid so each card can light where the cursor
+ * is. One listener on the container rather than one per card, and it writes
+ * straight to the element, so hovering never costs a render.
+ */
+function trackPointer(event: React.MouseEvent<HTMLDivElement>) {
+  const card = (event.target as HTMLElement).closest('.resource-card');
+  if (!(card instanceof HTMLElement)) return;
+  const rect = card.getBoundingClientRect();
+  card.style.setProperty('--mx', `${event.clientX - rect.left}px`);
+  card.style.setProperty('--my', `${event.clientY - rect.top}px`);
+}
+
 export function Resources() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [error, setError] = useState<string>();
@@ -271,6 +295,12 @@ export function Resources() {
       .then(c => setOffers(c.offers.filter(o => o.live)))
       .catch(e => setError((e as Error).message));
   }, []);
+
+  // A number and the texts sent from it share one card, so sms.send is drawn
+  // where phone.provision sits and never on its own.
+  const number = offers.find(o => o.kind === 'phone.provision');
+  const sms = offers.find(o => o.kind === 'sms.send');
+  const paired = Boolean(number && sms);
 
   return (
     <section id="resources" style={{ padding: '112px 24px', borderTop: '1px solid var(--color-line)' }}>
@@ -295,6 +325,7 @@ export function Resources() {
         )}
 
         <div
+          onMouseMove={trackPointer}
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
@@ -302,9 +333,13 @@ export function Resources() {
             borderBottom: '1px solid var(--color-line)',
           }}
         >
-          {offers.map(offer => (
-            <Card key={offer.kind} offer={offer} />
-          ))}
+          {offers.map(offer => {
+            if (paired && offer.kind === 'sms.send') return null;
+            if (paired && offer.kind === 'phone.provision') {
+              return <PhoneCard key="phone" number={number!} sms={sms!} />;
+            }
+            return <Card key={offer.kind} offer={offer} />;
+          })}
           {PLANNED.map(item => (
             <PlannedCard key={item.kind} item={item} />
           ))}
