@@ -18,7 +18,7 @@ second, with nobody to ask.
 [![npm](https://img.shields.io/npm/v/warrant-client?color=C98A2E&label=warrant-client)](https://www.npmjs.com/package/warrant-client)
 [![Hedera](https://img.shields.io/badge/Hedera-testnet%20296-6FE3A5)](https://hashscan.io/testnet/contract/0xF33E2E0ecc982416f788759083129de6A147a1FE)
 [![x402](https://img.shields.io/badge/x402-v2-E8B55C)](https://github.com/coinbase/x402)
-[![contracts](https://img.shields.io/badge/contracts-27%20tests-6FE3A5)](contracts)
+[![contracts](https://img.shields.io/badge/contracts-28%20tests-6FE3A5)](contracts)
 [![node](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
@@ -303,7 +303,7 @@ npm install && cp .env.example .env      # fill in the Hedera keys
 npm run build:web                        # build the console
 npm run dev                              # service and console on :8090
 
-cd contracts && ./setup.sh && forge test # 27 tests
+cd contracts && ./setup.sh && forge test # 28 tests
 ```
 
 The agent needs a Hedera account holding testnet USDC. It does not need HBAR: the

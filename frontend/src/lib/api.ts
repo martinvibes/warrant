@@ -6,6 +6,13 @@
  */
 const API_URL = (import.meta.env?.VITE_API_URL as string | undefined) ?? '';
 
+/**
+ * The base to print in documentation, as opposed to the one to fetch from.
+ * A reader copying a curl line out of the docs needs an absolute host, and in
+ * development that host is the deployed one rather than their own machine.
+ */
+export const PUBLIC_API = API_URL || 'https://warrant-api-production-e111.up.railway.app';
+
 export interface Offer {
   kind: string;
   title: string;

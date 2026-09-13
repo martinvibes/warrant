@@ -8,6 +8,7 @@
 import { type ReactNode, type CSSProperties, useEffect, useState } from 'react';
 import { Nav } from './Nav';
 import { Footer } from './Footer';
+import { PUBLIC_API as API } from '../lib/api';
 
 const BRASS = '#E8B55C';
 const TEXT = '#f7f6f3';
@@ -53,6 +54,15 @@ function Code({ children, lang }: { children: string; lang?: string }) {
       {lang && <div className="label" style={{ color: TEXT_GHOST, marginBottom: 9, fontSize: 10 }}>{lang}</div>}
       <code>{children}</code>
     </pre>
+  );
+}
+
+function Lead({ n, children }: { n: string; children: ReactNode }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, margin: '28px 0 2px' }}>
+      <span className="mono" style={{ fontSize: 11, color: BRASS }}>{n}</span>
+      <span style={{ fontSize: 14.5, color: TEXT }}>{children}</span>
+    </div>
   );
 }
 
@@ -142,7 +152,8 @@ const NAV: [string, string, string][] = [
   ['06', 'Receipts', 'receipts'],
   ['07', 'Settlement', 'settlement'],
   ['08', 'Contracts', 'contracts'],
-  ['09', 'What this does not do', 'bounds'],
+  ['09', 'Who holds the key', 'key'],
+  ['10', 'What this does not do', 'bounds'],
 ];
 
 /**
@@ -222,8 +233,38 @@ export function Docs() {
             id="quick-start"
             kicker="01"
             title="Quick start"
-            intro="Three commands. The first two are setup and happen once; the third is the thing itself."
+            intro="Three ways in, against the same catalogue and the same prices. Nothing here needs an account or a key."
           >
+            <Lead n="01">From your own agent, in one line.</Lead>
+            <Code lang="typescript">{`npm i warrant-client
+
+import { Warrant } from "warrant-client";
+
+const warrant = new Warrant({ accountId, privateKey });
+const { result, settlement } = await warrant.buy("inference", { prompt: "hello" });`}</Code>
+            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8 }}>
+              The package wraps the challenge, the payment and the retry into one call. Prices and
+              endpoints come from the catalogue, so a new resource does not need it republished.
+            </p>
+
+            <Lead n="02">Plain HTTP, which is the whole point.</Lead>
+            <Code lang="shell">{`curl -X POST ${API}/v1/inference \\
+  -H 'content-type: application/json' -d '{"prompt":"one line on Hedera"}'
+# 402 Payment Required, with the price and where to pay
+
+# sign an x402 payment, retry with payment-signature
+# 200, and a settlement id in the payment-response header`}</Code>
+
+            <Lead n="03">As MCP tools, through the gateway listed on Bazantic.</Lead>
+            <Code lang="mcp">{`https://qmt6sdhe5ffmva3zl2iagc6hkm.bazgateway.com/mcp`}</Code>
+            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8 }}>
+              A coding agent can also read the whole thing at{' '}
+              <a href={`${API}/skill.md`} target="_blank" rel="noreferrer" style={{ color: BRASS }}>
+                /skill.md
+              </a>.
+            </p>
+
+            <Lead n="04">Or run the service yourself.</Lead>
             <Code lang="shell">{`git clone https://github.com/martinvibes/warrant && cd warrant
 npm install && cp .env.example .env     # fill in the Hedera keys
 npm run dev                             # service and console on :8090
@@ -384,7 +425,38 @@ draw(listingId, calls) -> (drawId, amount)
             />
           </Section>
 
-          <Section id="bounds" kicker="09" title="What this does not do" intro="The honest list. Each of these is a real bound, not a roadmap item dressed as one.">
+          <Section
+            id="key"
+            kicker="09"
+            title="Who holds the key"
+            intro="The agent signs with a key it does not have a copy of. Its spending key is a Privy server wallet, owned by a key quorum whose private half was generated locally and never sent to Privy, so neither side can move money alone."
+          >
+            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, maxWidth: 720 }}>
+              The awkward part is that Warrant spans two worlds. <code className="mono">AgentTreasury.draw</code>{' '}
+              pays <code className="mono">msg.sender</code> on the EVM, while the x402 payment is a
+              native Hedera transfer, so the account that draws and the account that pays have to be
+              the same one. They can be: a Hedera signature is secp256k1 over{' '}
+              <code className="mono">keccak256(bodyBytes)</code>, returned as a compact{' '}
+              <code className="mono">r‖s</code> — which is exactly the{' '}
+              <code className="mono">secp256k1_sign</code> primitive Privy exposes. One wallet covers
+              both, and it co-signed the account-create transaction that attached its own EVM alias.
+            </p>
+            <Code lang="shell">{`npm run privy:check`}</Code>
+            <Code lang="output">{`✓ ALLOWED  draw from the treasury
+✓ ALLOWED  pay on Hedera over x402
+✓ DENIED   move HBAR out of the account
+✓ DENIED   call the stablecoin contract directly`}</Code>
+            <p style={{ fontSize: 14, color: TEXT_DIM, lineHeight: 1.8, maxWidth: 720, marginTop: 14 }}>
+              The policy is written as what the engine can enforce rather than as what would read
+              best. A matching deny beats any allow, there is no <code className="mono">neq</code>,
+              and <code className="mono">starts_with</code> is unsupported on the destination — so
+              “only ever call the treasury” is inexpressible, and the enforceable complement is used
+              instead. One key is deliberately not custodial: sealed mail is decrypted with a
+              separate messaging key the agent holds itself.
+            </p>
+          </Section>
+
+          <Section id="bounds" kicker="10" title="What this does not do" intro="The honest list. Each of these is a real bound, not a roadmap item dressed as one.">
             <Table
               head={['Bound', 'Why']}
               rows={[
@@ -392,6 +464,7 @@ draw(listingId, calls) -> (drawId, amount)
                 ['One service, one catalogue', 'The market is permissionless, but only this service is listed on it today.'],
                 ['Memory is 4096 bytes', 'A permanent file is written in one transaction. Longer content has to be split and linked.'],
                 ['Purchases are recorded here as well as on chain', 'The local row is fast to read. Anything you need to trust, read from the chain.'],
+                ['The signing policy is a complement, not a whitelist', 'Privy’s engine cannot express “only the treasury”. It can express, and does enforce, “never HBAR, never the token directly”.'],
               ]}
             />
           </Section>

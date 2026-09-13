@@ -1,8 +1,10 @@
 import { LogoLockup } from './Logo';
 import { XIcon } from './Icons';
+import { PUBLIC_API } from '../lib/api';
 
 const X_URL = 'https://x.com/0xgents';
 const REPO_URL = 'https://github.com/martinvibes/warrant';
+const NPM_URL = 'https://www.npmjs.com/package/warrant-client';
 
 const iconButton: React.CSSProperties = {
   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -65,9 +67,9 @@ export function Footer() {
             {[
               ['Ledger', '/ledger', false],
               ['Docs', '/docs', false],
+              ['Skill', `${PUBLIC_API}/skill.md`, true],
+              ['npm', NPM_URL, true],
               ['GitHub', REPO_URL, true],
-              ['x402', 'https://x402.org', true],
-              ['Hedera', 'https://hedera.com', true],
             ].map(([l, h, ext]) => (
               <a
                 key={l as string}

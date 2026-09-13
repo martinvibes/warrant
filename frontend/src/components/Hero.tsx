@@ -27,6 +27,47 @@ function useCountUp(target: number, durationMs = 900): number {
   return value;
 }
 
+/**
+ * The install line, which is the shortest true answer to "how do I use this".
+ * Click copies it, because a line meant to be pasted should not have to be
+ * selected by hand.
+ */
+function Install() {
+  const [copied, setCopied] = useState(false);
+  const line = 'npm i warrant-client';
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        navigator.clipboard?.writeText(line).then(
+          () => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1600);
+          },
+          () => undefined,
+        );
+      }}
+      aria-label={copied ? 'Copied' : `Copy ${line}`}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 12,
+        margin: '22px auto 0', padding: '9px 16px',
+        fontFamily: 'IBM Plex Mono, ui-monospace, monospace',
+        fontSize: 13, color: 'var(--color-dim)',
+        background: 'var(--color-surface)', border: '1px solid var(--color-line)',
+        cursor: 'pointer', transition: 'color 0.2s ease, border-color 0.2s ease',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(232,181,92,0.3)'; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--color-line)'; }}
+    >
+      <span style={{ color: 'var(--color-muted)' }}>$</span>
+      <span style={{ color: 'var(--color-text)' }}>{line}</span>
+      <span className="label" style={{ fontSize: 10, color: copied ? 'var(--color-settled)' : 'var(--color-muted)' }}>
+        {copied ? 'copied' : 'copy'}
+      </span>
+    </button>
+  );
+}
+
 function Figure({ value, label }: { value: number; label: string }) {
   const shown = useCountUp(value);
   return (
@@ -162,6 +203,10 @@ export function Hero() {
           >
             Read the ledger
           </a>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Install />
         </div>
 
         <div
