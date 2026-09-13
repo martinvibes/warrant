@@ -1,0 +1,49 @@
+{
+  "name": "Spend Audit",
+  "description": "Read back what an agent actually spent, and what it was stopped from spending. Walks the public ledger of an agent on Warrant, groups its purchases by resource, totals the USDC, names the refusals and why each one was refused, and states how much of the contract-held limit is left. Costs nothing to run: every call it makes is a free read, so an auditor can check an agent without paying for the privilege.",
+  "input_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "agent": {
+        "type": "string",
+        "description": "The agent's Hedera account id, in shard.realm.num form."
+      },
+      "question": {
+        "type": "string",
+        "description": "An optional question to answer from the ledger, such as whether the agent ever paid for inference twice in one day."
+      }
+    },
+    "required": ["agent"],
+    "additionalProperties": false
+  },
+  "input_example": {
+    "agent": "0.0.10514332",
+    "question": "What did it spend the most on, and was it ever refused?"
+  },
+  "output_example": {
+    "agent": "0.0.10514332",
+    "spent": { "usdc": "1.48", "purchases": 12 },
+    "byResource": [
+      { "resource": "inference", "calls": 7, "usdc": "0.70" },
+      { "resource": "memory.write", "calls": 3, "usdc": "0.03" },
+      { "resource": "email.inbox", "calls": 1, "usdc": "0.25" },
+      { "resource": "identity.mint", "calls": 1, "usdc": "0.50" }
+    ],
+    "refusals": [
+      { "resource": "phone.provision", "reason": "over the daily cap", "at": "2026-09-12T18:04:11Z" }
+    ],
+    "limit": { "perDay": "5.00", "lifetime": "5.00", "remaining": "3.52" },
+    "answer": "Most of it went on inference. It was refused once, by the daily cap, and did not retry.",
+    "sources": ["/v1/purchases", "/v1/receipts", "/v1/agents/0.0.10514332"]
+  },
+  "prompt_template": "You are auditing one agent's spending on Warrant, a pay-per-call resource market on Hedera where the spending limit lives in a contract rather than a database.\n\nEvery call you make here is a free read. Do not guess at figures you can look up, and do not soften a refusal: a refusal is the system working, and it is the most interesting line in any audit.\n\n1. Read the agent with the agent tool to see what it owns and what it has left.\n2. Read the purchases and receipts to see each settled payment, its resource and its amount.\n3. Read the contracts and stats for the limit and the totals, so the numbers you report are the chain's, not yours.\n4. Group the purchases by resource, total the USDC exactly as recorded rather than rounding, and list every refusal with the reason given.\n5. Answer the question if one was asked, using only what the ledger shows. If the ledger cannot answer it, say which call would have told you and stop there.\n\nReport amounts as strings in USDC with the precision the ledger uses, name each endpoint you read in sources, and keep the answer to something a human can read in one breath.\n\nAudit this agent: {{inputs}}",
+  "model": "anthropic/claude-haiku-4.5",
+  "tool_bindings": [
+    { "gateway_slug": "qmt6sdhe5ffmva3zl2iagc6hkm", "tool_name": "agent" },
+    { "gateway_slug": "qmt6sdhe5ffmva3zl2iagc6hkm", "tool_name": "purchases" },
+    { "gateway_slug": "qmt6sdhe5ffmva3zl2iagc6hkm", "tool_name": "receipts" },
+    { "gateway_slug": "qmt6sdhe5ffmva3zl2iagc6hkm", "tool_name": "contracts" },
+    { "gateway_slug": "qmt6sdhe5ffmva3zl2iagc6hkm", "tool_name": "stats" }
+  ]
+}

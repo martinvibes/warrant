@@ -32,8 +32,8 @@ const BUILT_ON: { name: string; role: string; href: string; Mark: () => ReactEle
   },
   {
     name: 'Bazantic',
-    role: 'Lists the catalogue where other agents go looking for tools.',
-    href: 'https://bazantic.com',
+    role: 'Lists the catalogue, and the Recipes other agents run against it.',
+    href: 'https://bazantic.com/recipes/agent-starter-kit',
     Mark: BazanticMark,
   },
 ];

@@ -1,0 +1,63 @@
+{
+  "name": "Agent Starter Kit",
+  "description": "Stand up a brand-new agent so it can act on its own: an identity minted on Hedera, one memory file recording what it is for, and a working mailbox. The agent pays for each of the three itself over x402 in USDC, inside the limit its treasury contract enforces, so there is no human approval step in the middle and every step leaves a receipt you can look up. Give it the Hedera account id and EVM address of the agent, plus one sentence saying what the agent is for.",
+  "input_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "agent": {
+        "type": "string",
+        "description": "The agent's Hedera account id, in shard.realm.num form."
+      },
+      "address": {
+        "type": "string",
+        "description": "The agent's EVM address. Must be the same key as the Hedera account, because the treasury pays whoever draws."
+      },
+      "purpose": {
+        "type": "string",
+        "description": "One sentence saying what this agent is for. It goes on the identity and into the first memory file."
+      },
+      "handle": {
+        "type": "string",
+        "description": "The local part of the mailbox to provision, without the domain."
+      }
+    },
+    "required": ["agent", "address", "purpose"],
+    "additionalProperties": false
+  },
+  "input_example": {
+    "agent": "0.0.10514332",
+    "address": "0x7d141bf9320F8797184ebd65E1Fb746a440d33cC",
+    "purpose": "Books and pays for the tools a research assistant needs, and nothing else.",
+    "handle": "research-desk"
+  },
+  "output_example": {
+    "identity": {
+      "tokenId": "0.0.10514901",
+      "purpose": "Books and pays for the tools a research assistant needs, and nothing else.",
+      "receipt": "rcpt_7f2c1a"
+    },
+    "memory": {
+      "fileId": "0.0.10514903",
+      "wrote": "Standing brief: books and pays for research tools, nothing else."
+    },
+    "mailbox": {
+      "address": "research-desk@0gent.xyz"
+    },
+    "spent": {
+      "usdc": "0.055",
+      "remaining": "3.465",
+      "limit": "5.00"
+    },
+    "summary": "Identity minted, brief written, mailbox live. Three purchases, 0.055 USDC, all inside the limit."
+  },
+  "prompt_template": "You are provisioning a new agent on Warrant, a pay-per-call resource market on Hedera. Every paid call is settled by the agent itself in USDC over x402, under a spending limit held in a contract, so you never ask anyone for approval and you never skip a step because it costs money.\n\nWork in this order and stop at the first failure, reporting what did and did not happen:\n\n1. Read the catalogue so you quote real prices rather than remembered ones.\n2. Mint the identity with identity_mint, passing the agent's account id as the x-agent header and its EVM address as x-agent-address, and the purpose sentence in the body.\n3. Write the purpose into memory with memory_write as the agent's standing brief, one short paragraph in its own words.\n4. If a handle was given, provision the mailbox with email_inbox for that handle.\n5. Read the agent back with the agent tool, and report what it now owns, what each step cost, and how much of the limit is left.\n\nIf a call comes back 402, that is the price, not an error: it means payment is required and the client will pay and retry. If a call comes back 409 the agent already owns that thing, which is a success, not a failure. If the limit refuses a purchase, say so plainly and name the remaining balance rather than trying a smaller amount.\n\nReturn JSON matching the shape of the output example, with a one-line summary a human can read in the ledger.\n\nProvision this agent: {{inputs}}",
+  "model": "anthropic/claude-sonnet-4.6",
+  "tool_bindings": [
+    { "gateway_slug": "qmt6sdhe5ffmva3zl2iagc6hkm", "tool_name": "catalogue" },
+    { "gateway_slug": "qmt6sdhe5ffmva3zl2iagc6hkm", "tool_name": "identity_mint" },
+    { "gateway_slug": "qmt6sdhe5ffmva3zl2iagc6hkm", "tool_name": "memory_write" },
+    { "gateway_slug": "qmt6sdhe5ffmva3zl2iagc6hkm", "tool_name": "email_inbox" },
+    { "gateway_slug": "qmt6sdhe5ffmva3zl2iagc6hkm", "tool_name": "agent" }
+  ]
+}

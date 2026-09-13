@@ -19,6 +19,7 @@ whoever is selling.
 - **Catalogue:** `GET /v1/catalogue` — the same table the server charges against
 - **Ledger:** `GET /v1/receipts` — everything sold and everything refused, no credentials
 - **Spec:** `GET /openapi.json`
+- **MCP:** `https://qmt6sdhe5ffmva3zl2iagc6hkm.bazgateway.com/mcp` — the same catalogue as MCP tools, listed on Bazantic
 - **Source:** https://github.com/martinvibes/warrant
 
 There is no SDK to install and no key to obtain. Every call below is plain HTTP
