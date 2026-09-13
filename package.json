@@ -10,10 +10,10 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "node dist/src/server.js",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && npm run build:web",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "agent": "tsx src/agent/run.ts",
-    "build:web": "npm --prefix frontend install && npm --prefix frontend run build",
+    "build:web": "npm --prefix frontend install --include=dev --no-audit --no-fund && npm --prefix frontend run build",
     "dev:web": "npm --prefix frontend run dev",
     "contracts:test": "cd contracts && forge test",
     "contracts:deploy": "cd contracts && forge script script/Deploy.s.sol --rpc-url hedera_testnet --broadcast --skip-simulation",
@@ -26,7 +26,8 @@
     "privy:setup": "tsx scripts/privy-setup.ts",
     "privy:policy": "tsx scripts/privy-policy.ts",
     "privy:check": "tsx scripts/privy-check.ts",
-    "endpoints": "tsx scripts/endpoints.ts"
+    "endpoints": "tsx scripts/endpoints.ts",
+    "build:server": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "@hiero-ledger/sdk": "2.85.0",
