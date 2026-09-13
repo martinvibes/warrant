@@ -29,3 +29,4 @@ dist-ssr
 
 # Output of the checks in scripts/
 scripts/.out
+.vercel

@@ -1,8 +1,14 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "build": {
+    "env": {
+      "VITE_API_URL": "https://warrant-api-production-e111.up.railway.app"
+    }
+  },
   "rewrites": [
-    { "source": "/console", "destination": "/index.html" },
-    { "source": "/audit", "destination": "/index.html" },
-    { "source": "/docs", "destination": "/index.html" },
-    { "source": "/agent/:id", "destination": "/index.html" }
+    { "source": "/((?!assets/).*)", "destination": "/index.html" }
   ]
 }

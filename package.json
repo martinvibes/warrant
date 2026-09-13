@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "agent": "tsx src/agent/run.ts",
@@ -25,7 +25,8 @@
     "verify": "tsx scripts/verify-receipt.ts",
     "privy:setup": "tsx scripts/privy-setup.ts",
     "privy:policy": "tsx scripts/privy-policy.ts",
-    "privy:check": "tsx scripts/privy-check.ts"
+    "privy:check": "tsx scripts/privy-check.ts",
+    "endpoints": "tsx scripts/endpoints.ts"
   },
   "dependencies": {
     "@hiero-ledger/sdk": "2.85.0",
