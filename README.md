@@ -37,6 +37,21 @@ second, with nobody to ask.
 > The spending limit lives in a contract on Hedera, not in this service's database.
 > It holds even if this service disappears.
 
+## See it in 90 seconds
+
+| | |
+|---|---|
+| [The catalogue](https://warrant-aufgabe.vercel.app) | Eight resources, live, with the mark of the company actually answering each call |
+| [The ledger](https://warrant-aufgabe.vercel.app/ledger) | Every purchase and every refusal, signed, no credentials |
+| [One agent's record](https://warrant-aufgabe.vercel.app/agent/0.0.10514332) | What it bought, what it was refused, what is left of its ceiling |
+
+```bash
+npx warrant catalogue                        # free, no key
+npx warrant buy inference --prompt "hello"   # $0.02, settles on Hedera
+```
+
+The shot list and the narration are in [`docs/demo.md`](docs/demo.md).
+
 ## Quick start
 
 Three ways in. Same catalogue, same prices, same contract saying no.
